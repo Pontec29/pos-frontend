@@ -1,0 +1,178 @@
+<div class="container">
+    <form [formGroup]="form" class="employee-form-layout">
+
+        <!-- Sidebar: Perfil del Empleado -->
+        <aside class="profile-sidebar">
+            <div class="profile-card">
+                <div class="avatar-container">
+                    <img class="avatar-img" src="img/avatars/default-user.png" alt="Perfil">
+                    @if (mode() !== 'ver') {
+                    <button type="button" class="edit-avatar-btn">
+                        <i class="pi pi-pencil"></i>
+                    </button>
+                    }
+                </div>
+                <h2 class="profile-name">
+                    {{ form.get('nombres')?.value || 'Nombres' }} {{ form.get('apellidos')?.value || 'Apellidos' }}
+                </h2>
+                <p class="profile-id">DNI: {{ form.get('nroDocumento')?.value || '---' }}</p>
+                
+                @if (mode() !== 'nuevo') {
+                <div class="status-badge" style="margin-top: 1rem;">
+                    <p-tag [value]="form.get('activo')?.value ? 'Activo' : 'Inactivo'"
+                           [severity]="form.get('activo')?.value ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                </div>
+                }
+            </div>
+            
+            <div class="sidebar-info-extra" style="margin-top: 2rem;">
+                <app-button *ngIf="mode() === 'ver'" label="Habilitar Edición" icon="pi pi-pencil" 
+                    (click)="enableEditMode()" class="w-full"></app-button>
+            </div>
+        </aside>
+
+        <!-- Contenido principal con las tarjetas -->
+        <main class="form-content">
+
+            <!-- 1. Información Personal -->
+            <section class="form-section-card">
+                <div class="section-header">
+                    <i class="pi pi-user icon-blue"></i>
+                    <h3>Información Personal</h3>
+                    <p-tag *ngIf="mode() === 'ver'" value="MODO LECTURA" severity="info" class="ml-auto"></p-tag>
+                </div>
+                <div class="fields-grid">
+                    <div class="field-wrapper">
+                        <label>Nombres <span class="required">*</span></label>
+                        <input pInputText formControlName="nombres">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Apellidos <span class="required">*</span></label>
+                        <input pInputText formControlName="apellidos">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Número de Documento</label>
+                        <input pInputText formControlName="nroDocumento">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Fecha de Nacimiento</label>
+                        <input pInputText formControlName="fechaNacimiento" class="input-styled">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Correo Electrónico</label>
+                        <input pInputText formControlName="email" class="input-styled">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Número de Teléfono</label>
+                        <input pInputText formControlName="telefono" class="input-styled">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Contacto de Emergencia -->
+            <section class="form-section-card">
+                <div class="section-header">
+                    <i class="pi pi-phone icon-blue"></i>
+                    <h3>Contacto de Emergencia</h3>
+                </div>
+                <div class="fields-grid">
+                    <div class="field-wrapper">
+                        <label>Nombre del Contacto</label>
+                        <input pInputText formControlName="contactoEmergenciaNombre">
+                    </div>
+                    <div class="field-wrapper">
+                        <label>Teléfono de Emergencia</label>
+                        <input pInputText formControlName="contactoEmergenciaTelefono">
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. Detalles de Trabajo & Acceso (Grid Inferior) -->
+            <div class="bottom-grid">
+
+                <!-- Detalles del Trabajo -->
+                <section class="form-section-card">
+                    <div class="section-header">
+                        <i class="pi pi-briefcase icon-blue"></i>
+                        <h3>Detalles del Trabajo</h3>
+                    </div>
+                    <div class="fields-grid">
+                        <div class="field-wrapper">
+                            <label>Sucursal</label>
+                            <p-select [options]="sucursales()" formControlName="idSucursal" optionLabel="nombre" optionValue="id" [showClear]="true" placeholder="Seleccionar" appendTo="body"></p-select>
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Posición (Cargo)</label>
+                            <p-select [options]="cargos()" formControlName="idCargo" optionLabel="nombre" optionValue="id" [showClear]="true" placeholder="Seleccionar" appendTo="body"></p-select>
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Fecha de Ingreso</label>
+                            <p-datepicker formControlName="fechaIngreso" [showIcon]="true" iconDisplay="input" appendTo="body"></p-datepicker>
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Sueldo</label>
+                            <p-inputNumber formControlName="sueldoActual" mode="currency" currency="PEN" locale="es-PE"></p-inputNumber>
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Comisión (%)</label>
+                            <p-inputNumber formControlName="porcentajeComision" suffix=" %" [min]="0" [max]="100"></p-inputNumber>
+                        </div>
+                        <div class="field-wrapper full-width">
+                            <label>Observaciones</label>
+                            <input pInputText formControlName="observaciones">
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Acceso al Sistema -->
+                <section class="form-section-card">
+                    <div class="section-header" style="justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="pi pi-lock icon-purple"></i>
+                            <h3>Acceso al Sistema</h3>
+                        </div>
+                        <p-toggleswitch formControlName="tieneAccesoSistema"></p-toggleswitch>
+                    </div>
+
+                    @if (form.get('tieneAccesoSistema')?.value) {
+                    <div class="fields-grid" style="grid-template-columns: 1fr;">
+                        <div class="field-wrapper">
+                            <label>Usuario</label>
+                            <input pInputText formControlName="username" class="input-styled" placeholder="Ej: jlopez">
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Contraseña</label>
+                            <div class="p-input-icon-right" style="position: relative;">
+                                <input pInputText type="password" formControlName="password" 
+                                       class="input-styled w-full" placeholder="••••••••"
+                                       autocomplete="new-password">
+                                <i class="pi pi-eye" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; cursor: pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="field-wrapper">
+                            <label>Rol de Usuario</label>
+                            <p-select [options]="roles()" formControlName="idRol" optionLabel="nombre" optionValue="id" [showClear]="true" placeholder="Seleccionar" appendTo="body"></p-select>
+                        </div>
+                    </div>
+                    } @else {
+                    <div style="text-align: center; padding: 2rem 0; color: #94a3b8; font-size: 13px;">
+                        <i class="pi pi-info-circle mb-2" style="font-size: 24px;"></i>
+                        <p>El empleado no tendrá acceso al sistema.</p>
+                    </div>
+                    }
+                </section>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-actions">
+                <app-button  (click)="cancel()" label="Volver" icon="pi pi-arrow-left" severity="secondary">
+                </app-button>
+                
+                <app-button *ngIf="mode() !== 'ver'" [loading]="isSubmitting()" (click)="onSubmit()" 
+                    [label]="mode() === 'nuevo' ? 'Guardar Registro' : 'Actualizar Cambios'" 
+                    [icon]="mode() === 'nuevo' ? 'pi pi-save' : 'pi pi-check'">
+                </app-button>
+            </div>
+        </main>
+    </form>
+</div>

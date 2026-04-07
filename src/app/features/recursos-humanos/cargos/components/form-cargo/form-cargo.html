@@ -1,0 +1,33 @@
+<form [formGroup]="form" class="cargo-form" (ngSubmit)="onSubmit()">
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="nombre" formControlName="nombre" placeholder=" " [class.p-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched" />
+                <label for="nombre">Nombre del Cargo <span class="required">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <textarea pInputText id="descripcion" formControlName="descripcion" rows="3" placeholder=" "></textarea>
+                <label for="descripcion">Descripción</label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    @if (data()) {
+    <div class="row">
+        <div class="form-row">
+            <div class="status-container">
+                <div class="status-info">
+                    <span class="status-label">Estado</span>
+                    <span class="status-text">{{ form.get('activo')?.value ? 'Activo' : 'Inactivo' }}</span>
+                </div>
+                <p-toggleswitch formControlName="activo"></p-toggleswitch>
+            </div>
+        </div>
+    </div>
+    }
+</form>

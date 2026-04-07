@@ -1,0 +1,160 @@
+<p-toast></p-toast>
+
+<div class="egreso-container">
+    <!-- Cabecera del documento -->
+    <div class="document-header">
+        <div class="doc-title-row">
+            <button pButton icon="pi pi-arrow-left" class="btn-back p-button-text p-button-rounded"
+                (click)="volver()"></button>
+            <h1 class="doc-title">
+                Nota de Salida
+                @if (correlativoPreview()) {
+                <span class="doc-serie">{{ correlativoPreview()!.documentoFormateado }}</span>
+                } @else {
+                <span class="doc-serie doc-serie--pending">(Sin serie)</span>
+                }
+            </h1>
+            <span class="status-badge">NUEVO</span>
+        </div>
+
+        <div class="doc-context">
+            <div class="context-badge context-badge--danger">
+                <i class="fa-solid fa-building"></i> {{ sucursalNombre() }}
+            </div>
+            <div class="context-badge context-badge--light">
+                <i class="fa-solid fa-store"></i> {{ almacenNombre() }}
+            </div>
+        </div>
+    </div>
+
+    <div class="form-card" [formGroup]="formulario">
+        <!-- Formulario de cabecera -->
+        <div class="form-grid">
+            <div class="field">
+                <label>Fecha Emisión</label>
+                <p-datepicker formControlName="fechaEmision" dateFormat="dd/mm/yy" [showIcon]="true" appendTo="body"
+                    [iconDisplay]="'input'"></p-datepicker>
+            </div>
+
+            <div class="field field-sunat">
+                <label>Código Operación SUNAT</label>
+                <p-select [options]="codigosSunatSalida" formControlName="codigoOperacionSunat" optionLabel="nombre"
+                    optionValue="codigo" appendTo="body"></p-select>
+            </div>
+
+            <div class="field field-ref">
+                <label>Doc. Referencia / Motivo</label>
+                <input pInputText formControlName="documentoReferencia" placeholder="Ej: Informe INF-044" />
+            </div>
+        </div>
+
+        <p-divider styleClass="my-4"></p-divider>
+
+        <!-- Toolbar + Búsqueda -->
+        <div class="detail-section">
+            <div class="detail-toolbar">
+                <div class="toolbar-title">
+                    <h3>Detalle de mercadería a retirar</h3>
+                </div>
+                <div class="search-exterior">
+                    <p-inputgroup>
+                        <p-autoComplete [formControl]="buscadorControl" [suggestions]="productosSugeridos"
+                            (completeMethod)="buscarProductos($event)" (onSelect)="onProductoSeleccionado($event)"
+                            field="nombre" [minLength]="2" placeholder="Buscar producto para agregar..."
+                            inputStyleClass="border-left-none">
+                        </p-autoComplete>
+                        <p-inputgroup-addon>
+                            <i class="pi pi-search text-gray"></i>
+                        </p-inputgroup-addon>
+                    </p-inputgroup>
+                </div>
+            </div>
+
+            <!-- Tabla de detalle -->
+            <div class="table-wrapper">
+                <table class="pos-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px">#</th>
+                            <th>PRODUCTO</th>
+                            <th style="width: 90px; text-align: center; color: #e11d48;">CANT. A SACAR</th>
+                            <th style="width: 140px; color: #1d4ed8;">UNIDAD / EMPAQUE</th>
+                            <th style="width: 100px; text-align: center;">CANT. BASE</th>
+                            <th style="width: 120px; text-align: center; color: #d97706;">LOTE</th>
+                            <th style="width: 100px; text-align: right; color: #16a34a;">STOCK DISP.</th>
+                            <th style="width: 100px; text-align: right;">COSTO PROM.</th>
+                            <th style="width: 40px"></th>
+                        </tr>
+                    </thead>
+                    <tbody formArrayName="detalles">
+                        @for (item of detallesFormArray.controls; track $index) {
+                        <tr [formGroupName]="$index">
+                            <td class="text-center text-gray">{{ $index + 1 }}</td>
+                            <td>
+                                <div class="product-name-display">{{ item.get('productoNombre')?.value }}</div>
+                            </td>
+                            <td>
+                                <input type="number" class="pos-input-num bold-num center-text input-danger"
+                                    formControlName="cantidad" (input)="recalcularFila($index)" min="0.0001">
+                            </td>
+                            <td>
+                                <p-select [options]="item.get('unidadesList')?.value"
+                                    formControlName="unidadSeleccionada" (onChange)="recalcularFila($index)"
+                                    optionLabel="unidadNombre" appendTo="body" styleClass="w-full table-select"
+                                    placeholder="Seleccionar"
+                                    [disabled]="item.get('unidadesList')?.value?.length === 0"></p-select>
+                            </td>
+                            <td class="text-center">
+                                <div class="read-only-cell">- {{ item.get('cantidadBase')?.value | number:'1.2-2' }}
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                @if(item.get('tipoControlStock')?.value !== 'NORMAL') {
+                                <div class="lote-badge lote-badge--active">
+                                    <i class="pi pi-box"></i> Requiere
+                                </div>
+                                } @else {
+                                <div class="lote-badge lote-badge--none">SIN LOTE</div>
+                                }
+                            </td>
+                            <td class="text-right">
+                                <span class="stock-value">{{ item.get('stockDisponible')?.value | number:'1.2-2'
+                                    }}</span>
+                            </td>
+                            <td class="text-right text-gray">
+                                {{ item.get('costoPromedio')?.value | number:'1.2-2' }}
+                            </td>
+                            <td class="text-center">
+                                <i class="pi pi-times action-icon text-gray hover-red"
+                                    (click)="eliminarFila($index)"></i>
+                            </td>
+                        </tr>
+                        }
+                        @if(detallesFormArray.length === 0) {
+                        <tr>
+                            <td colspan="9" class="text-center text-gray py-4">
+                                No hay productos agregados. Utilice el buscador para agregar productos a retirar.
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Footer -->
+            <div class="footer-area">
+                <div class="total-display">
+                    VALOR TOTAL (PÉRDIDA/SALIDA): <span class="total-amount">S/ {{ totalGeneral() | number:'1.2-2'
+                        }}</span>
+                </div>
+                <div class="actions">
+                    <button pButton label="Limpiar" icon="pi pi-refresh"
+                        class="btn-clean p-button-outlined p-button-secondary" (click)="limpiar()"
+                        [disabled]="guardando()"></button>
+                    <button pButton label="Confirmar Salida" icon="pi pi-sign-out" class="btn-confirm"
+                        (click)="confirmarSalida()" [loading]="guardando()"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

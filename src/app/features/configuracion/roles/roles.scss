@@ -1,0 +1,10 @@
+@use 'table' as *;
+
+.user-info-cell .role-name-text {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.required {
+  color: red;
+}

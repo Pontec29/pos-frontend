@@ -1,0 +1,19 @@
+<div class="layout" [class.layout--expanded]="!isSidebarCollapsed()">
+
+  <div class="sidebar-container">
+    <app-sidebar [collapsed]="isSidebarCollapsed()" (toggleSidebar)="toggleSidebar()"></app-sidebar>
+  </div>
+
+  <div class="main-container" [class.main-container--expanded]="!isSidebarCollapsed()">
+
+    <app-header
+      [isSidebarCollapsed]="isSidebarCollapsed()"
+      (toggleSidebar)="toggleSidebar()"
+    ></app-header>
+
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+</div>

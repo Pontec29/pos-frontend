@@ -1,0 +1,175 @@
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+
+    // ! TEXTO
+    --color-primary: #333;
+    --color-secondary: #666;
+    --color-primary-dark: #000000;
+    --color-text: #494D50;
+    --color-text-secondary: #797C86;
+
+  // ! BORDER
+    --color-border: #e5e7eb;
+    --color-border-secondary: #d1d5db;
+
+  // ! BACKGROUND
+  --color-background: #f9fafb;
+  --color-bg-secondary: #a8a8a8;
+  --color-bg-transparent: rgba(255, 255, 255, 0.473);
+
+  // ! COLORES DEL SISTEMA
+  --bg-dark-strong: #1F1F1F;
+  --border-strong: #40403F;
+  --bg-medium: #40403F;
+
+  --primary: #0066cc;
+  --primary-hover: #0052A3;
+  --primary-active: #004080;
+  --primary-light: #E6F0FA;
+  --primary-lighter: #F0F7FF;
+
+  --success: #107E3E;
+  --success-light: #E6F4EA;
+  --success-bg: #DCFCE7;
+
+  --warning: #E9730C;
+  --warning-light: #FEF3E6;
+  --warning-bg: #FEF3C7;
+
+  --danger: #BB0000;
+  --danger-light: #FEEBEB;
+  --danger-bg: #FEE2E2;
+
+  --info: #0A6ED1;
+  --info-light: #E6F3FC;
+  --info-bg: #DBEAFE;
+
+  --success-color: #49bb8d;
+  --error-color: #ff815a;
+  --warning-color: #fcaf17;
+
+  // ! ESTADOS
+    /* ERROR / DANGER */
+  --status-red: #ef4444;
+  --status-red-light: #fca5a5;
+  --status-red-dark: #b91c1c;
+  --status-red-soft: #ef444433;
+
+  /* SUCCESS */
+  --status-green: #22c55e;
+  --status-green-light: #86efac;
+  --status-green-dark: #15803d;
+  --status-green-soft: #22c55e33;
+
+  /* WARNING */
+  --status-yellow: #eab308;
+  --status-yellow-light: #fde047;
+  --status-yellow-dark: #a16207;
+  --status-yellow-soft: #eab30833;
+
+  /* INFO */
+  --status-blue: #3b82f6;
+  --status-blue-light: #93c5fd;
+  --status-blue-dark: #1d4ed8;
+  --status-blue-soft: #3b82f633;
+
+  /* PROCESS / IN PROGRESS */
+  --status-purple: #a855f7;
+  --status-purple-light: #d8b4fe;
+  --status-purple-dark: #6b21a8;
+  --status-purple-soft: #a855f733;
+
+  /* NEUTRAL / DISABLED */
+  --status-gray: #6b7280;
+  --status-gray-light: #d1d5db;
+  --status-gray-dark: #374151;
+  --status-gray-soft: #6b728033;
+
+  /* PENDING */
+  --status-orange: #f97316;
+  --status-orange-light: #fdba74;
+  --status-orange-dark: #c2410c;
+  --status-orange-soft: #f9731633;
+
+  --gray-50: #FAFBFC;
+  --gray-100: #F3F4F6;
+  --gray-200: #E5E7EB;
+  --gray-300: #D1D5DB;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4B5563;
+  --gray-700: #374151;
+  --gray-800: #1F2937;
+  --gray-900: #111827;
+
+  --surface-ground: #EDF0F4;
+  --surface-card: #FFFFFF;
+  --surface-overlay: #FFFFFF;
+  --surface-section: #F8FAFC;
+  --surface-hover: #F1F5F9;
+
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-tertiary: #9CA3AF;
+  --text-disabled: #D1D5DB;
+  --text-inverse: #FFFFFF;
+
+  --border-color: #E5E7EB;
+  --border-light: #F3F4F6;
+  --border-dark: #D1D5DB;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+  --space-1: 0.25rem; // 4px
+  --space-2: 0.5rem; // 8px
+  --space-3: 0.75rem; // 12px
+  --space-4: 1rem; // 16px
+  --space-5: 1.25rem; // 20px
+  --space-6: 1.5rem; // 24px
+  --space-7: 1.75rem; // 28px
+  --space-8: 2rem; // 32px
+  --space-9: 2.25rem; // 36px
+  --space-10: 2.5rem; // 40px
+  --space-11: 2.75rem; // 44px
+  --space-12: 3rem; // 48px
+  --space-13: 3.25rem; // 52px
+  --space-14: 3.5rem; // 56px
+
+  --text-xs: 0.75rem; // 12px
+  --text-sm: 0.875rem; // 14px
+  --text-base: 1rem; // 16px
+  --text-lg: 1.125rem; // 18px
+  --text-xl: 1.25rem; // 20px
+  --text-2xl: 1.5rem; // 24px
+  --text-3xl: 1.875rem; // 30px
+
+  --font-size-1: 1rem; // 16px
+  --font-size-2: 1.125rem; // 18px
+  --font-size-3: 1.25rem; // 20px
+  --font-size-4: 1.5rem; // 24px
+  --font-size-5: 1.875rem; // 30px
+  --font-size-6: 2.25rem; // 36px
+
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-slow: 300ms ease;
+
+  --z-dropdown: 1000;
+  --z-sticky: 1020;
+  --z-fixed: 900;
+  --z-modal-backdrop: 1040;
+  --z-modal: 1050;
+  --z-popover: 1060;
+  --z-tooltip: 1070;
+}

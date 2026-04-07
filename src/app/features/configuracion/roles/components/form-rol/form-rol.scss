@@ -1,0 +1,49 @@
+:host {
+  display: block;
+}
+
+.rol-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  .row {
+    display: flex;
+    gap: var(--space-8);
+    padding: var(--space-4) 0;
+  }
+}
+
+.form-row {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+// Estilo del contenedor de estado (mismo diseño que otros modales)
+.status-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4) var(--space-5);
+  background-color: var(--surface-section);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+
+  .status-info {
+    display: flex;
+    flex-direction: column;
+
+    .status-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: var(--text-sm);
+    }
+
+    .status-text {
+      font-size: var(--text-xs);
+      color: var(--text-secondary);
+    }
+  }
+}

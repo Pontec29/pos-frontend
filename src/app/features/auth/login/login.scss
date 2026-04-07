@@ -1,0 +1,231 @@
+$login-bg-gradient-start: var(--status-green);
+$login-bg-gradient-mid: var(--primary);
+$login-bg-gradient-end: var(--gray-900);
+
+$login-card-bg: var(--surface-card);
+$login-card-shadow: var(--shadow-xl);
+$login-card-radius: var(--radius-lg);
+$login-card-padding: var(--space-8);
+
+$login-text-title: var(--text-primary);
+$login-text-desc: var(--text-secondary);
+$login-font-title: var(--text-2xl);
+$login-font-desc: var(--text-sm);
+
+$login-spacing-gap: var(--space-5);
+$login-spacing-sm: var(--space-2);
+
+$login-label-color: var(--gray-700);
+$login-label-font: var(--text-sm);
+
+$login-input-icon-color: var(--gray-500);
+$login-input-bg: var(--gray-50);
+$login-input-border: var(--gray-300);
+$login-input-text: var(--gray-900);
+$login-input-placeholder: var(--gray-500);
+$login-input-radius: var(--radius-md);
+$login-input-height: var(--space-12);
+$login-input-font: var(--text-base);
+$login-input-padding: var(--space-10);
+
+$login-input-focus-border: var(--success);
+$login-input-focus-shadow: var(--success-light);
+
+$login-btn-bg: var(--gray-800);
+$login-btn-text: var(--text-inverse);
+$login-btn-hover: var(--primary);
+$login-btn-active: var(--primary-active);
+$login-btn-radius: var(--radius-md);
+$login-btn-font: var(--text-base);
+
+$login-transition: var(--transition-base);
+
+.auth-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(83deg, $login-bg-gradient-start 0%, $login-bg-gradient-mid 46%, $login-bg-gradient-end 94.86%);
+
+  .section-container {
+    width: 80%;
+    max-width: 1400px;
+    height: 70%;
+    max-height: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      height: auto;
+      gap: 1rem;
+    }
+
+    @media (max-width: 750px) {
+      width: 100%;
+      padding: 1rem;
+      gap: 0;
+    }
+
+    .form-container {
+      box-sizing: border-box;
+      border-radius: $login-card-radius;
+      background-color: $login-card-bg;
+      display: flex;
+      width: 100%;
+      max-width: 420px;
+      padding: $login-card-padding 1.5rem;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: $login-spacing-gap;
+      box-shadow: $login-card-shadow;
+      position: relative;
+      z-index: 10;
+
+      @media (max-width: 750px) {
+        max-width: 100%;
+        width: 100%;
+        box-shadow: none;
+      }
+
+      .img-container {
+        width: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+          width: 100%;
+          height: auto;
+          object-fit: contain;
+        }
+      }
+
+      .description-container {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $login-spacing-sm;
+
+        .text-title {
+          color: $login-text-title;
+          font-size: $login-font-title;
+          font-weight: 700;
+          line-height: 1.2;
+        }
+
+        .text-description {
+          color: $login-text-desc;
+          font-size: $login-font-desc;
+          font-weight: 400;
+          line-height: 1.4;
+        }
+      }
+
+      form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: $login-spacing-gap;
+
+        .item-form {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          gap: $login-spacing-sm;
+
+          label {
+            color: $login-label-color;
+            font-weight: 500;
+            font-size: $login-label-font;
+          }
+
+          // Input wrapper with icon
+          >div {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+
+            i:first-child {
+              position: absolute;
+              left: 1rem;
+              color: $login-input-icon-color;
+              z-index: 1;
+            }
+
+            // Password toggle icon
+            i:last-child:not(:first-child) {
+              position: absolute;
+              right: 1rem;
+              color: $login-input-icon-color;
+              cursor: pointer;
+              z-index: 1;
+            }
+
+            input {
+              width: 100%;
+              height: $login-input-height;
+              padding: 0 $login-input-padding; // Space for icons
+              border: 1px solid $login-input-border;
+              border-radius: $login-input-radius;
+              background-color: $login-input-bg;
+              transition: all $login-transition;
+              color: $login-input-text;
+              font-size: $login-input-font;
+
+              &:focus {
+                border-color: $login-input-focus-border;
+                outline: none;
+                background-color: $login-card-bg;
+                box-shadow: 0 0 0 2px $login-input-focus-shadow;
+              }
+
+              &::placeholder {
+                color: $login-input-placeholder;
+              }
+            }
+          }
+
+          button {
+            width: 100%;
+            height: $login-input-height;
+            background-color: $login-btn-bg;
+            color: $login-btn-text;
+            border-radius: $login-btn-radius;
+            font-weight: 600;
+            font-size: $login-btn-font;
+            border: none;
+            cursor: pointer;
+            transition: background-color $login-transition;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            &:hover {
+              background-color: $login-btn-hover;
+            }
+
+            &:active {
+              background-color: $login-btn-active;
+            }
+          }
+        }
+      }
+    }
+
+    .bg-container {
+      display: block;
+      width: 550px;
+
+      @media (max-width: 750px) {
+        display: none;
+      }
+    }
+  }
+}

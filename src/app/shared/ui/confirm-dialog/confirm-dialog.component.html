@@ -1,0 +1,26 @@
+<p-confirmDialog #cd [style]="{width: '320px'}" styleClass="custom-confirm-dialog" [closable]="false" [acceptVisible]="false" [rejectVisible]="false">
+    <ng-template pTemplate="message" let-message>
+        <div class="confirm-modal">
+            <!-- Icon -->
+            <div class="confirm-icon-wrapper">
+                <i [class]="message.icon || 'pi pi-exclamation-triangle'" class="confirm-icon"></i>
+            </div>
+
+            <!-- Message -->
+            <p class="confirm-message">{{ message.message }}</p>
+
+            <!-- Actions -->
+            <div class="confirm-actions">
+                <button type="button" class="cancel-button" (click)="handleReject()">
+                    {{ message.rejectLabel || 'Cancel' }}
+                </button>
+                <button type="button" [class]="'action-button ' + (message.acceptButtonStyleClass || 'primary')" (click)="handleAccept()">
+                    {{ message.acceptLabel || 'Confirm' }}
+                </button>
+            </div>
+        </div>
+    </ng-template>
+
+    <!-- Empty footer to suppress default behavior -->
+    <!-- <ng-template pTemplate="footer"></ng-template> -->
+</p-confirmDialog>

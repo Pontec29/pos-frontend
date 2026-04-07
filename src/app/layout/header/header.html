@@ -1,0 +1,59 @@
+<div class="header-container">
+  <div class="page-header header-desktop-only" [attr.aria-hidden]="isCompact() ? 'true' : null">
+    <button type="button" class="sidebar-toggle" (click)="onToggleSidebar()"
+      [ngClass]="{ 'is-expanded': !isSidebarCollapsed() }">
+      <i class="pi pi-angle-double-right"></i>
+    </button>
+    <div class="breadcrumb-row">
+      <p-breadcrumb [model]="items()" [home]="home()" class="rutas" />
+    </div>
+  </div>
+  <div class="header-content" [formGroup]="headerForm">
+    <div class="left-section">
+      <!-- ! MOSTRAR ESTADO DE CAJA -->
+      <div class="status status--caja">
+        <p-tag [value]="cajaLabel()" [severity]="cajaSeverity()" [icon]="cajaIcon()" />
+      </div>
+
+      <p-select [options]="companies()" formControlName="company" optionLabel="razonSocial"
+        placeholder="Seleccionar Empresa" class="company-selector">
+        <ng-template #dropdownicon>
+          <i class="pi pi-building"></i>
+        </ng-template>
+      </p-select>
+
+      <div class="header-desktop-only header-context-selectors" [attr.aria-hidden]="isCompact() ? 'true' : null">
+        <p-select [options]="contexto.jerarquia()" formControlName="sucursal" optionLabel="nombre"
+          placeholder="Sucursal" class="company-selector">
+          <ng-template #dropdownicon>
+            <i class="pi pi-shop"></i>
+          </ng-template>
+        </p-select>
+
+
+        <!-- <p-select [options]="contexto.almacenesDisponibles()" formControlName="almacen" optionLabel="nombre"
+          placeholder="Almacén" class="company-selector">
+          <ng-template #dropdownicon>
+            <i class="pi pi-box"></i>
+          </ng-template>
+        </p-select> -->
+      </div>
+    </div>
+    <div class="right-section">
+      <!-- Notificaciones -->
+      <button pButton pRipple type="button" icon="pi pi-bell" class="notification-btn" title="Notificaciones">
+        <p-badge value="2" severity="danger" class="notification-badge"></p-badge>
+      </button>
+      <!-- Tema oscuro -->
+      <!-- <button
+        pButton
+        pRipple
+        type="button"
+        icon="pi pi-moon"
+        class="theme-btn"
+        title="Modo oscuro"
+        (click)="toggleTheme()"
+      ></button> -->
+    </div>
+  </div>
+</div>

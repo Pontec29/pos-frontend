@@ -1,0 +1,8 @@
+<p-toast />
+<app-confirm-dialog />
+<router-outlet />
+@if (isLoading()) {
+<div class="spinner-container">
+  <app-loader></app-loader>
+</div>
+}

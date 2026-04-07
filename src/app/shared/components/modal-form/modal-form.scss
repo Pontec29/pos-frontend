@@ -1,0 +1,76 @@
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+
+  .header-text {
+    .modal-title {
+      font-weight: 700;
+      color: var(--color-blue-500);
+      margin: 0;
+    }
+
+    .modal-subtitle {
+      margin: 0;
+      color: var(--color-navy-500);
+      font-size: var(--text-sm);
+    }
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    color: var(--color-blue-300);
+
+    &:hover {
+      background-color: var(--color-ice-100);
+      color: var(--color-blue-500);
+    }
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  width: 100%;
+}
+
+.modal-body {
+  padding: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+::ng-deep .custom-form-dialog {
+  .p-dialog {
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+
+    .p-dialog-header {
+      padding: 24px 24px 15px;
+      border-bottom: 1px solid var(--color-ice-300);
+    }
+
+    .p-dialog-content {
+      padding: 20px 24px !important;
+      background: white;
+    }
+
+    .p-dialog-footer {
+      padding: 15px 24px 16px;
+      border-top: 1px solid var(--color-ice-300);
+      background: white;
+    }
+  }
+}

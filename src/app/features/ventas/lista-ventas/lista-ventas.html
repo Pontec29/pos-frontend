@@ -1,0 +1,130 @@
+<div class="container">
+  <section class="header-content">
+    <div class="header-content--title">
+      <h6><i class="fa-solid fa-cash-register"></i> Lista de Ventas</h6>
+      <p class="subtitle">Listado de ventas realizadas</p>
+    </div>
+    <div class="header-content--actions">
+      <app-button preset="add" label="Nueva Venta"></app-button>
+    </div>
+  </section>
+
+  <section class="main-content">
+    <div class="table-section">
+      <div class="table-section__header-actions">
+        <div class="table-section__header-actions--left">
+          <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <input
+              pInputText
+              type="text"
+              (input)="onSearchChange($any($event.target).value)"
+              placeholder="Buscar por cliente, DNI/RUC o N° de documento..."
+              class="search-input"
+              aria-label="Buscar por cliente, DNI/RUC o N° de documento"
+            />
+          </span>
+        </div>
+        <div class="table-section__header-actions--right">
+          <label>Estado:</label>
+          <p-select
+            placeholder="Cualquier Estado"
+            [options]="statusOptions"
+            [showClear]="true"
+            [ngModel]="selectedStatus()"
+            (ngModelChange)="onStatusChange($event)"
+          ></p-select>
+          <p-datepicker
+            placeholder="Este Mes"
+            [showIcon]="true"
+            [ngModel]="selectedMonth()"
+            (ngModelChange)="onMonthChange($event)"
+            view="month"
+            dateFormat="mm/yy"
+          ></p-datepicker>
+        </div>
+      </div>
+
+      <div class="table-section__main-table compras-table" [class.table-loading]="cargando()">
+        <p-table
+          [value]="ventas()"
+          [loading]="cargando()"
+          [(selection)]="selectedVentas"
+          dataKey="id"
+          [lazy]="true"
+          (onLazyLoad)="onLazyLoad($event)"
+          [rowHover]="true"
+          [scrollable]="true"
+          scrollHeight="flex"
+          class="p-datatable-sm custom-table"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 3.5rem">#</th>
+              <th>Serie / N°</th>
+              <th pSortableColumn="cliente">Cliente <p-sortIcon field="cliente"></p-sortIcon></th>
+              <th pSortableColumn="fEmision">Fecha <p-sortIcon field="fEmision"></p-sortIcon></th>
+              <th>Moneda</th>
+              <th>Forma Pago</th>
+              <th pSortableColumn="estado">Estado <p-sortIcon field="estado"></p-sortIcon></th>
+              <th>SUNAT</th>
+              <th pSortableColumn="total" class="text-right">Total <p-sortIcon field="total"></p-sortIcon></th>
+              <th style="width: 9rem" class="text-center">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-item>
+            <tr>
+              <td style="color: #94a3b8; font-size: 13px;">{{ item.id }}</td>
+              <td>
+                <div style="display: flex; flex-direction: column; gap: 2px;">
+                  <span style="font-weight: 700; font-size: 13px; color: #334155; font-family: monospace;">{{ item.serie }}-{{ item.numero }}</span>
+                  <span style="font-size: 11px; color: #94a3b8;">{{ item.comprobanteCodigoSunat === "01" ? "FACTURA" : item.comprobanteCodigoSunat === "03" ? "BOLETA" : "COMPROBANTE" }}</span>
+                </div>
+              </td>
+              <td>
+                <div class="user-info-cell">
+                  <div class="avatar-circle" aria-hidden="true">
+                    {{ (item.clienteNombre || "").substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ item.clienteNombre }}</span>
+                    <span class="user-dni">{{ item.clienteNumeroDocumento }}</span>
+                  </div>
+                </div>
+              </td>
+              <td style="font-size: 13px; color: #475569;">{{ item.fEmision | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>
+                <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;"
+                  [style.background]="item.moneda === 'USD' ? '#eff6ff' : '#f0fdf4'"
+                  [style.color]="item.moneda === 'USD' ? '#1d4ed8' : '#166534'">
+                  {{ item.moneda }}
+                </span>
+              </td>
+              <td style="font-size: 12px; font-weight: 500; color: #475569;">{{ item.formaPago }}</td>
+              <td>
+                <p-tag [value]="item.estado" [severity]="getSeverity(item.estado)" [rounded]="true"></p-tag>
+              </td>
+              <td>
+                @if (item.enviadoSunat) {
+                  <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#16a34a; font-weight:600;">
+                    <i class="pi pi-check-circle"></i> Enviado
+                  </span>
+                } @else {
+                  <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#dc2626; font-weight:600;">
+                    <i class="pi pi-clock"></i> Pendiente
+                  </span>
+                }
+              </td>
+              <td class="text-right" style="font-weight: 700; color: #1e293b;">
+                {{ item.moneda === 'USD' ? '$' : 'S/' }} {{ item.total | number: '1.2-2' }}
+              </td>
+              <td class="text-center">
+                <div class="action-buttons">
+                  <p-button icon="pi pi-eye" [text]="true" severity="secondary" pTooltip="Ver detalle" tooltipPosition="top" (click)="verDetalle(item)" />
+                  <p-button icon="pi pi-print" [text]="true" severity="info" pTooltip="Imprimir PDF" tooltipPosition="top" (click)="imprimirPdf(item)" />
+                  <p-button icon="pi pi-times" [text]="true" severity="danger" pTooltip="Anular" tooltipPosition="top" [disabled]="item.estado === 'ANULADO'" (click)="anularVenta(item)" />
+                </div>
+              </td>
+            </tr>
+          </ng-template>

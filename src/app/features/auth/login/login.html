@@ -1,0 +1,39 @@
+<main class="auth-container">
+  <div class="section-container">
+    <section class="form-container">
+      <div class="img-container">
+        <img src="LOGO_LOGIN.jpg" alt="POS 2026 Logo" />
+      </div>
+      <div class="description-container">
+        <h2 class="text-title">Iniciar sesión</h2>
+        <p class="text-description">Administra tus SEDES en un solo lugar</p>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="login()">
+        <div class="item-form">
+          <label for="username">Usuario</label>
+          <div>
+            <i class="pi pi-user"></i>
+            <input pInputText id="username" formControlName="username" aria-describedby="username-help" />
+          </div>
+        </div>
+        <div class="item-form">
+          <label for="password">Contraseña</label>
+          <div>
+            <i class="pi pi-lock"></i>
+            <input [type]="hide() ? 'password' : 'text'" pInputText id="password" formControlName="password" aria-describedby="password-help" />
+            <i class="pi" [class.pi-eye]="hide()" [class.pi-eye-slash]="!hide()" (click)="hide.set(!hide())" role="button" tabindex="0"></i>
+          </div>
+        </div>
+        <div class="item-form">
+          <button pButton type="submit" class="w-full" [loading]="isLoading()" label="Iniciar sesión"></button>
+        </div>
+      </form>
+      <!-- <div class="img-background">
+        <img src="icon/logoTransparent.svg" alt="">
+      </div> -->
+    </section>
+      <section class="bg-container">
+        <app-auth-carousel />
+      </section>
+  </div>
+</main>

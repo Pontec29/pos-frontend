@@ -1,0 +1,53 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve",
+    "paths": {
+      "@environments/*": ["./src/environments/*"],
+      "@core/*": ["./src/app/core/*"],
+      "@shared/*": ["./src/app/shared/*"],
+      "@auth/*": ["./src/app/features/auth/*"],
+      "@inventario/*": ["./src/app/features/inventario/*"],
+
+      "@inventarios/*": ["./src/app/features/inventarios/*"],
+      "@proveedores/*": ["./src/app/features/proveedores/*"],
+      "@compras/*": ["./src/app/features/compras/*"],
+      "@unidades-medida/*": ["./src/app/features/unidades-medida/*"],
+
+      // ! DEFINIRLO CORRECTAMENTE
+      "@dashboard/*": ["./src/app/features/dashboard/*"],
+      "@importacion-producto/*": ["./src/app/features/inventario/importacion-producto/*"],
+      "@ventas/*": ["./src/app/features/ventas/*"],
+      "@caja/*": ["./src/app/features/finanzas/caja/*"],
+      "@clientes/*": ["./src/app/features/clientes/*"],
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "typeCheckHostBindings": true,
+    "strictTemplates": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.spec.json"
+    }
+  ]
+}

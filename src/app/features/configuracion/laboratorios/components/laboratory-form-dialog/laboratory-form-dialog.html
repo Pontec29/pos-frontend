@@ -1,0 +1,33 @@
+<p-dialog [visible]="visible" (visibleChange)="visibleChange.emit($event)" [modal]="true" [style]="{width:'500px'}"
+    [draggable]="false" [closable]="false">
+    <ng-template #header>
+        <div class="modal-header-content">
+            <i class="pi pi-flask modal-header-icon"></i>
+            <span class="modal-title">{{ isEditMode ? 'Editar Laboratorio' : 'Nuevo Laboratorio' }}</span>
+        </div>
+    </ng-template>
+
+    <form [formGroup]="labForm" class="form">
+        <div class="form-row">
+            <label for="name" class="required">Nombre</label>
+            <input pInputText id="name" formControlName="name" placeholder="Ej: GSK, Pfizer" autofocus />
+        </div>
+
+        <div class="form-row">
+            <label for="status">Estado</label>
+            <p-select id="status" [options]="statusOptions" formControlName="status" placeholder="Seleccione un estado"
+                appendTo="body"></p-select>
+        </div>
+
+        <div class="form-row">
+            <label for="description">Descripción</label>
+            <textarea pTextarea id="description" formControlName="description" rows="3"
+                placeholder="Descripción del laboratorio (opcional)"></textarea>
+        </div>
+    </form>
+
+    <ng-template #footer>
+        <app-button preset="cancel" label="Cancelar" (clicked)="onCancel()"></app-button>
+        <app-button preset="save" label="Guardar" (clicked)="onSave()"></app-button>
+    </ng-template>
+</p-dialog>

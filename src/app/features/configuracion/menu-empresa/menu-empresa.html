@@ -1,0 +1,134 @@
+<!-- 1. Estado de Carga (Overlay) -->
+@if (loading()) {
+<div class="loading-overlay">
+    <app-loading-spinner></app-loading-spinner>
+</div>
+}
+
+<!-- 2. Estado de Error -->
+@if (error()) {
+<div class="error-container">
+    <app-error-state [message]="error()!" (retry)="refrescar()">
+    </app-error-state>
+</div>
+}
+
+<!-- 3. Contenido Principal (Estructura Plana) -->
+<div class="erp-master-detail" [class.is-loading]="loading() || error()">
+    <!-- Sidebar / Master Column -->
+    <aside class="master-column">
+        <header class="master-header">
+            <h2>Módulos</h2>
+            <p class="company-badge">EMPRESA: <span>{{ empresaNombre() }}</span></p>
+
+            <div class="search-box">
+                <i class="pi pi-search"></i>
+                <input type="text" placeholder="Filtrar módulos..." [value]="searchTerm()" (input)="searchTerm.set(t.value)" #t>
+            </div>
+        </header>
+
+        <nav class="modules-sidebar scroll-container">
+            @for (modulo of modulosFiltrados(); track modulo.data.id) {
+            <button class="module-item" [class.active]="moduloSeleccionado()?.data?.id === modulo.data.id" (click)="seleccionarModulo(modulo)">
+                <div class="module-icon" [ngClass]="'icon-' + modulo.data.id % 5">
+                    <i [class]="modulo.data.icono || 'pi pi-box'"></i>
+                </div>
+                <div class="module-info">
+                    <span class="label">{{ modulo.data.etiqueta }}</span>
+                    <span class="status" [class.enabled]="isNodoHabilitado(modulo)">
+                        {{ isNodoHabilitado(modulo) ? (modulo.children?.length ? (modulo.children?.length ?? 0) + ' Submódulos' : 'Habilitado') : 'Deshabilitado' }}
+                    </span>
+                </div>
+                @if (moduloSeleccionado()?.data?.id === modulo.data.id) {
+                <div class="selection-indicator"></div>
+                }
+            </button>
+            } @empty {
+            <div class="empty-sidebar">
+                <i class="pi pi-search"></i>
+                <p>No se encontraron módulos</p>
+            </div>
+            }
+        </nav>
+    </aside>
+
+    <!-- Content / Detail Column -->
+    <main class="detail-column scroll-container">
+        @if (moduloSeleccionado(); as mod) {
+        <header class="detail-header">
+            <div class="header-left">
+                <div class="detail-icon-box">
+                    <i [class]="mod.data.icono || 'pi pi-box'"></i>
+                </div>
+                <div class="detail-title">
+                    <h1>Configuración de {{ mod.data.etiqueta }}</h1>
+                    <p class="root-path">Módulo raíz: <span class="path-chip">{{ mod.data.ruta }}</span></p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <app-button preset="primary" label="Guardar Configuración" icon="pi pi-check" [loading]="guardando()" (clicked)="guardarCambios()">
+                </app-button>
+            </div>
+        </header>
+
+        <div class="detail-content">
+            <!-- Global Status -->
+            <section class="config-section global-status">
+                <div class="section-info">
+                    <h4>Visibilidad del Módulo</h4>
+                    <p>Si se desactiva, nadie en la empresa verá esta sección.</p>
+                </div>
+                <p-toggleswitch [(ngModel)]="mod.data.seleccionado" (onChange)="toggleSeleccion(mod)"></p-toggleswitch>
+            </section>
+
+            <!-- Submodules List -->
+            <section class="config-section submodules">
+                <div class="section-header">
+                    <h3>Submódulos y Accesos</h3>
+                    <button class="btn-action-small" (click)="toggleAll(mod, true)">Habilitar todos</button>
+                </div>
+
+                <div class="submodules-grid">
+                    @for (sub of mod.children; track sub.data.id) {
+                    <div class="submodule-card" [class.inactive]="!sub.data.seleccionado">
+                        <div class="sub-info">
+                            <div class="sub-icon">
+                                <i [class]="sub.data.icono || 'pi pi-tag'"></i>
+                            </div>
+                            <div>
+                                <h5>{{ sub.data.etiqueta }}</h5>
+                                <code class="path-text">{{ sub.data.ruta }}</code>
+                            </div>
+                        </div>
+                        <div class="sub-actions">
+                            <p-checkbox [(ngModel)]="sub.data.seleccionado" [binary]="true" (onChange)="toggleSeleccion(sub)"></p-checkbox>
+                        </div>
+                    </div>
+                    } @empty {
+                    <div class="empty-subs">
+                        <i class="pi pi-info-circle"></i>
+                        <p>Este módulo no tiene sub-módulos configurables.</p>
+                    </div>
+                    }
+                </div>
+            </section>
+
+            <!-- Tip / Information -->
+            <div class="info-banner">
+                <div class="info-icon">
+                    <i class="pi pi-info-circle"></i>
+                </div>
+                <div class="info-text">
+                    <h6>Actualización en tiempo real</h6>
+                    <p>Al guardar, los usuarios que estén logueados verán el cambio reflejado en su menú lateral de forma inmediata.</p>
+                </div>
+            </div>
+        </div>
+        } @else {
+        <div class="no-selection">
+            <i class="pi pi-mouse"></i>
+            <p>Selecciona un módulo de la lista para configurarlo</p>
+        </div>
+        }
+    </main>
+</div>

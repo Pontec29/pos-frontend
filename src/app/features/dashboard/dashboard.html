@@ -1,0 +1,63 @@
+<div class="dashboard-wrapper">
+  <!-- ! HEADER DE BIENVENIDA -->
+  <header class="welcome-header">
+    <div class="welcome-content">
+      <div class="welcome-text">
+        <span class="greeting-prefix">Hola de nuevo,</span>
+        <h1 class="userName">{{ userName() }}</h1>
+        <p class="welcome-desc">Aquí tienes un resumen de lo que está sucediendo en tu negocio hoy.</p>
+      </div>
+      <div class="header-right">
+        <div class="current-date">
+          <i class="pi pi-calendar"></i>
+          <span>{{ currentDate | date:'fullDate' | titlecase }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-decoration"></div>
+  </header>
+
+  <div class="main-dashboard-grid">
+    <!-- ! ACCESOS DIRECTOS -->
+    <section class="quick-access-area">
+      <div class="section-header">
+        <h2 class="section-title">
+          <i class="pi pi-th-large"></i>
+          Accesos Directos
+        </h2>
+        <span class="section-subtitle">Gestiona rápidamente los módulos del sistema</span>
+      </div>
+
+      <div class="quick-access-grid">
+        @for (item of quickAccessItems(); track $index) {
+        <div class="access-card-wrapper" (click)="navigateToModule(item.route)">
+          <div class="access-card" [ngClass]="'card-' + item.id">
+            <div class="card-header">
+              <div class="icon-box">
+                <i [class]="item.icon" style="font-size: 2rem;"></i>
+              </div>
+              <div *ngIf="item.stats" class="card-badge">
+                <span class="badge-value">{{ item.stats.value }}</span>
+                <span class="badge-label">{{ item.stats.label }}</span>
+              </div>
+            </div>
+
+            <div class="card-body">
+              <h3 class="item-title">{{ item.title }}</h3>
+              <p class="item-desc">{{ item.description }}</p>
+            </div>
+
+            <div class="card-footer">
+              <span class="action-link">Ir al módulo <i class="pi pi-arrow-right"></i></span>
+            </div>
+
+            <div class="card-loading" *ngIf="item.loading">
+              <p-progressSpinner styleClass="w-2rem h-2rem" strokeWidth="4"></p-progressSpinner>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+  </div>
+</div>

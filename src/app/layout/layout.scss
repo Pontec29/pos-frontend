@@ -1,0 +1,47 @@
+@use 'mixins' as *;
+
+.layout {
+  display: flex;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+
+  .sidebar-container {
+    max-height: 100dvh;
+  }
+
+  .main-container {
+    width: 100%;
+    background-color: #f0f1f5;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    margin-left: 68px;
+    transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+    .main-content {
+      background-color: #EDEDED;
+      height: calc(100dvh - 5.521rem);
+      overflow: hidden;
+    }
+  }
+}
+
+.layout.layout--expanded .main-container {
+  margin-left: 260px;
+}
+
+@media (max-width: $tablet-large) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .main-container {
+    margin-left: 0 !important;
+    margin-top: 64px;
+    height: calc(100dvh - 64px);
+  }
+
+  .page-content {
+    padding: 1rem;
+  }
+}

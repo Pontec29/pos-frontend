@@ -1,0 +1,144 @@
+<div class="container text-premium">
+    <section class="header-content">
+        <div class="header-content--title">
+            <h6>Gestión de Cargos</h6>
+            <p class="subtitle">Administre los cargos y puestos dentro de la organización.</p>
+        </div>
+        <div class="header-content--actions">
+            <app-button preset="add" label="Nuevo Cargo" (clicked)="openNew()"></app-button>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="table-section">
+            <div class="table-section__header-actions">
+                <div class="table-section__header-actions--left">
+                    <span class="p-input-icon-left search-wrapper">
+                        <i class="pi pi-search" aria-hidden="true"></i>
+                        <input pInputText type="text" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" placeholder="Buscar cargo por nombre..." class="search-input" />
+                    </span>
+                </div>
+
+                <div class="table-section__header-actions--right">
+                    <label>Estado:</label>
+                    <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); first.set(0)" class="filter-dropdown">
+                    </p-select>
+                </div>
+            </div>
+
+            <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
+                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="id">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            @if (isSelected('id')) {
+                            <th style="width: 4rem">#</th>
+                            }
+                            @if (isSelected('nombre')) {
+                            <th pSortableColumn="nombre">NOMBRE <p-sortIcon field="nombre"></p-sortIcon>
+                            </th>
+                            }
+                            @if (isSelected('descripcion')) {
+                            <th pSortableColumn="descripcion">DESCRIPCIÓN <p-sortIcon field="descripcion"></p-sortIcon>
+                            </th>
+                            }
+                            @if (isSelected('activo')) {
+                            <th style="width: 8rem" class="text-center">ESTADO</th>
+                            }
+                            @if (isSelected('actions')) {
+                            <th style="width: 12rem" class="text-center">ACCIONES</th>
+                            }
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="body" let-r let-rowIndex="rowIndex">
+                        <tr>
+                            @if (isSelected('id')) {
+                            <td>{{ rowIndex + 1 }}</td>
+                            }
+                            @if (isSelected('nombre')) {
+                            <td>
+                                <div class="user-info-cell">
+                                    <div class="avatar-circle" aria-hidden="true">
+                                        {{ (r.nombre || '').substring(0, 2).toUpperCase() }}
+                                    </div>
+                                    <div class="user-details">
+                                        <span class="user-name">{{ r.nombre }}</span>
+                                    </div>
+                                </div>
+                            </td>
+                            }
+                            @if (isSelected('descripcion')) {
+                            <td>{{ r.descripcion }}</td>
+                            }
+                            @if (isSelected('activo')) {
+                            <td class="text-center">
+                                <p-tag [value]="r.activo ? 'Activo' : 'Inactivo'" [severity]="r.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                            </td>
+                            }
+                            @if (isSelected('actions')) {
+                            <td class="text-center">
+                                <div class="action-buttons">
+                                    <button class="action-buttons--edit" (click)="editCargo(r)" pTooltip="Editar" tooltipPosition="top">
+                                        <i class="pi pi-pencil" aria-hidden="true"></i>
+                                    </button>
+                                    <!-- <button class="action-buttons--delete" (click)="remove(r)" pTooltip="Eliminar"
+                                        tooltipPosition="top">
+                                        <i class="pi pi-trash" aria-hidden="true"></i>
+                                    </button> -->
+                                </div>
+                            </td>
+                            }
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="cols.length">
+                                @if (error()) {
+                                <div class="table-state table-state--error" role="alert" aria-live="assertive">
+                                    <div class="table-state__icon">
+                                        <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="table-state__content">
+                                        <div class="table-state__title">No se pudo cargar la información</div>
+                                        <div class="table-state__subtitle">{{ error() }}</div>
+                                        <button type="button" class="table-state__action" (click)="refrescar()">
+                                            Reintentar
+                                        </button>
+                                    </div>
+                                </div>
+                                } @else {
+                                <div class="table-state table-state--empty" role="status" aria-live="polite">
+                                    <div class="table-state__icon">
+                                        <i class="pi pi-search" aria-hidden="true"></i>
+                                    </div>
+                                    <div class="table-state__content">
+                                        <div class="table-state__title">No se encontraron resultados</div>
+                                        <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.
+                                        </div>
+                                    </div>
+                                </div>
+                                }
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+
+            <div class="table-section__footer-paginated">
+                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+                </p-paginator>
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Componente Genérico para el Modal -->
+@if (showDialog()) {
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)">
+</app-modal-form>
+}
+}
+
+<p-confirmDialog [style]="{width: '450px'}" />

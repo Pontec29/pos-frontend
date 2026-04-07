@@ -1,0 +1,89 @@
+<div class="modal-overlay" (click)="onOverlayClick()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h2 class="modal-title font-lg font-bold">Filtros Avanzados</h2>
+          <!-- <p class="modal-subtitle font-sm font-regular">Filtra productos por categorías, laboratorios o presentaciones</p> -->
+        </div>
+      </div>
+      <button class="close-button" (click)="onClose()" type="button" aria-label="Cerrar">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="modal-body">
+      <form>
+        @if (search()) {
+          <div class="content-item" style="margin-bottom: 1rem; color: var(--color-navy-500)">
+            <p><strong>Buscando térmiono:</strong> {{ search() }}</p>
+          </div>
+        }
+        <div class="content-item" style="flex-direction: column; gap: 6px; margin-bottom: 12px">
+          <label
+            for="idCategoria"
+            class="font-bold"
+            style="color: var(--color-navy-600); font-size: 14px"
+            >ID Categoría</label
+          >
+          <p-inputNumber
+            inputId="idCategoria"
+            [(ngModel)]="filters.ID_CATEGORIA"
+            name="idCategoria"
+            class="w-full"
+            placeholder="Ej. 1"
+          />
+        </div>
+        <div class="content-item" style="flex-direction: column; gap: 6px; margin-bottom: 12px">
+          <label
+            for="idLaboratorio"
+            class="font-bold"
+            style="color: var(--color-navy-600); font-size: 14px"
+            >ID Laboratorio</label
+          >
+          <p-inputNumber
+            inputId="idLaboratorio"
+            [(ngModel)]="filters.ID_LABORATORIO"
+            name="idLaboratorio"
+            class="w-full"
+            placeholder="Ej. 2"
+          />
+        </div>
+        <div class="content-item" style="flex-direction: column; gap: 6px">
+          <label
+            for="idPresentacion"
+            class="font-bold"
+            style="color: var(--color-navy-600); font-size: 14px"
+            >ID Presentación</label
+          >
+          <p-inputNumber
+            inputId="idPresentacion"
+            [(ngModel)]="filters.ID_PRESENTACION"
+            name="idPresentacion"
+            class="w-full"
+            placeholder="Ej. 3"
+          />
+        </div>
+      </form>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="modal-footer">
+      <app-button
+        preset="cancel"
+        label="Cancelar"
+        (clicked)="onClose()"
+        styleClass="cancel-button"
+      ></app-button>
+      <app-button
+        preset="save"
+        label="Aplicar Filtros"
+        styleClass="submit-button"
+        (clicked)="onApply()"
+      ></app-button>
+    </div>
+  </div>
+</div>

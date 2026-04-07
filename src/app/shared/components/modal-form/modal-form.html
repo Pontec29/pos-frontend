@@ -1,0 +1,55 @@
+<!-- ! (click)="onOverlayClick()" IMPLEMENTARLO SI ES NECESARIO -->
+<p-dialog [visible]="true" (onHide)="onClose()" [draggable]="false" [closable]="false" [modal]="true" [style]="{ width: '700px' }" styleClass="custom-form-dialog">
+
+  <ng-template #header>
+    <div class="modal-header">
+      <div class="header-text">
+        <h2 class="modal-title">{{ title() }}</h2>
+        <p class="modal-subtitle">{{ description() }}</p>
+      </div>
+      <button class="close-button" (click)="onClose()" type="button" aria-label="Cerrar">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+  </ng-template>
+
+  <div class="modal-body">
+    @switch (apartado()) {
+    <!-- ! PROVEEDOR -->
+    @case ('proveedor') {
+    <app-form-proveedor #formComponent [data]="currentProveedor()" (saveSuccess)="onSaveSuccess($event)"></app-form-proveedor>
+    }
+    <!-- ! ROL -->
+    @case ('rol') {
+    <app-form-rol #formComponent [data]="currentRol()" (saveSuccess)="onSaveSuccess(null)"></app-form-rol>
+    }
+    <!-- ! CARGO RRHH-->
+    @case ('cargo') {
+    <app-form-cargo #formComponent [data]="currentCargo()" (saveSuccess)="onSaveSuccess(null)"></app-form-cargo>
+    }
+    @case ('usuario') {
+    <app-form-usuario #formComponent [data]="currentUsuario()" (saveSuccess)="onSaveSuccess(null)"></app-form-usuario>
+    }
+    @case ('sucursal') {
+    <app-form-sucursal #formComponent [data]="currentSucursal()" (saveSuccess)="onSaveSuccess(null)"></app-form-sucursal>
+    }
+    @case ('unidad-medida') {
+    <app-form-unidad-medida #formComponent [data]="currentUnidadMedida()" (saveSuccess)="onSaveSuccess(null)"></app-form-unidad-medida>
+    }
+    @default {
+    <div>
+      <p class="font-sm font-regular">
+        No se ha encontrado el apartado para el tipo de datos proporcionado.
+      </p>
+    </div>
+    }
+    }
+  </div>
+
+  <ng-template #footer>
+    <div class="modal-footer">
+      <app-button preset="cancel" label="Cancelar" (clicked)="onClose()"></app-button>
+      <app-button preset="save" [label]="actionText()" [loading]="formComponent?.isSubmitting()" (clicked)="submitForm()"></app-button>
+    </div>
+  </ng-template>
+</p-dialog>

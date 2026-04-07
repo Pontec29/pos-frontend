@@ -1,0 +1,377 @@
+/* Variables extracted from reference image */
+:host {
+    display: block;
+    background-color: #e2e8f0;
+    min-height: 80vh;
+    padding: 2rem 1rem;
+    border-radius: 14px;
+}
+
+.ingreso-container {
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+/* === Document Header === */
+.document-header {
+    margin-bottom: 2rem;
+}
+
+.doc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+::ng-deep .btn-back.p-button {
+    color: #64748b;
+    width: 2.5rem;
+    height: 2.5rem;
+
+    &:hover {
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+}
+
+.doc-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.doc-serie {
+    color: #0f172a;
+    letter-spacing: 0.5px;
+}
+
+.doc-serie--pending {
+    color: #64748b;
+    font-weight: 400;
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    background-color: #fef08a;
+    color: #854d0e;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.doc-context {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: 3.25rem;
+}
+
+.context-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.context-badge--info {
+    background-color: #eff6ff;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+}
+
+.context-badge--light {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+/* === Main Container Card === */
+.form-card {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+/* === Form Grid === */
+.form-grid {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+}
+
+.field-sunat {
+    flex: 1;
+    max-width: 400px;
+}
+
+.field-ref {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* === Detail Section === */
+.detail-section {
+    background-color: transparent;
+}
+
+.detail-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+}
+
+.search-exterior {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* Custom Table Layout */
+.table-wrapper {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.pos-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 1000px;
+}
+
+.pos-table thead {
+    background-color: #f1f5f9;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.pos-table th {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pos-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.pos-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Product display */
+.product-name-display {
+    padding: 0.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/* Input Customizations */
+.pos-input-num {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    background-color: #eef2f7;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.pos-input-num:focus {
+    border-color: #3b82f6;
+    background-color: #f1f5f9;
+}
+
+.bold-num {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-gray {
+    color: #64748b;
+}
+
+.blue-text {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+::ng-deep .table-select.p-select {
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+::ng-deep .table-select .p-select-label {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+.read-only-cell {
+    background-color: #f1f5f9;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+}
+
+/* LOTE Box Styles */
+.lote-box {
+    display: inline-block;
+    width: 24px;
+    height: 24px;
+    line-height: 22px;
+    text-align: center;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.lote-box--active {
+    color: #d97706;
+    border: 1px solid #fcd34d;
+    background-color: #fef3c7;
+}
+
+.lote-box--inactive {
+    color: #94a3b8;
+    border: 1px solid #cbd5e1;
+    background-color: #f1f5f9;
+}
+
+::ng-deep .active-date .p-inputtext {
+    border-color: #fbbf24;
+}
+
+.na-cell {
+    color: #94a3b8;
+    text-align: center;
+    font-weight: 600;
+}
+
+.action-icon {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.hover-red:hover {
+    color: #ef4444;
+    background-color: #fee2e2;
+}
+
+/* === Footer Area === */
+.footer-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #cbd5e1;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+}
+
+.total-display {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.total-amount {
+    font-size: 1.75rem;
+    color: #0f172a;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+::ng-deep .btn-clean.p-button {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+}
+
+::ng-deep .btn-save.p-button {
+    background-color: #10b981;
+    border-color: #10b981;
+    color: white;
+    font-weight: 600;
+}
+
+::ng-deep .btn-save.p-button:hover {
+    background-color: #059669;
+    border-color: #059669;
+}

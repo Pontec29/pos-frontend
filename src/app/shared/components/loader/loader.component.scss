@@ -1,0 +1,69 @@
+// @use 'mixins' as *;
+
+.loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: opacity 280ms ease, visibility 280ms ease;
+  opacity: 1;
+  visibility: visible;
+
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+.loader-center {
+  position: relative;
+  width: var(--ring-size, clamp(150px, 22vw, 225px));
+  height: var(--ring-size, clamp(150px, 22vw, 225px));
+}
+
+.loader-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: var(--ring-thickness, 8px) solid var(--ring-base-color, rgba(255, 255, 255, 0.25));
+  border-top-color: var(--ring-color, #ffffff);
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.35));
+  animation: rotate 1.1s linear infinite;
+  transition: filter 240ms ease;
+}
+
+.loader-logo {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  width: var(80px, clamp(60px, 10vw, 80px));
+  height: var(80px, clamp(60px, 10vw, 80px));
+}
+
+.loader-logo mat-icon {
+  width: 100%;
+  height: 100%;
+  color: #fff;
+  transition: transform 240ms ease, filter 240ms ease;
+}
+
+@keyframes rotate {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}

@@ -1,0 +1,37 @@
+version: '3.9'
+
+services:
+  # Tu Aplicación de Angular (Contenedor Interno)
+  pos-frontend-app:
+    container_name: pos-frontend-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    # Exponemos el puerto 80 interno para que el Proxy lo vea
+    expose:
+      - '80'
+    # Mantenemos el 8081 mapeado por si quieres probar localmente antes de subir
+    ports:
+      - '8081:80'
+    networks:
+      - production-network
+
+  # Nginx Proxy Manager (Aduana con SSL / HTTPS Gratis)
+  nginx-proxy-manager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    container_name: nginx-proxy-manager
+    restart: always
+    ports:
+      - '80:80' # Tráfico HTTP de producción
+      - '443:443' # Tráfico Seguro HTTPS de producción
+      - '81:81' # Panel de control (tu-ip:81)
+    volumes:
+      - ./nginx_proxy/data:/data
+      - ./nginx_proxy/letsencrypt:/etc/letsencrypt
+    networks:
+      - production-network
+
+networks:
+  production-network:
+    driver: bridge

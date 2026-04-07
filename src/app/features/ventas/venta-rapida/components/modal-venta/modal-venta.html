@@ -1,0 +1,32 @@
+<!-- ! (click)="onOverlayClick()" IMPLEMENTARLO SI ES NECESARIO -->
+<div class="modal-overlay">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="header-text">
+          <h2 class="modal-title font-lg font-bold">Prueba Modal</h2>
+          <p class="modal-subtitle font-sm font-regular">Prueba Modal</p>
+        </div>
+      </div>
+      <button class="close-button" (click)="onClose()" type="button" aria-label="Cerrar">
+        <i class="pi pi-times" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <div class="separator"></div>
+
+    <div class="modal-body"></div>
+
+    <div class="separator"></div>
+
+    <div class="modal-footer">
+      <app-button
+        preset="cancel"
+        label="Cancelar"
+        (clicked)="onClose()"
+        styleClass="cancel-button"
+      ></app-button>
+      <app-button preset="save" label="Guardar" styleClass="submit-button"></app-button>
+    </div>
+  </div>
+</div>

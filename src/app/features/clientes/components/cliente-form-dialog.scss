@@ -1,0 +1,33 @@
+.form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    margin-bottom: 1.25rem; // Espacio entre filas del formulario
+
+    label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+
+        &.required::after {
+            content: " *";
+            color: var(--danger);
+        }
+    }
+}
+
+.d-flex {
+    display: flex;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.justify-content-end {
+    justify-content: flex-end;
+}
+
+.w-full {
+    width: 100%;
+}

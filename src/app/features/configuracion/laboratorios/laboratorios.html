@@ -1,0 +1,82 @@
+<div class="page-header">
+  <div class="title-row">
+    <div class="title-content">
+      <h1>Laboratorios</h1>
+      <p class="subtitle">Gestión de laboratorios farmacéuticos</p>
+    </div>
+    <div class="actions">
+      <app-button label="Nuevo Laboratorio" icon="pi pi-plus" (onClick)="openNew()" />
+    </div>
+  </div>
+</div>
+
+<div class="card flex-column-card">
+  <!-- Filtro de búsqueda -->
+  <div class="filter-section">
+    <div class="filters-bar">
+      <div class="search">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search"></i>
+          <input type="text" pInputText placeholder="Buscar laboratorio..." [(ngModel)]="searchQuery"
+            style="width: 300px;" />
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  @if (loading()) {
+  <app-loading-spinner />
+  }
+
+  <!-- Tabla -->
+  @if (!loading()) {
+  <p-table [value]="laboratories()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['name', 'description']" [tableStyle]="{ 'min-width': '50rem' }">
+    <ng-template #header>
+      <tr>
+        <th>Nombre</th>
+        <th>Descripción</th>
+        <th>Estado</th>
+        <th style="width: 100px; text-align: center;">Acciones</th>
+      </tr>
+    </ng-template>
+    <ng-template #body let-lab>
+      <tr>
+        <td>{{ lab.name }}</td>
+        <td>{{ lab.description || '-' }}</td>
+        <td>
+          <span [class]="'status-badge ' + (lab.active ? 'active' : 'inactive')">
+            {{ lab.active ? 'Activo' : 'Inactivo' }}
+          </span>
+        </td>
+        <td>
+          <div class="actions">
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+              (click)="edit(lab)" pTooltip="Editar"></button>
+            <button pButton pRipple icon="pi pi-trash"
+              class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(lab)"
+              pTooltip="Eliminar"></button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+    <ng-template #emptymessage>
+      <tr>
+        <td colspan="4" style="text-align: center; padding: 2rem;">
+          <i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-secondary);"></i>
+          <p style="margin-top: 0.5rem; color: var(--text-secondary);">No hay laboratorios registrados</p>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+  }
+</div>
+
+<!-- Dialog de formulario -->
+<!-- Dialog de formulario -->
+<app-laboratory-form-dialog [(visible)]="visible" [laboratory]="selectedLab()" (save)="save($event)"
+  (cancel)="cancel()"></app-laboratory-form-dialog>
+
+<app-confirm-dialog />
+<p-toast />

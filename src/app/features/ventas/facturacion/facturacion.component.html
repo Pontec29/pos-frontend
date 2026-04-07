@@ -1,0 +1,207 @@
+<div class="erp-sales-container">
+    <form [formGroup]="ventaForm" (ngSubmit)="guardar()">
+        <div class="erp-layout-grid">
+
+            <div class="erp-main-content">
+
+                <div class="erp-card erp-header-card">
+                    <div class="header-info">
+                        <h1 class="header-title">Venta Electrónica</h1>
+                    </div>
+
+                    <div class="header-actions">
+                        <div class="voucher-type-selector">
+                            <label class="radio-option">
+                                <input type="radio" name="tipoComprobante" [value]="1" [checked]="tipoComprobanteSeleccionado() === 1" (change)="onTipoComprobanteChange(1)">
+                                <span>Factura</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="tipoComprobante" [value]="2" [checked]="tipoComprobanteSeleccionado() === 2" (change)="onTipoComprobanteChange(2)">
+                                <span>Boleta</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="tipoComprobante" [value]="3" [checked]="tipoComprobanteSeleccionado() === 3" (change)="onTipoComprobanteChange(3)">
+                                <span>Nota Crédito</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="tipoComprobante" [value]="4" [checked]="tipoComprobanteSeleccionado() === 4" (change)="onTipoComprobanteChange(4)">
+                                <span>Nota Débito</span>
+                            </label>
+                        </div>
+
+                        <div class="correlative-box">
+                            <span class="box-label">Serie - Correlativo</span>
+                            <span class="box-value">{{ serieCorrelativo() }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card">
+                    <div class="section-header">
+                        <i class="pi pi-user"></i>
+                        <h2 class="section-title">Datos del Cliente</h2>
+                    </div>
+
+                    <div class="row items-end">
+                        <div class="col-12 col-md-2 form-field">
+                            <label>Fecha de Emisión</label>
+                            <p-datepicker inputId="fechaEmision" [showIcon]="true" formControlName="fechaEmision" fluid></p-datepicker>
+                        </div>
+
+                        <div class="col-12 col-md-6 form-field">
+                            <label>Nombre o Razón Social</label>
+                            <!-- <p-select formControlName="cliente" [options]="clientesSugeridos" optionLabel="razonSocial" optionValue="id" placeholder="Buscar cliente..." fluid>
+                            </p-select> -->
+                            <p-autoComplete formControlName="cliente" [suggestions]="clientesSugeridos" (completeMethod)="buscarClientes($event)" optionLabel="razonSocial" (onSelect)="onClienteSeleccionado($event)" [forceSelection]="true" placeholder="Buscar cliente..." fluid>
+                            </p-autoComplete>
+                        </div>
+
+                        <div class="col-6 col-md-2 form-field">
+                            <p-button label="Nuevo Cliente" icon="pi pi-plus" (click)="abrirModalCliente()" fluid styleClass="btn-new-client w-full"></p-button>
+                        </div>
+
+
+                        <div class="col-6 col-md-2 form-field">
+                            <label>Moneda</label>
+                            <p-select formControlName="moneda" [options]="[{label: 'PEN', value: 1}, {label: 'USD', value: 2}]" [disabled]="true" fluid></p-select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card erp-search-section">
+                    <div class="row items-end">
+                        <div class="col-12 col-md-4 form-field">
+                            <label>Buscar Producto</label>
+                            <p-inputgroup>
+                                <p-autoComplete [formControl]="buscadorControl" [suggestions]="productosSugeridos" (completeMethod)="buscarProductos($event)" optionLabel="nombre" (onSelect)="onProductoSeleccionado($event)" (onClear)="onBuscadorClear()" placeholder="Escanea o busca..." fluid>
+                                </p-autoComplete>
+                                <p-inputgroup-addon><i class="pi pi-search"></i></p-inputgroup-addon>
+                            </p-inputgroup>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label>Unidad</label>
+                            <p-select [options]="itemUnidadOptions" [formControl]="itemUnidad" placeholder="Seleccione" fluid optionLabel="label" optionValue="value">
+                            </p-select>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label>Cantidad</label>
+                            <p-inputnumber [formControl]="itemCantidad" mode="decimal" [minFractionDigits]="2" [min]="0.0001" fluid></p-inputnumber>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label>Afectación IGV</label>
+                            <p-select [options]="tiposAfectacion" [formControl]="itemAfectacion" fluid></p-select>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <p-button (click)="agregarDetalle()" label="Agregar" icon="pi pi-plus" [disabled]="!selectedProducto" fluid styleClass="btn-add-item w-full">
+                            </p-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card erp-table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th>Descripción</th>
+                                <th style="width: 120px;">Unidad</th>
+                                <th style="width: 180px;">Afectación</th>
+                                <th class="text-center" style="width: 100px;">Cant.</th>
+                                <th class="text-right" style="width: 120px;">Unitario</th>
+                                <th class="text-right" style="width: 120px;">Total</th>
+                                <th class="action-col" style="width: 60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody formArrayName="detalles">
+                            <tr *ngFor="let item of detallesFormArray.controls; let i = index" [formGroupName]="i">
+                                <td class="text-center">{{ i + 1 }}</td>
+                                <td>
+                                    <span class="product-name font-medium">{{ item.get('productoNombre')?.value
+                                        }}</span>
+                                    <small class="text-muted block mt-1">Cod: {{ item.get('productoCodigo')?.value
+                                        }}</small>
+                                </td>
+                                <td>
+                                    <span class="text-sm">{{ item.get('unidadSeleccionada')?.value?.unidadNombre }}</span>
+                                </td>
+                                <td><p-select [options]="tiposAfectacion" formControlName="afectacion" fluid appendTo="body"></p-select>
+                                </td>
+                                <td><p-inputnumber formControlName="cantidad" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
+                                <td><p-inputnumber formControlName="precioUnitario" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
+                                <td class="text-right font-bold">{{ item.get('subtotal')?.value | number:'1.2-2' }}</td>
+                                <td class="text-center">
+                                    <button class="btn-delete" type="button" (click)="eliminarFila(i)">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="detallesFormArray.length === 0">
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    No hay productos agregados a la venta
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="erp-sidebar">
+                <div class="erp-card summary-card">
+                    <h2 class="summary-title">Resumen de Totales</h2>
+                    <div class="summary-totals">
+                        <div class="summary-row"><span>Op. Gravada:</span><span class="amount">{{ subtotalGeneral() |
+                                number:'1.2-2' }}</span></div>
+                        <div class="summary-row"><span>I.G.V. (18%):</span><span class="amount">{{ igvGeneral() |
+                                number:'1.2-2' }}</span></div>
+                        <div class="summary-divider"></div>
+                        <div class="total-display">
+                            <span class="total-label">Total</span>
+                            <span class="total-number">{{ totalGeneral() | number:'1.2-2' }}</span>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-issue-voucher" [disabled]="guardando()">
+                        <i [class]="guardando() ? 'pi pi-spin pi-spinner' : 'pi pi-file-export'"></i>
+                        {{ guardando() ? 'Procesando...' : 'Emitir Comprobante' }}
+                    </button>
+                </div>
+
+                <div formGroupName="condicionPago" class="erp-card">
+                    <div class="section-header mb-3">
+                        <h3 class="section-title">Condición de Pago</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="col-12 form-field">
+                            <div class="payment-toggle">
+                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CONTADO'" (click)="ventaForm.get('condicionPago.condicion')?.setValue('CONTADO')">Contado</button>
+                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CRÉDITO'" (click)="ventaForm.get('condicionPago.condicion')?.setValue('CRÉDITO')">Crédito</button>
+                            </div>
+                        </div>
+                        <div class="col-12 form-field">
+                            <label>Forma de Pago</label>
+                            <p-select [options]="formaPagoOptions()" formControlName="formaPago" fluid></p-select>
+                        </div>
+                        <div class="col-12 form-field">
+                            <label>Ref. de Operación</label>
+                            <input pInputText type="text" formControlName="refOperacion" placeholder="Opcional" class="w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sunat-alert">
+                    <i class="pi pi-info-circle"></i>
+                    <div>
+                        <strong>Nota SUNAT</strong>
+                        <p class="mt-1">Facturas > S/ 700.00 requieren identificación del cliente.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- <app-cliente-form-dialog [visible]="mostrarModalCliente()" (save)="onSaveCliente($event)" (cancel)="onCancelCliente()">
+</app-cliente-form-dialog> -->

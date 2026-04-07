@@ -1,0 +1,41 @@
+<p-dialog [visible]="visible" [modal]="true" [style]="{width:'600px'}" [draggable]="false" [closable]="false">
+    <ng-template #header>Empresa</ng-template>
+    <form [formGroup]="form" class="form-grid">
+        <div class="form-row">
+            <label for="razonSocial">Razón Social</label>
+            <input pInputText id="razonSocial" formControlName="razonSocial" />
+        </div>
+        <div class="form-row">
+            <label for="ruc">RUC</label>
+            <input pInputText id="ruc" formControlName="ruc" />
+        </div>
+        <div class="form-row">
+            <label for="direccion">Dirección</label>
+            <input pInputText id="direccion" formControlName="direccion" />
+        </div>
+        <div class="form-row">
+            <label for="telefono">Teléfono</label>
+            <input pInputText id="telefono" formControlName="telefono" />
+        </div>
+        <div class="form-row">
+            <label for="email">Correo</label>
+            <input pInputText id="email" formControlName="email" />
+        </div>
+        <div class="form-row">
+            <label for="tipoEmpresa">Tipo Empresa</label>
+            <input pInputText id="tipoEmpresa" formControlName="tipoEmpresa" />
+        </div>
+        <!-- <div class="form-row">
+            <label for="mainCompany">Principal</label>
+            <p-select id="mainCompany" [options]="[{label:'Sí',value:true},{label:'No',value:false}]" formControlName="mainCompany"></p-select>
+        </div>
+        <div class="form-row">
+            <label for="active">Estado</label>
+            <p-select id="active" [options]="statusOptions" formControlName="active"></p-select>
+        </div> -->
+    </form>
+    <ng-template #footer>
+        <app-button preset="cancel" label="Cancelar" (clicked)="visibleChange.emit(false)"></app-button>
+        <app-button preset="save" label="Guardar" (clicked)="save.emit()"></app-button>
+    </ng-template>
+</p-dialog>

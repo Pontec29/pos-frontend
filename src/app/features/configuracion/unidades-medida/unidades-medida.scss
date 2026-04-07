@@ -1,0 +1,10 @@
+@use 'table' as *;
+
+.type-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #e3f2fd;
+    color: #1976d2;
+}

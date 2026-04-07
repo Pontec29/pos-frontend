@@ -1,0 +1,243 @@
+<div class="erp-sales-container">
+    <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="erp-layout-grid">
+
+            <div class="erp-main-content">
+
+                <div class="erp-card erp-header-card">
+                    <div class="header-info">
+                        <h1 class="header-title">Compra a Proveedor</h1>
+                    </div>
+                </div>
+
+                <div class="erp-card">
+                    <div class="section-header">
+                        <i class="pi pi-building"></i>
+                        <h2 class="section-title">Datos del Proveedor</h2>
+                    </div>
+
+                    <div class="row items-end">
+                        <div class="col-12 col-md-6 form-field">
+                            <label for="proveedor" class="required">Proveedor</label>
+                            <p-autoComplete inputId="proveedor" [ngModel]="selectedSupplier()"
+                                (ngModelChange)="selectedSupplier.set($event)" [suggestions]="filteredSuppliers()"
+                                (completeMethod)="filterSuppliers($event)" (onSelect)="onSupplierSelect($event)"
+                                field="businessName" [dropdown]="true" placeholder="Buscar por nombre o RUC" fluid
+                                [ngModelOptions]="{standalone: true}" aria-describedby="proveedor-error" />
+                            <small id="proveedor-error"
+                                *ngIf="form.get('ID_PROVEEDOR')?.invalid && form.get('ID_PROVEEDOR')?.touched"
+                                class="p-error">
+                            </small>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="tipo_doc" class="required">Tipo Doc.</label>
+                            <p-select inputId="tipo_doc" [options]="voucherTypes" formControlName="ID_TIPO_COMPROBANTE"
+                                optionLabel="label" optionValue="value" placeholder="Seleccione" fluid
+                                aria-describedby="tipo-doc-error" />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="moneda" class="required">Moneda</label>
+                            <p-select inputId="moneda" [options]="currencies" formControlName="ID_MONEDA"
+                                optionLabel="label" optionValue="value" fluid />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="fecha_emision" class="required">Emisión</label>
+                            <p-datepicker inputId="fecha_emision" formControlName="FECHA_EMISION" dateFormat="dd/mm/yy"
+                                [showIcon]="true" fluid aria-describedby="fecha-emision-error" />
+                            <small id="fecha-emision-error"
+                                *ngIf="form.get('FECHA_EMISION')?.invalid && form.get('FECHA_EMISION')?.touched"
+                                class="p-error">
+                            </small>
+                        </div>
+                    </div>
+
+                    <div class="row items-end">
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="fecha_venc">Vencimiento</label>
+                            <p-datepicker inputId="fecha_venc" formControlName="FECHA_VENCIMIENTO" dateFormat="dd/mm/yy"
+                                [showIcon]="true" fluid />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="serie" class="required">Serie</label>
+                            <input pInputText id="serie" formControlName="SERIE" placeholder="F001" maxlength="4" fluid
+                                aria-describedby="serie-error" />
+                            <small id="serie-error" *ngIf="form.get('SERIE')?.invalid && form.get('SERIE')?.touched"
+                                class="p-error">
+                            </small>
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="numero" class="required">Número</label>
+                            <input pInputText id="numero" formControlName="NUMERO" placeholder="00000001" maxlength="10"
+                                fluid aria-describedby="numero-error" />
+                            <small id="numero-error" *ngIf="form.get('NUMERO')?.invalid && form.get('NUMERO')?.touched"
+                                class="p-error">
+                            </small>
+                        </div>
+
+                        <div class="col-12 col-md-6 form-field">
+                            <label for="observaciones">Observaciones</label>
+                            <textarea pInputTextarea id="observaciones" formControlName="OBSERVACIONES" rows="2"
+                                placeholder="Notas adicionales..." class="w-full"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card erp-search-section">
+                    <div class="row items-end">
+                        <div class="col-12 col-md-5 form-field">
+                            <label for="new_product">Buscar Producto</label>
+                            <p-autoComplete inputId="new_product" [ngModel]="newProduct()"
+                                (ngModelChange)="newProduct.set($event)" [suggestions]="filteredProducts()"
+                                (completeMethod)="filterProducts($event)" field="name" [dropdown]="true"
+                                placeholder="Escanea o busca..." fluid [ngModelOptions]="{standalone: true}"
+                                panelStyleClass="product-dropdown-panel" />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="new_qty">Cantidad</label>
+                            <p-inputNumber inputId="new_qty" [ngModel]="newQuantity()"
+                                (ngModelChange)="newQuantity.set($event)" [min]="0.01" [showButtons]="true"
+                                buttonLayout="horizontal" inputStyleClass="text-center" incrementButtonIcon="pi pi-plus"
+                                decrementButtonIcon="pi pi-minus" [ngModelOptions]="{standalone: true}" fluid />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="new_cost">Costo Unit.</label>
+                            <p-inputNumber inputId="new_cost" [ngModel]="newUnitCost()"
+                                (ngModelChange)="newUnitCost.set($event)" mode="currency" currency="PEN" locale="es-PE"
+                                [ngModelOptions]="{standalone: true}" fluid />
+                        </div>
+
+                        <div class="col-12 col-md-2 form-field">
+                            <label for="new_lot">Lote</label>
+                            <input pInputText id="new_lot" [ngModel]="newLotCode()"
+                                (ngModelChange)="newLotCode.set($event)" placeholder="Opcional"
+                                [ngModelOptions]="{standalone: true}" fluid />
+                        </div>
+
+                        <div class="col-12 col-md-1 form-field">
+                            <p-button (click)="addLine()" icon="pi pi-plus" label="Agregar" fluid styleClass="w-full">
+                            </p-button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card erp-table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th>Descripción</th>
+                                <th class="text-center" style="width: 100px;">Cant.</th>
+                                <th class="text-right" style="width: 120px;">Costo Unit.</th>
+                                <th class="text-right" style="width: 120px;">Subtotal</th>
+                                <th class="text-right" style="width: 100px;">IGV</th>
+                                <th class="text-right" style="width: 120px;">Total</th>
+                                <th class="action-col" style="width: 60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of detailsControls; let i = index" [formGroup]="item"
+                                class="detail-row">
+                                <td class="text-center">{{ i + 1 }}</td>
+                                <td>
+                                    <span class="product-name font-medium">{{ item.get('PRODUCTO_NOMBRE')?.value
+                                        }}</span>
+                                    <small class="text-muted block mt-1" *ngIf="item.get('CODIGO_LOTE')?.value">
+                                        Lote: {{ item.get('CODIGO_LOTE')?.value }}
+                                        <span *ngIf="item.get('FECHA_VENCIMIENTO')?.value">
+                                            | Venc: {{ item.get('FECHA_VENCIMIENTO')?.value | date:'dd/MM/yyyy' }}
+                                        </span>
+                                    </small>
+                                </td>
+                                <td class="text-center">
+                                    <span class="font-bold">{{ item.get('CANTIDAD')?.value | number:'1.2-2' }}</span>
+                                </td>
+                                <td class="text-right">
+                                    {{ item.get('VALOR_UNITARIO')?.value | currency:'PEN':'symbol':'1.2-2' }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.get('SUBTOTAL')?.value | currency:'PEN':'symbol':'1.2-2' }}
+                                </td>
+                                <td class="text-right">
+                                    {{ item.get('IGV')?.value | currency:'PEN':'symbol':'1.2-2' }}
+                                </td>
+                                <td class="text-right font-bold">
+                                    <span class="row-total">{{ item.get('TOTAL')?.value |
+                                        currency:'PEN':'symbol':'1.2-2' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn-delete" type="button" (click)="removeLine(i)">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="detailsControls.length === 0">
+                                <td colspan="8" class="text-center py-4 text-muted">
+                                    No hay productos agregados a la compra
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr class="totals-row subtotal">
+                                <td colspan="6" class="label-cell">Subtotal</td>
+                                <td class="amount-cell">{{ subtotalGeneral() | currency:'PEN':'symbol':'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                            <tr class="totals-row igv">
+                                <td colspan="6" class="label-cell">IGV (18%)</td>
+                                <td class="amount-cell">{{ igvTotal() | currency:'PEN':'symbol':'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                            <tr class="totals-row grand-total">
+                                <td colspan="6" class="label-cell">Total a Pagar</td>
+                                <td class="amount-cell highlight">{{ totalGeneral() |
+                                    currency:'PEN':'symbol':'1.2-2' }}</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div *ngIf="form.get('DETALLES')?.invalid && form.get('DETALLES')?.touched"
+                    class="error-feedback fade-in">
+                    <i class="pi pi-exclamation-triangle"></i>
+                    <span>Debe agregar al menos un producto para registrar la compra.</span>
+                </div>
+            </div>
+
+            <div class="erp-sidebar">
+                <div class="erp-card summary-card">
+                    <h2 class="summary-title">Resumen de Compra</h2>
+
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span class="amount">{{ subtotalGeneral() | currency:'PEN':'symbol':'1.2-2' }}</span>
+                    </div>
+
+                    <div class="summary-row">
+                        <span>IGV (18%)</span>
+                        <span class="amount">{{ igvTotal() | currency:'PEN':'symbol':'1.2-2' }}</span>
+                    </div>
+
+                    <div class="summary-divider"></div>
+
+                    <div class="total-display">
+                        <span class="total-label">Total</span>
+                        <span class="total-number">{{ totalGeneral() | currency:'PEN':'symbol':'1.2-2' }}</span>
+                    </div>
+
+                    <p-button label="Guardar Compra" icon="pi pi-check" class="btn-issue-voucher" (onClick)="save()"
+                        [loading]="false" [disabled]="form.invalid">
+                    </p-button>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>

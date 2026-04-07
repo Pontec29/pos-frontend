@@ -1,0 +1,96 @@
+<div class="page-header">
+    <div class="title-row">
+        <div class="title-content">
+            <h1>Principios Activos</h1>
+            <p class="subtitle">Componentes activos de los medicamentos</p>
+        </div>
+        <div class="actions">
+            <app-button label="Nuevo Principio" icon="pi pi-plus" (onClick)="openNew()" />
+        </div>
+    </div>
+</div>
+
+<div class="card flex-column-card">
+    <div class="filter-section">
+        <div class="filters-bar">
+            <div class="search">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input type="text" pInputText placeholder="Buscar principio activo..." [(ngModel)]="searchQuery"
+                        style="width: 300px;" />
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if (loading()) {
+    <app-loading-spinner />
+    }
+
+    @if (!loading()) {
+    <p-table [value]="principles()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
+        [globalFilterFields]="['name', 'description']">
+        <ng-template #header>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Estado</th>
+                <th style="width: 100px; text-align: center;">Acciones</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-item>
+            <tr>
+                <td><strong>{{ item.name }}</strong></td>
+                <td>{{ item.description || '-' }}</td>
+                <td>
+                    <span [class]="'status-badge ' + (item.active ? 'active' : 'inactive')">
+                        {{ item.active ? 'Activo' : 'Inactivo' }}
+                    </span>
+                </td>
+                <td>
+                    <div class="actions">
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
+                            (click)="edit(item)" pTooltip="Editar"></button>
+                        <button pButton pRipple icon="pi pi-trash"
+                            class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(item)"
+                            pTooltip="Eliminar"></button>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="4" style="text-align: center; padding: 2rem;">
+                    <i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-secondary);"></i>
+                    <p style="margin-top: 0.5rem; color: var(--text-secondary);">No hay principios activos registrados
+                    </p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    }
+</div>
+
+<p-dialog [header]="selectedItem() ? 'Editar Principio Activo' : 'Nuevo Principio Activo'" [(visible)]="visible"
+    [modal]="true" [style]="{ width: '500px' }" [draggable]="false" [resizable]="false">
+    <div class="form-grid" style="grid-template-columns: 1fr;">
+        <div class="form-row">
+            <label for="name" class="required">Nombre</label>
+            <input id="name" type="text" pInputText [(ngModel)]="form.name" placeholder="Ej: Paracetamol, Ibuprofeno" />
+        </div>
+        <div class="form-row">
+            <label for="description">Descripción</label>
+            <textarea id="description" pTextarea [(ngModel)]="form.description" placeholder="Descripción o notas"
+                rows="3"></textarea>
+        </div>
+    </div>
+    <ng-template #footer>
+        <div class="flex justify-content-end gap-2">
+            <p-button label="Cancelar" severity="secondary" (onClick)="cancel()" />
+            <p-button label="Guardar" (onClick)="save()" [loading]="saving()" />
+        </div>
+    </ng-template>
+</p-dialog>
+
+<app-confirm-dialog />
+<p-toast />

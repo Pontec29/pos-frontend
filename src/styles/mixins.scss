@@ -1,0 +1,91 @@
+// Dispositivos móviles
+$phone-x1: 350px;           // Teléfonos pequeños (iPhone SE, Galaxy Fold)
+$phone-x2: 375px;           // Teléfonos estándar (iPhone 12/13 mini)
+$phone-medium: 414px;       // Teléfonos medianos (iPhone 12/13 Pro)
+$phone-large: 520px;        // Phablets (ej: Galaxy Note) o móviles grandes
+// Tablets
+$tablet-small: 630px;       // Tablets pequeñas en vertical (ej: Kindle Fire)
+$tablet: 744px;             // Tablets estándar (iPad Mini, iPad Vertical)
+$tablet-large: 900px;       // Tablets grandes en horizontal (iPad Pro 10.5")
+// Dispositivos de escritorio
+$desktop-small: 1024px;     // Laptops pequeñas (11-13") o tablets en desktop mode
+$desktop-medium: 1280px;    // Laptops estándar (14-15", ej: MacBook Pro 13")
+$desktop-full: 1366px;      // Monitores de escritorio (1080p común en laptops económicas)
+$desktop-ultra-hd: 1700px;  // Pantallas grandes (4K/Ultra HD, ej: monitores 27"+)
+
+// Colores
+$text-body-subtle: #787878;
+$bg-dark-strong: #1F1F1F;
+$border-strong: #40403F;
+$bg-medium: #40403F;
+$text-fg-secondary:#F2911C;
+$text-soft:#CCCCCC;
+$bg-medium:#40403F;
+$bg-secondary-strong:#E17100;
+
+// Teléfonos pequeños (≥360px)
+@mixin phone-x1 {
+  @media (min-width: $phone-x1) {
+    @content;
+  }
+}
+// Teléfonos estándar (≥375px)
+@mixin phone-x2 {
+  @media (min-width: $phone-x2) {
+    @content;
+  }
+}
+// Teléfonos medianos (≥414px)
+@mixin phone-medium {
+  @media (min-width: $phone-medium) {
+    @content;
+  }
+}
+// Phablets/Móviles grandes (≥520px)
+@mixin phone-large {
+  @media (min-width: $phone-large) {
+    @content;
+  }
+}
+// Tablets pequeñas vertical (≥630px)
+@mixin tablet-small {
+  @media (min-width: $tablet-small) {
+    @content;
+  }
+}
+// Tablets estándar (≥768px)
+@mixin tablet {
+  @media (min-width: $tablet) {
+    @content;
+  }
+}
+// Tablets grandes horizontal (≥900px)
+@mixin tablet-large {
+  @media (min-width: $tablet-large) {
+    @content;
+  }
+}
+// Laptops pequeñas/Tablets desktop (≥1024px)
+@mixin desktop-small {
+  @media (min-width: $desktop-small) {
+    @content;
+  }
+}
+// Laptops estándar (≥1280px)
+@mixin desktop-medium {
+  @media (min-width: $desktop-medium) {
+    @content;
+  }
+}
+// Monitores escritorio (≥1366px)
+@mixin desktop-full {
+  @media (min-width: $desktop-full) {
+    @content;
+  }
+}
+// Pantallas Ultra HD/4K (≥1700px)
+@mixin desktop-ultra-hd {
+  @media (min-width: $desktop-ultra-hd) {
+    @content;
+  }
+}

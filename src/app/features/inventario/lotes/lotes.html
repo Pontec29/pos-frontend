@@ -1,0 +1,84 @@
+<div class="page-header">
+    <div class="title-row">
+        <div class="title-content">
+            <h1>Control de Lotes</h1>
+            <p class="subtitle">Gestión de lotes y fechas de vencimiento</p>
+        </div>
+    </div>
+</div>
+
+<div class="card flex-column-card">
+    <div class="filter-section">
+        <div class="filters-bar">
+            <div class="search">
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input type="text" pInputText placeholder="Buscar producto o lote..." [(ngModel)]="searchQuery"
+                        style="width: 250px;" />
+                </span>
+            </div>
+            <div class="chips">
+                <div class="chip">
+                    <label style="margin-right: 0.5rem;">Sucursal:</label>
+                    <p-select [options]="branches" [(ngModel)]="selectedBranchId" optionLabel="name" optionValue="id"
+                        (onChange)="onBranchChange()" [style]="{ width: '200px' }" />
+                </div>
+                <div class="chip">
+                    <label style="margin-right: 0.5rem;">Filtro:</label>
+                    <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label"
+                        optionValue="value" (onChange)="onFilterChange()" [style]="{ width: '220px' }" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @if (loading()) {
+    <app-loading-spinner />
+    }
+
+    @if (!loading()) {
+    <p-table [value]="lots()" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[10, 15, 25, 50]"
+        [globalFilterFields]="['productName', 'lotCode']" [tableStyle]="{ 'min-width': '60rem' }">
+        <ng-template #header>
+            <tr>
+                <th pSortableColumn="lotCode">Código Lote <p-sortIcon field="lotCode" /></th>
+                <th pSortableColumn="productName">Producto <p-sortIcon field="productName" /></th>
+                <th pSortableColumn="expirationDate">Vencimiento <p-sortIcon field="expirationDate" /></th>
+                <th style="text-align: right;">Cantidad Inicial</th>
+                <th style="text-align: right;">Cantidad Actual</th>
+                <th style="text-align: right;">Costo Unit.</th>
+                <th style="text-align: center;">Estado</th>
+                <th style="text-align: center;">Vencimiento</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-lot>
+            <tr [ngClass]="{'row-expired': lot.isExpired, 'row-warning': lot.isNearExpiration && !lot.isExpired}">
+                <td><code>{{ lot.lotCode }}</code></td>
+                <td><strong>{{ lot.productName }}</strong></td>
+                <td>{{ lot.expirationDate | date:'dd/MM/yyyy' }}</td>
+                <td style="text-align: right;">{{ lot.initialQuantity | number:'1.2-2' }}</td>
+                <td style="text-align: right; font-weight: 600;">{{ lot.currentQuantity | number:'1.2-2' }}</td>
+                <td style="text-align: right;">S/ {{ lot.unitCost | number:'1.2-2' }}</td>
+                <td style="text-align: center;">
+                    <span [class]="'status-badge ' + (lot.status === 'ACTIVO' ? 'active' : 'inactive')">
+                        {{ lot.status }}
+                    </span>
+                </td>
+                <td style="text-align: center;">
+                    <p-tag [value]="getExpirationLabel(lot)" [severity]="getExpirationSeverity(lot)" />
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template #emptymessage>
+            <tr>
+                <td colspan="8" style="text-align: center; padding: 2rem;">
+                    <i class="pi pi-inbox" style="font-size: 2rem; color: var(--text-secondary);"></i>
+                    <p style="margin-top: 0.5rem; color: var(--text-secondary);">No hay lotes registrados</p>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+    }
+</div>
+
+<p-toast />

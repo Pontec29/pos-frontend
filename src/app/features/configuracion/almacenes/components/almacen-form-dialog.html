@@ -1,0 +1,48 @@
+<p-dialog [visible]="visible()" [modal]="true" [closable]="false" [style]="{ width: '600px' }"
+    [header]="almacen() ? 'Editar Almacén' : 'Nuevo Almacén'">
+    <form [formGroup]="almacenForm" (ngSubmit)="onSubmit()">
+
+        <!-- Sucursal -->
+        <div class="form-row">
+            <label for="sucursalId" class="required">Sucursal</label>
+            <p-select id="sucursalId" [options]="sucursalOptions()" formControlName="sucursalId"
+                placeholder="Seleccione sucursal" appendTo="body" optionLabel="label" optionValue="value">
+            </p-select>
+        </div>
+
+        <!-- Nombre y Código SUNAT -->
+        <div class="form-grid" style="margin-top: 1rem;">
+            <div class="form-row">
+                <label for="nombre" class="required">Nombre</label>
+                <input pInputText id="nombre" formControlName="nombre" />
+            </div>
+
+            <!-- <div class="form-row">
+                <label for="codigoSunat" class="required">Código SUNAT</label>
+                <input pInputText id="codigoSunat" formControlName="codigoSunat" />
+            </div> -->
+        </div>
+
+        <!-- Switches -->
+        <div class="form-grid" style="margin-top: 1rem;">
+            <div class="form-row">
+                <label for="esPrincipal">Es Principal</label>
+                <p-toggleSwitch id="esPrincipal" formControlName="esPrincipal"></p-toggleSwitch>
+            </div>
+
+            <div class="form-row">
+                <label for="permiteVenta">Permite Venta</label>
+                <p-toggleSwitch id="permiteVenta" formControlName="permiteVenta"></p-toggleSwitch>
+            </div>
+        </div>
+
+    </form>
+
+    <ng-template #footer>
+        <div class="dialog-footer">
+            <app-button preset="cancel" label="Cancelar" (clicked)="onCancel()"></app-button>
+            <app-button preset="save" [label]="almacen() ? 'Actualizar' : 'Guardar'"
+                (clicked)="onSubmit()"></app-button>
+        </div>
+    </ng-template>
+</p-dialog>

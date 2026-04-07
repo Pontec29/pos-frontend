@@ -1,0 +1,272 @@
+@use 'table' as *;
+
+.main-content {
+  .form-container {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
+    gap: 20px;
+    align-items: start;
+
+    .form {
+      width: 100%;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: minmax(160px, 160px) minmax(0, 1fr);
+      align-items: start;
+      gap: 16px;
+
+      &.form--disabled {
+        opacity: 0.8;
+      }
+
+      .form-section-left {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100%;
+        min-width: 0;
+
+        ::ng-deep .apertura-button {
+          width: 100% !important;
+          min-width: 160px !important;
+          min-height: 72px !important;
+          font-size: 16px !important;
+          font-weight: bold !important;
+          padding: var(--space-4) var(--space-6) !important;
+        }
+      }
+
+      .form-section-right {
+        width: 100%;
+        min-width: 0;
+        padding: 16px 0;
+        border-radius: 14px;
+
+        .row {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          align-items: start;
+          gap: 12px;
+          margin-bottom: 12px;
+
+          &:last-child {
+            margin-bottom: 0;
+          }
+
+          .item-form {
+            width: 100%;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e8f0fc;
+            background-color: #ffffff;
+            box-shadow: 0 4px 10px rgba(12, 58, 120, 0.05);
+            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+
+            .field-label {
+              display: flex;
+              align-items: center;
+              flex-wrap: wrap;
+              gap: 8px;
+              margin: 0;
+              font-family: var(--font-family);
+              font-size: 12px;
+              font-weight: 600;
+              letter-spacing: 0.04em;
+              line-height: 1.2;
+              color: #13356e;
+              text-transform: uppercase;
+            }
+
+            .field-icon {
+              font-size: 12px;
+              color: #2b6ed2;
+            }
+
+            .required-asterisk {
+              color: #ef4444;
+              font-weight: 700;
+            }
+
+            .field-error {
+              color: #ef4444;
+              font-size: 12px;
+              font-weight: 500;
+              margin-top: -4px;
+            }
+
+            .field-caption {
+              color: #5f7aa5;
+              font-size: 11px;
+              margin-top: -4px;
+            }
+
+            ::ng-deep .p-select,
+            ::ng-deep .p-inputnumber-input,
+            textarea[pInputTextarea],
+            input[pInputText] {
+              width: 100%;
+              max-width: 100%;
+              height: 40px;
+              border-radius: 8px;
+              border: 1px solid #cfe0fb;
+              background: #ffffff;
+              color: #1b3f79;
+              font-size: 13px;
+              transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+            }
+
+            ::ng-deep .p-select:not(.p-disabled):hover,
+            ::ng-deep .p-inputnumber-input:hover,
+            textarea[pInputTextarea]:hover,
+            input[pInputText]:hover {
+              border-color: #9dbef3;
+            }
+
+            ::ng-deep .p-select.p-focus,
+            ::ng-deep .p-inputnumber-input:focus,
+            textarea[pInputTextarea]:focus,
+            input[pInputText]:focus {
+              border-color: #6f9fe7;
+              box-shadow: 0 0 0 3px rgba(111, 159, 231, 0.2);
+              outline: none;
+            }
+
+            ::ng-deep .p-select.p-disabled,
+            textarea[pInputTextarea]:disabled,
+            input[pInputText]:disabled {
+              background: #f1f6ff;
+              color: #6a84ad;
+              opacity: 1;
+            }
+
+            textarea[pInputTextarea] {
+              min-height: 92px;
+              height: auto;
+              resize: vertical;
+              padding: 10px 12px;
+            }
+          }
+
+          .item-form--full {
+            grid-column: span 2;
+          }
+
+          .item-form--denominacion {
+            ::ng-deep .denominacion-action-button {
+              width: 100% !important;
+              min-height: 40px !important;
+              display: inline-flex !important;
+              justify-content: center;
+            }
+
+            ::ng-deep .denominacion-action-button--sent {
+              width: 100% !important;
+              border-color: #16a34a !important;
+              color: #16a34a !important;
+              background: transparent !important;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .list-container {
+    width: 100%;
+    margin-top: 20px;
+
+    h6 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #091730;
+      margin-bottom: 12px;
+    }
+  }
+}
+
+.w-full {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (max-width: 1400px) {
+  .main-content {
+    .form-container {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    .form-container {
+      .form {
+        grid-template-columns: 1fr;
+        gap: 12px;
+
+        .form-section-left {
+          min-height: auto;
+        }
+
+        .form-section-right {
+          .row {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    .form-container {
+      .form {
+        .form-section-left {
+          min-height: auto;
+        }
+
+        .form-section-right {
+          padding: 10px;
+
+          .row {
+            gap: 12px;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ! MODAL BACKDROP STYLES
+.modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px);
+}
+
+.modal-content {
+    width: min(760px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+}
+
+app-arqueo-caja {
+    position: relative;
+    z-index: 1001;
+    width: 100%;
+    display: block;
+}

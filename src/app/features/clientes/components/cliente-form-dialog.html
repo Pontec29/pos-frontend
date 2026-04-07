@@ -1,0 +1,93 @@
+<p-dialog [visible]="visible()" [modal]="true" [closable]="false" appendTo="body" [baseZIndex]="12000"
+    [style]="{ width: '700px' }" [header]="cliente() ? 'Editar Cliente' : 'Nuevo Cliente'">
+    <form [formGroup]="clienteForm" (ngSubmit)="onSubmit()" class="p-3">
+
+        <div class="row">
+            <div class="col-12 col-md-6 form-field">
+                <label for="tipoDocumentoId" class="required">Tipo Documento</label>
+                <p-select id="tipoDocumentoId" [options]="tipoDocumentoOptions()" formControlName="tipoDocCodigo" optionLabel="label" optionValue="value" appendTo="body" fluid>
+                </p-select>
+            </div>
+
+            <div class="col-12 col-md-6 form-field">
+                <label for="numeroDocumento" class="required">N° Documento</label>
+                <div class="d-flex gap-2">
+                    <input pInputText id="numeroDocumento" formControlName="numeroDocumento" class="w-full" (keydown.enter)="$event.preventDefault(); buscarDocumento()" />
+                    <app-button icon="pi pi-search" (clicked)="buscarDocumento()" [loading]="loading()" pTooltip="Consultar SUNAT/RENIEC" tooltipPosition="top">
+                    </app-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 form-field">
+                <label for="razonSocial" class="required">
+                    {{ isPersonaJuridica() ? 'Razón Social' : 'Nombre Completo' }}
+                </label>
+                <input pInputText id="razonSocial" formControlName="razonSocial" class="w-full" />
+
+            </div>
+            <div class="col-12 col-md-6 form-field">
+                <label for="nombreComercial">Nombre Comercial</label>
+                <input pInputText id="nombreComercial" formControlName="nombreComercial" class="w-full" />
+
+            </div>
+        </div>
+
+        @if (!isPersonaJuridica()) {
+        <div class="row">
+            <div class="col-12 col-md-6 form-field">
+                <label for="nombres">Nombres</label>
+                <input pInputText id="nombres" formControlName="nombres" class="w-full" />
+            </div>
+            <div class="col-12 col-md-6 form-field">
+                <label for="apellidos">Apellidos</label>
+                <input pInputText id="apellidos" formControlName="apellidos" class="w-full" />
+            </div>
+        </div>
+        }
+
+        <div class="row">
+            <div class="col-12 col-md-12 form-field">
+                <label for="direccionFiscal">Dirección Fiscal</label>
+                <input pInputText id="direccionFiscal" formControlName="direccionFiscal" class="w-full" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 form-field">
+                <label for="email">Email</label>
+                <input pInputText id="email" type="email" formControlName="email" class="w-full" />
+            </div>
+            <div class="col-12 col-md-6 form-field">
+                <label for="telefonoPrincipal">Teléfono</label>
+                <input pInputText id="telefonoPrincipal" formControlName="telefonoPrincipal" class="w-full" />
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-md-6 form-field">
+                <label for="ubigeo">Ubigeo</label>
+                <p-autoComplete inputId="ubigeo" formControlName="ubigeo" [suggestions]="ubigeoResults()" (completeMethod)="searchUbigeo($event)" field="distrito" optionLabel="distrito" [forceSelection]="true" appendTo="body" [minLength]="1" fluid>
+                    <ng-template let-ubigeo pTemplate="item">
+                        <div>{{ubigeo.departamento}} - {{ubigeo.provincia}} - {{ubigeo.distrito}}</div>
+                    </ng-template>
+                </p-autoComplete>
+            </div>
+            <div class="col-12 col-md-6 form-field" [class.d-none]="isPersonaJuridica()">
+                <label for="genero">Género</label>
+                <p-select inputId="genero" [options]="generoOptions()" formControlName="genero" optionLabel="label" optionValue="value" appendTo="body" [showClear]="true" fluid>
+                </p-select>
+            </div>
+        </div>
+
+    </form>
+
+    <ng-template #footer>
+        <div class="d-flex justify-content-end gap-2 p-3">
+            <app-button preset="cancel" label="Cancelar" (clicked)="onCancel()"></app-button>
+            <app-button preset="save" [label]="cliente() ? 'Actualizar' : 'Guardar'" (clicked)="onSubmit()">
+            </app-button>
+        </div>
+    </ng-template>
+</p-dialog>

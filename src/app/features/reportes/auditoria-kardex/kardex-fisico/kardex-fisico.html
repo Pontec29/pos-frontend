@@ -1,0 +1,124 @@
+<p-toast></p-toast>
+
+<div class="kardex-container">
+    <!-- Cabecera -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fa-solid fa-boxes-stacked"></i>
+                Kardex Físico
+            </h1>
+            <p class="page-subtitle">Formato SUNAT 12.1 — Registro de Inventario Permanente en Unidades Físicas</p>
+        </div>
+        <div class="header-actions">
+            <app-button preset="excel" severity="success" label="Exportar Excel"></app-button>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-card">
+        <div class="filters-grid">
+            <div class="filter-item filter-producto">
+                <label>Producto</label>
+                <p-autoComplete [(ngModel)]="productoSeleccionado" [suggestions]="sugerenciasProducto()"
+                    (completeMethod)="buscarProducto($event)" optionLabel="nombre" [dropdown]="true"
+                    placeholder="Buscar producto..." [minLength]="2" styleClass="filter-autocomplete">
+                </p-autoComplete>
+            </div>
+            <div class="filter-item">
+                <label>Almacén</label>
+                <p-select [(ngModel)]="almacenSeleccionado" [options]="almacenes()" optionLabel="label"
+                    optionValue="value" placeholder="Seleccionar almacén" styleClass="filter-dropdown">
+                </p-select>
+            </div>
+            <div class="filter-item">
+                <label>Periodo</label>
+                <p-datepicker [(ngModel)]="rangoFechas" selectionMode="range" dateFormat="dd/mm/yy"
+                    placeholder="Fecha inicio - Fecha fin" [showIcon]="true" styleClass="filter-datepicker">
+                </p-datepicker>
+            </div>
+            <div class="filter-item filter-action">
+                <label>&nbsp;</label>
+                <app-button preset="search" severity="primary" label="Filtrar" icon="pi pi-search"
+                    (clicked)="filtrar()"></app-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen -->
+    @if (data()) {
+    <div class="resumen-card">
+        <div class="resumen-item">
+            <span class="resumen-label">Producto</span>
+            <span class="resumen-value">{{ data()!.productoSku }} — {{ data()!.productoNombre }}</span>
+        </div>
+        <div class="resumen-item">
+            <span class="resumen-label">Almacén</span>
+            <span class="resumen-value">{{ data()!.almacenNombre }}</span>
+        </div>
+        <div class="resumen-item">
+            <span class="resumen-label">Unidad</span>
+            <span class="resumen-value">{{ data()!.unidadMedida }}</span>
+        </div>
+        <div class="resumen-item">
+            <span class="resumen-label">Registros</span>
+            <span class="resumen-value fw-bold">{{ data()!.totalRegistros }}</span>
+        </div>
+        <div class="resumen-item">
+            <span class="resumen-label">Saldo Final</span>
+            <span class="resumen-value fw-bold text-blue">{{ data()!.saldoFinalCantidad | number:'1.2-2' }}</span>
+        </div>
+    </div>
+    }
+
+    <!-- Tabla -->
+    <div class="table-card">
+        <p-table [value]="data()?.registros ?? []" [loading]="cargando()" [scrollable]="true" scrollHeight="flex"
+            [paginator]="true" [rows]="25" [rowsPerPageOptions]="[25, 50, 100]" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first}-{last} de {totalRecords}"
+            paginatorTemplate="RowsPerPageDropdown CurrentPageReport PrevPageLink PageLinks NextPageLink" dataKey="id"
+            styleClass="custom-kardex-table" emptyMessage="Selecciona filtros y presiona 'Filtrar'">
+
+            <ng-template #header>
+                <tr>
+                    <th style="width: 45px; text-align: center">#</th>
+                    <th style="width: 140px">FECHA</th>
+                    <th style="width: 220px">TIPO OPERACIÓN</th>
+                    <th style="width: 140px">DOCUMENTO</th>
+                    <th style="width: 100px">LOTE</th>
+                    <th class="col-entrada" style="width: 110px; text-align: right">CANT. ENTRADA</th>
+                    <th class="col-salida" style="width: 110px; text-align: right">CANT. SALIDA</th>
+                    <th class="col-saldo" style="width: 110px; text-align: right">SALDO</th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center text-muted">{{ rowIndex + 1 }}</td>
+                    <td class="text-muted">{{ item.fecha | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td>
+                        <p-tag [value]="item.tipoOperacionDesc" [severity]="item.esEntrada ? 'success' : 'danger'"
+                            [rounded]="true">
+                        </p-tag>
+                    </td>
+                    <td class="text-muted">{{ item.documentoReferencia ?? '—' }}</td>
+                    <td class="text-muted">{{ item.codigoLote ?? '—' }}</td>
+                    <!-- Entrada (verde) -->
+                    <td class="text-right cell-entrada">
+                        @if (item.esEntrada) {
+                        <span class="fw-medium">{{ item.cantidad | number:'1.2-2' }}</span>
+                        }
+                    </td>
+                    <!-- Salida (rojo) -->
+                    <td class="text-right cell-salida">
+                        @if (!item.esEntrada) {
+                        <span class="fw-medium">{{ item.cantidad | number:'1.2-2' }}</span>
+                        }
+                    </td>
+                    <!-- Saldo (azul) -->
+                    <td class="text-right cell-saldo fw-semibold">{{ item.saldoCantidad | number:'1.2-2' }}</td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

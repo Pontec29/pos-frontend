@@ -1,0 +1,51 @@
+<div class="container">
+    <section class="header-matrix">
+        <div class="header-matrix__info">
+            <h1 class="title">Menú por Rol</h1>
+        </div>
+    </section>
+
+    <section class="main-content">
+        <div class="table-section">
+            <div class="table-section__main-table" [class.table-loading]="loading()">
+                <p-treeTable [value]="modulesTree()" [loading]="loading()" styleClass="matrix-table" [scrollable]="true" scrollHeight="calc(100vh - 150px)">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th style="min-width: 300px;">Menú / Submenú</th>
+                            <th *ngFor="let role of roles()" class="text-center role-header">
+                                {{ role.name | uppercase }}
+                            </th>
+                        </tr>
+                    </ng-template>
+                    <ng-template pTemplate="body" let-rowNode let-rowData="rowData">
+                        <tr [ttRow]="rowNode">
+                            <td style="min-width: 300px">
+                                <div class="module-row-cell">
+                                    <p-treeTableToggler [rowNode]="rowNode"></p-treeTableToggler>
+                                    <i [class]="rowData.icon || 'pi pi-folder'" class="module-icon"></i>
+                                    <span class="module-name">{{ rowData.label }}</span>
+                                </div>
+                            </td>
+                            <td *ngFor="let role of roles()" class="text-center">
+                                <p-checkbox [(ngModel)]="rowData.rolesAccess[role.id]" [binary]="true" (onChange)="updatePermission(rowData.moduloId, rowData.empresaModuloId, role.id, rowData.rolesAccess[role.id])"></p-checkbox>
+                            </td>
+                        </tr>
+                    </ng-template>
+
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td [attr.colspan]="roles().length + 1">
+                                <div class="table-state table-state--empty">
+                                    <div class="table-state__icon"><i class="pi pi-shield"></i></div>
+                                    <div class="table-state__content">
+                                        <div class="table-state__title">Cargando módulos...</div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-treeTable>
+            </div>
+        </div>
+    </section>
+</div>

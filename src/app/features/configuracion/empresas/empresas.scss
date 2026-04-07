@@ -1,0 +1,9 @@
+@use 'table' as *;
+
+// Estilos específicos para empresas si fueran necesarios
+.user-info-cell {
+    .business-name-text {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+}

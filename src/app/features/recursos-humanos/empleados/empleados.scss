@@ -1,0 +1,9 @@
+@use 'table' as *;
+
+.text-success {
+    color: var(--green-500);
+}
+
+.text-secondary {
+    color: var(--gray-400);
+}

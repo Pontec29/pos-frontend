@@ -1,0 +1,103 @@
+.container {
+  padding: var(--space-4) var(--space-6);
+  background-color: #f4f7f9;
+  min-height: 100vh !important;
+}
+
+.header-matrix {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: var(--space-6);
+
+  &__info {
+    .title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #2c3e50;
+      margin: 0;
+      letter-spacing: -0.5px;
+    }
+  }
+}
+
+.main-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: var(--space-4);
+  height: 85vh;
+}
+.table-section {
+  max-height: 85vh;
+}
+::ng-deep .matrix-table {
+  background: white;
+
+  .p-treetable-thead > tr > th {
+    background: #f8faff !important;
+    color: #5d6d7e !important;
+    padding: 1.2rem 1rem !important;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-bottom: 2px solid #e9ecef !important;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .p-treetable-tbody > tr {
+    transition: background 0.15s;
+
+    &:nth-child(even) {
+      background: #fafbfc;
+    }
+
+    &:hover {
+      background: #f1f8ff !important;
+    }
+
+    > td {
+      padding: 1rem !important;
+      border-bottom: 1px solid #f1f3f5 !important;
+      border-left: 1px solid transparent;
+
+      &:not(:first-child) {
+        border-left: 1px solid #f1f3f5;
+      }
+    }
+  }
+
+  .p-treetable-toggler {
+    color: #2196f3 !important;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+
+    &:hover {
+      background: rgba(33, 150, 243, 0.1);
+    }
+  }
+}
+
+.module-row-cell {
+  display: flex;
+  align-items: center;
+
+  .module-icon {
+    font-size: 1.1rem;
+    margin-right: 0.75rem;
+    color: #34495e;
+    opacity: 0.8;
+  }
+
+  .module-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 0.95rem;
+  }
+}
+
+.table-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}

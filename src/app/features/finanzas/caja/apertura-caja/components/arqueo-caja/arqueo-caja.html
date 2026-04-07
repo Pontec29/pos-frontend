@@ -1,0 +1,71 @@
+<div class="arqueo-caja">
+  @if (isEntering()) {
+  <div class="arqueo-caja__loading" aria-live="polite" aria-busy="true">
+    <p-progressspinner strokeWidth="4" [style]="{ width: '46px', height: '46px' }" />
+    <span>Cargando arqueo de caja...</span>
+  </div>
+  }
+
+  <h6 class="arqueo-caja--title">ARQUEO DE CAJA</h6>
+  <div class="arqueo-caja--body" [class.is-loading]="isEntering()">
+    <div class="arqueo-caja__table-wrapper" tabindex="0" aria-label="Tabla de denominaciones de arqueo de caja">
+      <table class="arqueo-caja__table">
+        <thead>
+          <tr>
+            <th>DENOMINACIÓN</th>
+            <th>CANTIDAD</th>
+            <th>TOTAL</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (fila of filas(); track fila.ID_DENOMINACION) {
+          <tr>
+            <td class="denominacion">{{ fila.VALOR }}</td>
+            <td>
+              <input
+                type="text"
+                inputmode="numeric"
+                class="cantidad-input"
+                [value]="fila.CANTIDAD === 0 ? '' : fila.CANTIDAD"
+                (input)="onCantidadInput(fila.ID_DENOMINACION, $any($event.target).value)"
+                placeholder="0"
+              />
+              @if (getError(fila.ID_DENOMINACION)) {
+              <small class="input-error">{{ getError(fila.ID_DENOMINACION) }}</small>
+              }
+            </td>
+            <td class="total">{{ fila.TOTAL }}</td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="arqueo-caja__summary">
+      <div class="arqueo-caja__summary-labels">
+        <span>MONTO FINAL DEL ARQUEO</span>
+        <small>Total calculado en tiempo real</small>
+      </div>
+      <strong>{{ montoFinalCalculado() }}</strong>
+    </div>
+
+    <div class="arqueo-caja__actions">
+      <div class="arqueo-caja__actions-cancel">
+        <app-button
+          label="Cancelar"
+          type="secondary"
+          [outlined]="true"
+          (clicked)="cancelar()"
+        ></app-button>
+      </div>
+      <div class="arqueo-caja__actions-submit">
+        <app-button
+          label="Enviar Denominación"
+          type="success"
+          [disabled]="!canSubmit() || isEntering()"
+          (clicked)="enviarDenominacion()"
+        ></app-button>
+      </div>
+    </div>
+  </div>
+</div>

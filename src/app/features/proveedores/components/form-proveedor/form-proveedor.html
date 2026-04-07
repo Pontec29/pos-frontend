@@ -1,0 +1,150 @@
+<form class="proveedor-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+  <div class="row">
+    <div class="form-row">
+      <div class="input-with-action">
+        <p-floatlabel class="w-full">
+          <input
+            pInputText
+            id="ruc"
+            formControlName="ruc"
+            maxlength="11"
+            placeholder=" "
+            aria-label="RUC o DNI"
+            [class.p-invalid]="form.controls.ruc.invalid && (form.controls.ruc.touched || form.controls.ruc.dirty)"
+          />
+          <label for="ruc">RUC / DNI  <span style="color: red;">*</span></label>
+        </p-floatlabel>
+        <button
+          pButton
+          icon="pi pi-search"
+          type="button"
+          class="search-btn"
+          aria-label="Buscar RUC o DNI"
+          [loading]="isSearching()"
+          (click)="searchEntity()"
+        ></button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input pInputText id="code" formControlName="code" placeholder=" " aria-label="Código" />
+        <label for="code">Código</label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="name"
+          formControlName="name"
+          placeholder=" "
+          aria-label="Razón social"
+          [class.p-invalid]="form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)"
+        />
+        <label for="name">Razón Social <span style="color: red;">*</span></label>
+      </p-floatlabel>
+    </div>
+
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="address"
+          formControlName="address"
+          placeholder=" "
+          aria-label="Dirección"
+          [class.p-invalid]="form.controls.address.invalid && (form.controls.address.touched || form.controls.address.dirty)"
+        />
+        <label for="address">Dirección </label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="contactName"
+          formControlName="contactName"
+          placeholder=" "
+          aria-label="Nombres"
+          [class.p-invalid]="form.controls.contactName.invalid && (form.controls.contactName.touched || form.controls.contactName.dirty)"
+        />
+        <label for="contactName">Nombres  <span style="color: red;">*</span></label>
+      </p-floatlabel>
+    </div>
+
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="contactLastName"
+          formControlName="contactLastName"
+          placeholder=" "
+          aria-label="Apellidos"
+          [class.p-invalid]="form.controls.contactLastName.invalid && (form.controls.contactLastName.touched || form.controls.contactLastName.dirty)"
+        />
+        <label for="contactLastName">Apellidos  <span style="color: red;">*</span></label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder=" "
+          aria-label="Email"
+          [class.p-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
+        />
+        <label for="email">Email</label>
+      </p-floatlabel>
+    </div>
+
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <input
+          pInputText
+          id="phone"
+          formControlName="phone"
+          placeholder=" "
+          aria-label="Teléfono"
+          [class.p-invalid]="form.controls.phone.invalid && (form.controls.phone.touched || form.controls.phone.dirty)"
+        />
+        <label for="phone">Teléfono</label>
+      </p-floatlabel>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="form-row">
+      <p-floatlabel class="w-full">
+        <p-autoComplete
+          inputId="ubigeo"
+          formControlName="ubigeo"
+          [suggestions]="ubigeoResults()"
+          (completeMethod)="searchUbigeo($event)"
+          [forceSelection]="true"
+          optionLabel="distrito"
+          appendTo="body"
+          aria-label="Ubigeo (Ciudad)"
+          [class.p-invalid]="form.controls.ubigeo.invalid && (form.controls.ubigeo.touched || form.controls.ubigeo.dirty)"
+        >
+          <ng-template let-ubigeo pTemplate="item">
+            <div>{{ ubigeo.departamento }} - {{ ubigeo.provincia }} - {{ ubigeo.distrito }}</div>
+          </ng-template>
+        </p-autoComplete>
+        <label for="ubigeo">Ubigeo (Ciudad)  <span style="color: red;">*</span></label>
+      </p-floatlabel>
+    </div>
+  </div>
+</form>

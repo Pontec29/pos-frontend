@@ -1,0 +1,158 @@
+<div class="sidebar-wrapper" [ngClass]="{ 'sidebar-collapsed': collapsed(), 'sidebar-expanded': !collapsed() }"
+  (mouseleave)="onSidebarMouseLeave()">
+  <aside class="main-sidebar">
+    <div class="logo-container sidebar-section sidebar-section--header" routerLink="/dashboard" style="cursor: pointer;">
+      <img
+        src="NEXORA.webp"
+        alt="Pos 2026"
+        class="logo-image logo-image--expanded"
+        aria-hidden="false"
+      />
+      <img
+        src="LOGO.png"
+        alt="Pos 2026"
+        class="logo-image logo-image--collapsed logo-image--mobile-hidden"
+        [attr.aria-hidden]="collapsed() ? 'false' : 'true'"
+        [attr.data-visible]="collapsed() ? 'true' : 'false'"
+      />
+    </div>
+
+    <button
+      class="mobile-toggle-btn"
+      [ngClass]="{ 'is-open': !collapsed() }"
+      (click)="toggleSidebar.emit()"
+      aria-label="Abrir/cerrar menú"
+      type="button">
+      <span class="hamburger-icon" aria-hidden="true">
+        <span class="hamburger-line hamburger-line--top"></span>
+        <span class="hamburger-line hamburger-line--mid"></span>
+        <span class="hamburger-line hamburger-line--bot"></span>
+      </span>
+    </button>
+
+    <nav class="menu-container sidebar-section sidebar-section--nav">
+      <ng-container *ngTemplateOutlet="menuTreeTemplate; context: { $implicit: menuTree(), depth: 1, inPanel: false }"></ng-container>
+    </nav>
+
+    <div class="footer-container sidebar-section sidebar-section--footer">
+      <!-- <div class="user-divider" aria-hidden="true"></div> -->
+      <button
+        type="button"
+        class="user-footer-button"
+        (click)="togglePopover($event)"
+        aria-label="Abrir menú de usuario"
+        aria-haspopup="menu">
+        <div class="footer-item" aria-hidden="true">
+          <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle"
+            class="user-avatar">
+          </p-avatar>
+        </div>
+
+        <div class="user-inline-details">
+          <span class="user-inline-name">Admin General</span>
+          <span class="user-inline-role">admin@vesalius.edu</span>
+        </div>
+      </button>
+
+      <p-popover #op styleClass="user-menu-popover" appendTo="body" [baseZIndex]="20000">
+        <div class="user-menu-wrapper">
+          <div class="menu-header">
+            <p-avatar image="https://primefaces.org/cdn/primeng/images/demo/avatar/amyelsner.png" shape="circle"
+              size="large">
+            </p-avatar>
+            <div class="user-details">
+              <span class="user-name">Sophia Munn</span>
+              <span class="user-email">sophia@untitledui.com</span>
+            </div>
+          </div>
+
+          <ul class="menu-list">
+            <li class="menu-list-item" routerLink="/configuracion/usuarios">
+              <i class="pi pi-user"></i>
+              <span>Mi Perfil</span>
+              <span class="shortcut">⌘P</span>
+            </li>
+            <li class="menu-list-item" routerLink="/configuracion">
+              <i class="pi pi-cog"></i>
+              <span>Configuración</span>
+              <span class="shortcut">⌘,</span>
+            </li>
+            <li class="menu-list-item" routerLink="/soporte">
+              <i class="pi pi-question-circle"></i>
+              <span>Ayuda y Soporte</span>
+            </li>
+          </ul>
+
+          <div class="menu-separator"></div>
+
+          <div class="menu-footer">
+            <div class="logout-action" (click)="logout($event)">
+              <i class="pi pi-sign-out"></i>
+              <span>Cerrar Sesión</span>
+            </div>
+          </div>
+        </div>
+      </p-popover>
+    </div>
+  </aside>
+
+  @if (collapsed() && submenuOpen() && activeCollapsedRoot()) {
+  <div class="submenu-panel">
+    <div class="submenu-header">
+      <div class="header-content">
+        @if (activeParentIcon()) {
+        <i [class]="activeParentIcon()"></i>
+        }
+        <h3>{{ activeParentLabel() }}</h3>
+      </div>
+    </div>
+
+    <nav class="submenu-items">
+      <ng-container *ngTemplateOutlet="menuTreeTemplate; context: { $implicit: collapsedPanelItems(), depth: 2, inPanel: true }"></ng-container>
+    </nav>
+  </div>
+  }
+</div>
+
+<ng-template #menuTreeTemplate let-items let-depth="depth" let-inPanel="inPanel">
+  @for (item of items; track item.key) {
+  <div class="menu-item-group" [ngClass]="'menu-item-group--depth-' + depth">
+    <button
+      type="button"
+      class="menu-item"
+      [ngClass]="{
+        'active': isItemActive(item),
+        'is-open': isItemOpen(item),
+        'menu-item--nested': depth > 1,
+        'menu-item--branch': hasChildren(item),
+        'menu-item--panel': inPanel
+      }"
+      (click)="onItemClick(item, $event, inPanel)"
+      [pTooltip]="collapsed() && depth === 1 ? item.label : undefined"
+      tooltipPosition="right"
+      tooltipStyleClass="sidebar-tooltip">
+      <div class="menu-main">
+        @if (item.icon) {
+        <i [class]="item.icon"></i>
+        }
+        @if (!collapsed() || inPanel) {
+        <span class="menu-label">{{ item.label }}</span>
+        }
+      </div>
+      @if ((!collapsed() || inPanel) && hasChildren(item)) {
+      <i class="pi submenu-arrow" [ngClass]="isItemOpen(item) ? 'pi-chevron-up' : 'pi-chevron-down'"></i>
+      }
+    </button>
+
+    @if ((!collapsed() || inPanel) && hasChildren(item)) {
+    <div class="submenu-inline" [ngClass]="{ 'submenu-inline--open': isItemOpen(item) }">
+      <div class="submenu-inline-inner">
+        <ng-container *ngTemplateOutlet="menuTreeTemplate; context: { $implicit: getChildren(item), depth: depth + 1, inPanel: inPanel }"></ng-container>
+      </div>
+    </div>
+    }
+  </div>
+  }
+</ng-template>
+
+<p-confirmDialog></p-confirmDialog>

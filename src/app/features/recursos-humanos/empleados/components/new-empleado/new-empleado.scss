@@ -1,0 +1,167 @@
+.container {
+  padding: var(--space-8);
+  background-color: #f8f8f8;
+  min-height: calc(100vh - 4rem);
+}
+
+.employee-form-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-8);
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+// Perfil Lateral
+.profile-sidebar {
+  .profile-card {
+    text-align: center;
+    position: sticky;
+
+    .avatar-container {
+      position: relative;
+      width: 250px;
+      height: 250px;
+      margin: 0 auto var(--space-6);
+
+      .avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: var(--radius-lg);
+        object-fit: cover;
+        background-color: #f1f5f9;
+      }
+
+      .edit-avatar-btn {
+        position: absolute;
+        bottom: -10px;
+        right: -10px;
+        width: 36px;
+        height: 36px;
+        border-radius: var(--radius-md);
+        background: #60a5fa;
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgb(0 0 0 / 0.1);
+      }
+    }
+
+    .profile-name {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 var(--space-2);
+      text-transform: uppercase;
+    }
+
+    .profile-id {
+      color: #64748b;
+      font-size: var(--text-sm);
+      margin: 0 0 var(--space-4);
+    }
+  }
+}
+
+// Secciones de Formulario
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+
+  .form-section-card {
+    background: white;
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-8);
+
+      i {
+        font-size: var(--text-lg);
+        &.icon-blue {
+          color: #60a5fa;
+        }
+        &.icon-purple {
+          color: #818cf8;
+        }
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #334155;
+      }
+    }
+  }
+}
+
+// Grid de campos
+.fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-6);
+  .field-wrapper {
+    display: flex;
+    flex-direction: column;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.5rem 0.8rem;
+      border: 1px solid #cccccc;
+      border-radius: 5px;
+    }
+
+    // p-select,
+    // p-datepicker,
+    // p-inputnumber {
+    //   width: 100%;
+    //   padding: 0.5rem 0.8rem;
+    //   border: 1px solid #cccccc;
+    //   border-radius: 5px;
+    // }
+  }
+}
+
+// Panel inferior de Detalles de Trabajo y Acceso
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: var(--space-6);
+}
+
+// Acciones finales
+.form-actions {
+  margin-top: var(--space-8);
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-6);
+
+  .btn-cancel {
+    color: #64748b;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      color: #334155;
+    }
+  }
+}

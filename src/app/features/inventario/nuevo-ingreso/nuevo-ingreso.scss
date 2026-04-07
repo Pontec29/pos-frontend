@@ -1,0 +1,154 @@
+:host {
+    display: block;
+    background-color: #e2e8f0;
+    min-height: 80vh;
+    padding: 2rem 1rem;
+    border-radius: 14px;
+}
+
+.ingreso-container {
+    padding: 0 1rem;
+    margin: 0 auto;
+}
+
+/* === Page Header === */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    i {
+        color: #10b981;
+        font-size: 1.5rem;
+    }
+}
+
+.page-subtitle {
+    margin: 0.25rem 0 0;
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* === Table Card === */
+.table-card {
+    background: var(--surface-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-xl);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02); // Sombra muy sutil
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 280px);
+
+    .filters-bar {
+        padding: var(--space-4) 1.5rem;
+        border-bottom: 1px solid var(--border-light);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface-card);
+        gap: 1rem;
+    }
+
+    .search-group {
+        flex: 1;
+        max-width: 450px;
+
+        ::ng-deep .search-input {
+            width: 100%;
+
+            .p-inputtext {
+                width: 100%;
+                border-radius: var(--radius-xl) !important;
+                border: 1px solid #cbd5e1 !important;
+                padding: 0.6rem 1rem 0.6rem 2.5rem !important; // Espacio para el icono a la izq
+                font-size: 0.95rem;
+
+                &::placeholder {
+                    color: #94a3b8;
+                }
+            }
+
+            .pi-search {
+                color: #94a3b8;
+                left: 1rem;
+            }
+        }
+    }
+
+    .filter-chips {
+        display: flex;
+        flex-wrap: nowrap;
+        align-items: center;
+        gap: 0.75rem;
+
+        ::ng-deep .filter-dropdown {
+            width: 170px;
+        }
+
+        ::ng-deep .filter-btn-icon {
+            color: #94a3b8 !important;
+            padding: 0.6rem !important;
+
+            &:hover {
+                background: var(--surface-hover) !important;
+                color: #475569 !important;
+            }
+        }
+    }
+
+    p-table {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+}
+
+
+
+::ng-deep .custom-modern-table {
+
+    // 1. Fijar la cabecera para el scroll
+    .p-datatable-wrapper {
+        min-height: 200px; // Altura mínima de seguridad
+    }
+
+    .p-datatable-thead>tr>th {
+        position: sticky;
+        top: 0;
+        z-index: 2;
+        background-color: #f1f5f9 !important; // Fondo gris
+    }
+
+    // La paginación usa la definida globalmente en _forms.scss
+}
+
+
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}

@@ -1,0 +1,92 @@
+<p-toast></p-toast>
+
+<div class="egreso-container">
+    <!-- Cabecera -->
+    <div class="page-header">
+        <div class="header-left">
+            <h1 class="page-title">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Notas de Salida
+            </h1>
+            <p class="page-subtitle">Gestión de salidas de mercadería del almacén</p>
+        </div>
+        <div class="header-actions">
+            <app-button preset="excel" severity="success" label="Excel"></app-button>
+            <app-button preset="add" label="Nueva Nota de Salida" (clicked)="nuevaSalida()"></app-button>
+        </div>
+    </div>
+
+    <!-- Tabla principal -->
+    <div class="table-card">
+        <div class="filters-bar">
+            <div class="search-group">
+                <span class="p-input-icon-left search-input">
+                    <i class="pi pi-search search-icon"></i>
+                    <input pInputText type="text" placeholder="Buscar por NS, referencia o responsable..." />
+                </span>
+            </div>
+            <div class="filter-chips">
+                <p-select placeholder="Cualquier Motivo" [options]="[]" class="filter-dropdown"></p-select>
+                <p-datepicker placeholder="Este Mes" [showIcon]="true"></p-datepicker>
+                <button pButton icon="pi pi-filter-slash"
+                    class="p-button-text p-button-secondary p-button-icon-only filter-btn-icon"></button>
+            </div>
+        </div>
+        <p-table [value]="salidas()" [loading]="cargando()" [scrollable]="true" scrollHeight="flex" [paginator]="true"
+            [rows]="10" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
+            currentPageReportTemplate="Mostrando {first}-{last} de {totalRecords}"
+            paginatorTemplate="RowsPerPageDropdown CurrentPageReport PrevPageLink PageLinks NextPageLink"
+            [globalFilterFields]="['documentoFormateado', 'almacenOrigenNombre', 'estado']" dataKey="id"
+            styleClass="custom-modern-table" emptyMessage="No hay notas de salida registradas">
+
+            <ng-template #header>
+                <tr>
+                    <th style="width: 50px; text-align: center">
+                        #
+                    </th>
+                    <th style="width: 160px">
+                        DOCUMENTO
+                    </th>
+                    <th>
+                        ALMACÉN ORIGEN
+                    </th>
+                    <th style="width: 130px">
+                        FECHA
+                    </th>
+                    <th style="width: 120px; text-align: center">ESTADO</th>
+                    <th style="width: 80px; text-align: center">ITEMS</th>
+                    <th style="width: 160px">CREADO</th>
+                    <th style="width: 100px; text-align: center">
+                        ACCIONES
+                    </th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-item let-rowIndex="rowIndex">
+                <tr>
+                    <td class="text-center">
+                        {{ rowIndex + 1 }}
+                    </td>
+                    <td>
+                        {{ item.documentoFormateado }}
+                    </td>
+                    <td>{{ item.almacenOrigenNombre ?? '—' }}</td>
+                    <td>{{ item.fechaEmision }}</td>
+                    <td class="text-center">
+                        <p-tag [value]="item.estado" [severity]="getSeverity(item.estado)"></p-tag>
+                    </td>
+                    <td class="text-center">{{ item.cantidadItems }}</td>
+                    <td class="text-muted">{{ item.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                    <td class="text-center">
+                        <div class="flex justify-content-center gap-2">
+                            <button pButton icon="pi pi-eye"
+                                class="p-button-text p-button-secondary p-button-rounded p-button-sm"></button>
+                            <button pButton icon="pi pi-times"
+                                class="p-button-text p-button-danger p-button-rounded p-button-sm"></button>
+                        </div>
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+    </div>
+</div>

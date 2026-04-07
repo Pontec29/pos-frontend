@@ -1,0 +1,102 @@
+<div class="container">
+  <section class="header-section">
+    <div class="header-section--title">
+      <h2>Importación de Producto</h2>
+      <p>Importa los productos a tu inventario</p>
+    </div>
+    <div class="header-section--actions">
+      <app-button type="success" icon="history" label="Historial"></app-button>
+      <app-button type="primary" icon="template" label="Plantilla"></app-button>
+      <app-button type="primary" icon="upload" label="Carga Masiva"></app-button>
+    </div>
+  </section>
+  <section>
+    <!-- ! IMPORTAR PRODUCTOS -->
+    <div class="upload-section">
+      <div class="upload-zone" (click)="triggerFileInput()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.drag-over]="isDragging">
+        <div class="upload-content">
+          <i class="pi pi-file" style="font-size: 3rem; color: var(--gray-400);"></i>
+          <p class="upload-title">Haz clic para subir un archivo o arrástralo aquí</p>
+          <p class="upload-subtitle">Formato permitidos: .xlsx, .xls Tamaño máximo: 20 MB</p>
+          <input #fileInput type="file" accept=".xlsx,.xls" style="display: none;" (change)="onFileSelected($event)">
+          <app-button type="primary" icon="upload" label="Seleccionar Archivo" (clicked)="triggerFileInput()"></app-button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ! TABLA DE FALLOS EN LA CARGA MASIVA -->
+    <div class="results-section">
+      <div class="results-header">
+        <div class="search-bar">
+          <p-iconField iconPosition="left">
+            <p-inputicon class="pi pi-search" />
+            <input pInputText type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" />
+          </p-iconField>
+        </div>
+      </div>
+
+      <div class="results-table">
+        <p-table [value]="importResults" [rowHover]="true" [scrollable]="true" scrollHeight="300px">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>Fila</th>
+              <th>Código</th>
+              <th>Producto</th>
+              <th>Error</th>
+              <th>Estado</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-result>
+            <tr>
+              <td>{{ result.row }}</td>
+              <td>{{ result.code }}</td>
+              <td>{{ result.product }}</td>
+              <td>{{ result.error }}</td>
+              <td>
+                <span class="status-badge" [ngClass]="'status-' + result.status">
+                  {{ result.status === 'success' ? 'Exitoso' : 'Error' }}
+                </span>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" class="empty-state">
+                <i class="pi pi-search" style="font-size: 3rem; color: var(--gray-400);"></i>
+                <p class="empty-title">No se encontraron resultados</p>
+                <p class="empty-subtitle">Cargue una tabla para mostrar datos</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <div class="results-footer">
+        <div class="pagination-info">
+          <span>Mostrar</span>
+          <p-select [options]="pageSizeOptions" [(ngModel)]="pageSize" [style]="{width: '70px'}"></p-select>
+          <span>por página</span>
+          <span class="results-count">0-0 de 0</span>
+        </div>
+        <div class="pagination-controls">
+          <button class="pagination-btn" disabled>
+            <i class="pi pi-angle-double-left"></i>
+          </button>
+          <button class="pagination-btn" disabled>
+            <i class="pi pi-angle-left"></i>
+          </button>
+          <button class="pagination-btn pagination-btn--active">1</button>
+          <button class="pagination-btn" disabled>
+            <i class="pi pi-angle-right"></i>
+          </button>
+          <button class="pagination-btn" disabled>
+            <i class="pi pi-angle-double-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+

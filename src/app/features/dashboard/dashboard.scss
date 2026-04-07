@@ -1,0 +1,306 @@
+:host {
+  display: block;
+  --dash-primary: #3b82f6;
+  --dash-primary-soft: rgba(59, 130, 246, 0.08);
+  --dash-surface: #ffffff;
+  --dash-bg: #f8fafc;
+  --dash-text: #1e293b;
+  --dash-text-soft: #64748b;
+  --dash-border: #e2e8f0;
+  --dash-radius: 16px;
+  --dash-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --dash-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.08);
+
+  background-color: var(--dash-bg);
+  min-height: calc(100vh - 64px);
+}
+
+.dashboard-wrapper {
+  padding: 1.5rem 2rem;
+  max-width: 1600px;
+  margin: 0 auto;
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+/* ! WELCOME HEADER */
+.welcome-header {
+  position: relative;
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  border-radius: var(--dash-radius);
+  padding: 2.5rem;
+  color: white;
+  overflow: hidden;
+  margin-bottom: 2rem;
+  box-shadow: var(--dash-shadow-lg);
+
+  .welcome-content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+    }
+  }
+
+  .greeting-prefix {
+    font-size: 1rem;
+    color: #94a3b8;
+    font-weight: 500;
+  }
+
+  .userName {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0.25rem 0;
+    letter-spacing: -0.02em;
+    background: linear-gradient(to right, #ffffff, #94a3b8);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .welcome-desc {
+    color: #94a3b8;
+    max-width: 400px;
+    line-height: 1.5;
+  }
+
+  .header-right {
+    .current-date {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(8px);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      i {
+        color: #3b82f6;
+      }
+      span {
+        font-size: 0.9rem;
+        font-weight: 500;
+      }
+    }
+  }
+
+  .header-decoration {
+    position: absolute;
+    top: -50px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+}
+
+/* ! MAIN GRID */
+.main-dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ! QUICK ACCESS */
+.quick-access-area {
+  .section-header {
+    margin-bottom: 1.5rem;
+
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--dash-text);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+
+      i {
+        color: var(--dash-primary);
+      }
+    }
+
+    .section-subtitle {
+      font-size: 0.875rem;
+      color: var(--dash-text-soft);
+    }
+  }
+
+  .quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .access-card-wrapper {
+    cursor: pointer;
+    perspective: 1000px;
+  }
+
+  .access-card {
+    background: var(--dash-surface);
+    border-radius: var(--dash-radius);
+    padding: 2rem;
+    border: 1px solid var(--dash-border);
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--dash-shadow);
+
+    &:hover {
+      box-shadow: var(--dash-shadow-lg);
+      border-color: var(--dash-primary);
+
+      .card-footer .action-link {
+        color: var(--dash-primary);
+        transform: translateX(4px);
+      }
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.5rem;
+
+      .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .card-badge {
+        text-align: right;
+        background: #f1f5f9;
+        padding: 4px 10px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+
+        .badge-value {
+          font-weight: 700;
+          font-size: 1.5rem;
+          color: var(--dash-text);
+        }
+        .badge-label {
+          font-size: 0.85rem;
+          color: var(--dash-text-soft);
+          text-transform: uppercase;
+        }
+      }
+    }
+
+    .item-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--dash-text);
+      margin: 0 0 0.5rem 0;
+    }
+
+    .item-desc {
+      font-size: 0.875rem;
+      color: var(--dash-text-soft);
+      line-height: 1.5;
+      margin-bottom: 2rem;
+    }
+
+    .card-footer {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px dashed var(--dash-border);
+
+      .action-link {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--dash-text-soft);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
+      }
+    }
+
+    /* Access Card Theming */
+    &.card-productos .icon-box {
+      background: #eff6ff;
+      color: #3b82f6;
+    }
+    &.card-clientes .icon-box {
+      background: #f5f3ff;
+      color: #8b5cf6;
+    }
+    &.card-ventas .icon-box {
+      background: #ecfdf5;
+      color: #10b981;
+    }
+    &.card-reportes .icon-box {
+      background: #fffbeb;
+      color: #f59e0b;
+    }
+    &.card-inventario .icon-box {
+      background: #fff1f2;
+      color: #f43f5e;
+    }
+    &.card-categorias .icon-box {
+      background: #f0fdfa;
+      color: #0d9488;
+    }
+  }
+
+  .card-loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--dash-radius);
+    z-index: 10;
+  }
+}
+
+/* ! ANIMATIONS */
+.fade-in {
+  animation: fadeIn 0.4s ease-out;
+}
+.slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideInRight {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}

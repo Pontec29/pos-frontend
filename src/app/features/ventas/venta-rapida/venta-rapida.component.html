@@ -1,0 +1,253 @@
+@if (!isMobil()) {
+  <div class="container">
+    <!-- ! PANEL DE PRODUCTOS -->
+    <div class="product-content">
+      <div class="search-section pos-card" aria-label="Búsqueda de productos">
+        <!-- <div class="filter-btn">
+          <app-button
+            icon="pi pi-filter"
+            [outlined]="true"
+            tooltip="Filtros avanzados"
+            (clicked)="filterAdvanced.set(true)"
+          ></app-button>
+        </div> -->
+        <div class="search-input">
+          <p-iconField iconPosition="left" class="w-full">
+            <p-inputIcon class="pi pi-search" />
+            <input
+              type="text"
+              pInputText
+              [ngModel]="searchQuery()"
+              (ngModelChange)="searchQuery.set($event)"
+              placeholder="Buscar producto por nombre o código"
+              class="w-full"
+            />
+          </p-iconField>
+        </div>
+      </div>
+
+      <div class="categories-chips pos-card" aria-label="Categorías de productos" role="tablist">
+        @for (category of categoriesForChips(); track category.id) {
+          <button
+            type="button"
+            class="category-chip"
+            [class.is-active]="selectedCategory() === category.name"
+            (click)="setCategory(category.name)"
+            [attr.aria-selected]="selectedCategory() === category.name"
+            role="tab"
+          >
+            <span class="category-chip__name">{{ category.name }}</span>
+            <span class="category-chip__count">{{ category.count }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="products-grid" aria-label="Listado de productos">
+        @if (isLoading()) {
+          <div class="loading-state">
+            <p-progress-spinner ariaLabel="loading" strokeWidth="4" />
+            <span class="loading-text">Cargando productos...</span>
+          </div>
+        } @else if (hasError()) {
+          <div class="empty-state empty-state--error" role="alert">
+            <i class="pi pi-exclamation-triangle" style="font-size: 2.5rem"></i>
+            <div class="empty-message">
+              <h3>Error al cargar</h3>
+              <p>{{ errorMessage() }}</p>
+            </div>
+          </div>
+        } @else if (!hasData()) {
+          <div class="empty-state">
+            <i
+              class="pi pi-inbox"
+              style="font-size: 2.5rem; color: var(--text-color-secondary)"
+            ></i>
+            <div class="empty-message">
+              <h3>No hay productos disponibles</h3>
+              <p>Intenta nuevamente en unos segundos.</p>
+            </div>
+          </div>
+        } @else if (filteredProducts().length === 0) {
+          <div class="empty-state">
+            <i
+              class="pi pi-search"
+              style="font-size: 2.5rem; color: var(--text-color-secondary)"
+            ></i>
+            <div class="empty-message">
+              <h3>No se encontraron productos</h3>
+              <p>Intenta buscar con otro término o filtra por categoría.</p>
+            </div>
+          </div>
+        } @else {
+          @for (product of filteredProducts(); track product.ID_PRODUCTO) {
+            <app-producto-card
+              [productData]="product"
+              (add)="addToCart(product)"
+            ></app-producto-card>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- ! PANEL DE CARRITO -->
+    <div class="cart-panel">
+      <div class="cart-header">
+        <div class="cart-header__title">
+          <div class="cart-header__heading">Ticket de Venta</div>
+          <div class="cart-header__subheading">Ventas rápidas y seguras</div>
+        </div>
+      </div>
+
+      <div class="cart-items" aria-label="Productos del ticket">
+        <div class="ticket-items-scroll" aria-label="Lista desplazable del ticket">
+          @if (cart().length === 0) {
+            <div class="ticket-empty">
+              <i class="pi pi-shopping-cart" aria-hidden="true"></i>
+              <div class="ticket-empty__title">Ticket vacío</div>
+              <div class="ticket-empty__hint">Agrega productos para iniciar la venta.</div>
+            </div>
+          }
+
+          @if (cart().length > 0) {
+            <div class="ticket-list" role="list" aria-label="Lista de productos">
+              @for (item of cart(); track item.id) {
+                <div class="ticket-item" role="listitem">
+                  <div class="ticket-item__top">
+                    <div class="ticket-item__name">{{ item.product.name }}</div>
+                    <button
+                      pButton
+                      type="button"
+                      icon="pi pi-trash"
+                      class="pos-btn pos-btn--danger pos-btn--icon"
+                      (click)="confirmRemoveFromCart(item)"
+                      aria-label="Eliminar producto"
+                    ></button>
+                  </div>
+
+                  <div class="ticket-item__meta">
+                    <span class="ticket-item__code">{{ item.product.code }}</span>
+                    <div class="unit-switch" [class.is-disabled]="item.product.priceUnit === 0">
+                      <button
+                        type="button"
+                        class="unit-switch__btn"
+                        [class.is-active]="item.isBox"
+                        (click)="setUnit(item, true)"
+                        [disabled]="item.product.priceUnit === 0"
+                        aria-label="Unidad: caja"
+                      >
+                        Caja
+                      </button>
+                      @if (item.product.priceUnit > 0) {
+                        <button
+                          type="button"
+                          class="unit-switch__btn"
+                          [class.is-active]="!item.isBox"
+                          (click)="setUnit(item, false)"
+                          aria-label="Unidad: unidad"
+                        >
+                          Und
+                        </button>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="ticket-item__controls">
+                    <div class="qty-control" aria-label="Control de cantidad">
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-minus"
+                        class="pos-btn pos-btn--ghost pos-btn--icon"
+                        (click)="updateQuantity(item, item.quantity - 1)"
+                        [disabled]="item.quantity <= 1"
+                        aria-label="Disminuir cantidad"
+                      ></button>
+                      <div class="qty-control__value" aria-label="Cantidad actual">
+                        {{ item.quantity }}
+                      </div>
+                      <button
+                        pButton
+                        type="button"
+                        icon="pi pi-plus"
+                        class="pos-btn pos-btn--ghost pos-btn--icon"
+                        (click)="updateQuantity(item, item.quantity + 1)"
+                        [disabled]="item.quantity >= maxQuantity(item)"
+                        aria-label="Aumentar cantidad"
+                      ></button>
+                    </div>
+
+                    <div class="ticket-item__prices" aria-label="Precios">
+                      <div class="ticket-item__priceRow">
+                        <span>P. Unit</span>
+                        <span class="ticket-money">{{
+                          formatPrice(item.isBox ? item.product.priceBox : item.product.priceUnit)
+                        }}</span>
+                      </div>
+                      <div class="ticket-item__priceRow ticket-item__priceRow--strong">
+                        <span>Subtotal</span>
+                        <span class="ticket-money ticket-money--strong">{{
+                          formatPrice(
+                            (item.isBox ? item.product.priceBox : item.product.priceUnit) *
+                              item.quantity
+                          )
+                        }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="cart-footer" aria-label="Resumen del ticket">
+        <div class="ticket-summary" aria-label="Totales">
+          <div class="ticket-summary__row">
+            <span>Subtotal</span>
+            <span>{{ formatPrice(cartSubtotal()) }}</span>
+          </div>
+          <div class="ticket-summary__row">
+            <span>IGV (18%)</span>
+            <span>{{ formatPrice(cartIgv()) }}</span>
+          </div>
+          <div class="ticket-summary__row ticket-summary__row--total">
+            <span>Total</span>
+            <span>{{ formatPrice(cartTotal()) }}</span>
+          </div>
+        </div>
+
+        <div class="ticket-actions" aria-label="Acciones del ticket">
+          <button
+            pButton
+            type="button"
+            class="pos-btn pos-btn--success ticket-actions__btn"
+            (click)="openPayment()"
+            [disabled]="cart().length === 0"
+          >
+            Finalizar venta
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+ <!-- @placeholder {
+  <div>Mensaje: Esta aplicación requiere al menos 800px de ancho.</div>
+} -->
+
+<!-- ! MODAL DE FILTRO AVANZADO -->
+@if (filterAdvanced()) {
+  <app-filter-advance-producto
+    [search]="searchQuery()"
+    (closed)="filterAdvanced.set(false)"
+    (payload)="handleAdvancedFilter($event)"
+  />
+}
+
+<!-- ! MODAL DE FINALIZAR COMPRA -->
+@if (false) {
+  <div class="modal-backdrop">
+    <app-modal-venta />
+  </div>
+}

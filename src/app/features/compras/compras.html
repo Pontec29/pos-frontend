@@ -1,0 +1,177 @@
+<div class="container">
+  <section class="header-content">
+    <div class="header-content--title">
+      <h6>Compras</h6>
+      <p class="subtitle">Gestión de compras del inventario</p>
+    </div>
+    <div class="header-content--actions">
+      <app-button preset="add" label="Nueva Compra" (clicked)="openNew()"></app-button>
+    </div>
+  </section>
+
+  <section class="main-content">
+    <div class="table-section">
+      <div class="table-section__header-actions">
+        <div class="table-section__header-actions--left">
+          <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)"
+              placeholder="Buscar por nombre, código o código de barras..." class="search-input"
+              aria-label="Buscar por nombre, código o código de barras" />
+          </span>
+        </div>
+
+        <div class="table-section__header-actions--right">
+          <label>Estado:</label>
+          <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()"
+            (ngModelChange)="onStatusChange($event)">
+          </p-select>
+        </div>
+      </div>
+
+      <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
+        <p-table [value]="compras()" [loading]="loading()" [(selection)]="selectedCompras" dataKey="ID_COMPRA"
+          [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
+          class="p-datatable-sm custom-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th>Proveedor</th>
+              <th>Serie</th>
+              <th>Número</th>
+              <th>Fecha Emisión</th>
+              <th>Importe Total</th>
+              <th>Estado</th>
+              <th style="width: 9rem" class="text-center">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-compra>
+            <tr>
+              <td>{{ compra.ID_COMPRA }}</td>
+              <td>
+                <div class="user-info-cell">
+                  <div class="avatar-circle" aria-hidden="true">
+                    {{ (compra.PROVEEDOR || '').substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ compra.PROVEEDOR }}</span>
+                    <span class="user-dni">{{ compra.EMPRESA || 'Sin empresa' }}</span>
+                  </div>
+                </div>
+              </td>
+              <!-- <td>{{ compra.ID_TIPO_COMPROBANTE }}</td> -->
+              <td>{{ compra.SERIE }}</td>
+              <td>{{ compra.NUMERO }}</td>
+              <td>{{ compra.FECHA_EMISION }}</td>
+              <td>{{ compra.IMPORTE_TOTAL }}</td>
+              <td>
+                <p-tag [value]="compra.ESTADO_DESCRIPCION || 'Sin estado'"
+                  [severity]="getEstadoSeverity(compra.ESTADO_DESCRIPCION)" [rounded]="true"></p-tag>
+              </td>
+              <td class="text-center">
+                <div class="action-buttons">
+                  <button class="action-buttons--view" (click)="onViewCompra(compra)"
+                    pTooltip="Ver Detalle" tooltipPosition="top">
+                    <i class="pi pi-eye"></i>
+                  </button>
+                  <button class="action-buttons--edit" (click)="onEditCompra(compra)"
+                    pTooltip="Editar" tooltipPosition="top">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="action-buttons--delete" (click)="onDeleteCompra(compra)"
+                    pTooltip="Eliminar" tooltipPosition="top">
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="8">
+                @if (hasError()) {
+                <div class="table-state table-state--error" role="alert" aria-live="assertive">
+                  <div class="table-state__icon">
+                    <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                  </div>
+                  <div class="table-state__content">
+                    <div class="table-state__title">No se pudo cargar la información</div>
+                    <div class="table-state__subtitle">{{ errorMessage() }}</div>
+                    <button type="button" class="table-state__action" (click)="loadCompras()">
+                      Reintentar
+                    </button>
+                  </div>
+                </div>
+                } @else {
+                <div class="table-state table-state--empty" role="status" aria-live="polite">
+                  <div class="table-state__icon">
+                    <i class="pi pi-search" aria-hidden="true"></i>
+                  </div>
+                  <div class="table-state__content">
+                    <div class="table-state__title">No se encontraron resultados</div>
+                    <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.</div>
+                  </div>
+                </div>
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+
+        <!-- ! VISTA PARA MOVIL -->
+        <div class="mobile-card-list">
+          @for (compra of compras(); track compra.ID_COMPRA) {
+          <div class="mobile-card">
+            <div class="mobile-card__header">
+              <div class="mobile-card__avatar-wrapper">
+                <div class="avatar-circle" aria-hidden="true">
+                  {{ (compra.PROVEEDOR || '').substring(0, 2).toUpperCase() }}
+                </div>
+              </div>
+
+              <div class="mobile-card__info">
+                <div class="mobile-card__status-badge">
+                  <p-tag [value]="compra.ESTADO_DESCRIPCION || 'Sin estado'"
+                    [severity]="getEstadoSeverity(compra.ESTADO_DESCRIPCION)" [rounded]="true"></p-tag>
+                </div>
+                <span class="mobile-card__name">{{ compra.PROVEEDOR }}</span>
+                <span class="mobile-card__dni">{{ compra.EMPRESA || 'Sin empresa' }}</span>
+              </div>
+
+              <div class="mobile-card__actions">
+                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded"
+                  (click)="selectedCompraForMenu.set(compra); menu.toggle($event)"
+                  [ariaLabel]="'Acciones para compra ' + compra.ID_COMPRA"></button>
+              </div>
+            </div>
+          </div>
+          }
+
+          @if (compras().length === 0 && !loading()) {
+          <div class="table-state table-state--empty mobile-card-empty" role="status" aria-live="polite">
+            <div class="table-state__icon">
+              <i class="pi pi-search" aria-hidden="true"></i>
+            </div>
+            <div class="table-state__content">
+              <div class="table-state__title">No se encontraron resultados</div>
+              <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.</div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <p-menu #menu [model]="menuItems" [popup]="true" appendTo="body"></p-menu>
+      </div>
+
+      <div class="table-section__footer-paginated">
+        <p-paginator (onPageChange)="onPageChange($event)" appendTo="body" [first]="first()" [rows]="rows()"
+          [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+        </p-paginator>
+      </div>
+
+    </div>
+  </section>
+</div>

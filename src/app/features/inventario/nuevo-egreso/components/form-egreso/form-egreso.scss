@@ -1,0 +1,376 @@
+:host {
+    display: block;
+    background-color: #e2e8f0;
+    min-height: 80vh;
+    padding: 2rem 1rem;
+    border-radius: 14px;
+}
+
+.egreso-container {
+    padding: 2rem;
+    margin: 0 auto;
+}
+
+/* === Document Header === */
+.document-header {
+    margin-bottom: 2rem;
+}
+
+.doc-title-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+::ng-deep .btn-back.p-button {
+    color: #64748b;
+    width: 2.5rem;
+    height: 2.5rem;
+
+    &:hover {
+        background-color: #f1f5f9;
+        color: #1e293b;
+    }
+}
+
+.doc-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.doc-serie {
+    color: #e11d48;
+    letter-spacing: 0.5px;
+}
+
+.doc-serie--pending {
+    color: #64748b;
+    font-weight: 400;
+    font-size: 1.2rem;
+}
+
+.status-badge {
+    background-color: #fef08a;
+    color: #854d0e;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.doc-context {
+    display: flex;
+    gap: 0.75rem;
+    margin-left: 3.25rem;
+}
+
+.context-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.context-badge--danger {
+    background-color: #fff1f2;
+    color: #e11d48;
+    border-color: #fecdd3;
+}
+
+.context-badge--light {
+    background-color: #f1f5f9;
+    color: #475569;
+    border-color: #cbd5e1;
+}
+
+/* === Form Card === */
+.form-card {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.form-grid {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #64748b;
+    }
+}
+
+.field-sunat {
+    flex: 1;
+    max-width: 400px;
+}
+
+.field-ref {
+    flex: 1;
+    max-width: 300px;
+}
+
+/* === Detail Section === */
+.detail-section {
+    background-color: transparent;
+}
+
+.detail-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+
+    h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #1e293b;
+    }
+}
+
+.search-exterior {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* === Table === */
+.table-wrapper {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+}
+
+.pos-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    min-width: 950px;
+}
+
+.pos-table thead {
+    background-color: #f1f5f9;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.pos-table th {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pos-table td {
+    padding: 0.75rem 0.5rem;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+}
+
+.pos-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* === Product Display === */
+.product-name-display {
+    padding: 0.5rem;
+    font-weight: 600;
+    color: #1e293b;
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+}
+
+/* === Inputs === */
+.pos-input-num {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    background-color: #eef2f7;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+        border-color: #e11d48;
+        background-color: #f1f5f9;
+    }
+}
+
+.input-danger {
+    border-color: #fda4af;
+    background-color: #fff1f2;
+    color: #e11d48;
+
+    &:focus {
+        border-color: #e11d48;
+        background-color: #fff5f6;
+    }
+}
+
+.bold-num {
+    font-weight: 700;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-gray {
+    color: #64748b;
+}
+
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.read-only-cell {
+    background-color: #f1f5f9;
+    border-radius: 6px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    border: 1px solid transparent;
+    color: #e11d48;
+    font-weight: 600;
+}
+
+::ng-deep .table-select.p-select {
+    background-color: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+}
+
+::ng-deep .table-select .p-select-label {
+    padding: 0.5rem;
+    font-size: 0.9rem;
+    color: #1e293b;
+}
+
+/* === Lote Badge === */
+.lote-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.lote-badge--active {
+    background-color: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fcd34d;
+}
+
+.lote-badge--none {
+    background-color: #f1f5f9;
+    color: #94a3b8;
+    border: 1px solid #cbd5e1;
+}
+
+/* === Stock Value === */
+.stock-value {
+    font-weight: 700;
+    color: #16a34a;
+    font-size: 0.95rem;
+}
+
+/* === Action Icon === */
+.action-icon {
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.2s;
+}
+
+.hover-red:hover {
+    color: #ef4444;
+    background-color: #fee2e2;
+}
+
+/* === Footer === */
+.footer-area {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fecdd3;
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+}
+
+.total-display {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #9f1239;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.total-amount {
+    font-size: 1.5rem;
+    color: #e11d48;
+    font-weight: 800;
+}
+
+.actions {
+    display: flex;
+    gap: 1rem;
+}
+
+::ng-deep .btn-clean.p-button {
+    background-color: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+    font-weight: 600;
+}
+
+::ng-deep .btn-confirm.p-button {
+    background-color: #e11d48;
+    border-color: #e11d48;
+    color: white;
+    font-weight: 600;
+
+    &:hover {
+        background-color: #be123c;
+        border-color: #be123c;
+    }
+}

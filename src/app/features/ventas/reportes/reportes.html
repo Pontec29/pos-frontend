@@ -1,0 +1,36 @@
+<p-tabs [value]="tabIndex()" (valueChange)="tabIndex.set($event)" lazy style="width: 100%; height: 100%;">
+    <header>
+        <p-tablist>
+            <p-tab value="0">Ventas</p-tab>
+            <p-tab value="1">Aperturas</p-tab>
+        </p-tablist>
+    </header>
+    <div class="container">
+        <p-tabpanels>
+            <p-tabpanel value="0" class="ventas">
+                <section class="header-actions">
+                </section>
+                <section class="main-content">
+                    @if (false) {
+                        <div class="loading-state">
+                            <p-progress-spinner ariaLabel="loading"/>
+                            <span class="loading-text">Cargando ventas...</span>
+                        </div>
+                    } @else if (false) {
+                        <div class="empty-state">
+                            <i class="pi pi-search" style="font-size: 2.5rem; color: var(--text-color-secondary)"></i>
+                            <div class="empty-message">
+                                <h3>No se encontraron ventas</h3>
+                                <p>Intenta ajustar los filtros o busca en otra zona.</p>
+                            </div>
+                        </div>
+                    } @else {
+
+                    }
+                </section>
+            </p-tabpanel>
+            <p-tabpanel value="1" class="aperturas">
+            </p-tabpanel>
+        </p-tabpanels>
+    </div>
+</p-tabs>

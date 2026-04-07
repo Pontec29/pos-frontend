@@ -1,0 +1,107 @@
+<div>
+  <section class="page-header">
+    <div class="title-row">
+      <div class="title-content">
+        <h1>Categorías</h1>
+        <p class="subtitle">Gestión de categorías del inventario</p>
+      </div>
+      <div class="actions">
+        <app-button preset="add" label="Nueva Categoría" (clicked)="openNew()"></app-button>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="table-main">
+      @if (loading()) {
+      <app-loading-spinner message="Cargando categorías..." size="medium"></app-loading-spinner>
+      } @else if (error()) {
+      <app-error-state [message]="error()!" (retry)="loadCategorias()"></app-error-state>
+      } @else {
+      <div class="header-search">
+        <div class="filters-bar">
+          <div class="search-group">
+            <p-iconField iconPosition="right">
+              <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
+                placeholder="Buscar por nombre..." style="width: 320px;" />
+              <p-inputicon class="pi pi-search" />
+            </p-iconField>
+          </div>
+          <div class="filter-chips">
+            <div class="filter-chip">
+              <label>Estado:</label>
+              <p-select [options]="statusOptions()" placeholder="Todos" [showClear]="true" [ngModel]="statusFilter()"
+                (ngModelChange)="onStatusChange($event)">
+              </p-select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="main-table">
+        <p-table [value]="filteredCategorias()" [rowHover]="true" [scrollable]="true" scrollHeight="412px"
+          dataKey="ID_CATEGORIA">
+          <ng-template pTemplate="header">
+            <tr class="table-header">
+              <th pSortableColumn="ID_CATEGORIA" style="width: 100px">ID <p-sortIcon
+                  field="ID_CATEGORIA"></p-sortIcon></th>
+              <th pSortableColumn="NOMBRE">Nombre <p-sortIcon field="NOMBRE"></p-sortIcon></th>
+              <th pSortableColumn="DESCRIPCION">Descripción <p-sortIcon field="DESCRIPCION"></p-sortIcon></th>
+              <th pSortableColumn="ACTIVO" style="width: 150px">Estado <p-sortIcon field="ACTIVO"></p-sortIcon></th>
+              <th style="width: 120px; text-align: center">Acciones</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-categoria>
+            <tr>
+              <td>{{ categoria.ID_CATEGORIA }}</td>
+              <td>
+                <div class="product-name">
+                  <span class="name">{{ categoria.NOMBRE }}</span>
+                </div>
+              </td>
+              <td>{{ categoria.DESCRIPCION || '-' }}</td>
+              <td>
+                <span class="status-badge"
+                  [ngClass]="categoria.ACTIVO ? 'status-badge--active' : 'status-badge--inactive'">
+                  {{ categoria.ACTIVO ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="table-actions">
+                  <app-button preset="edit" (clicked)="editCategoria(categoria)"></app-button>
+                  <app-button preset="delete" (clicked)="deleteCategoria(categoria)"></app-button>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="5" style="text-align: center;">
+                <i class="pi pi-exclamation-triangle"></i>
+                @if (searchQuery().length >= 1) {
+                No se encontraron categorías para los filtros seleccionados.
+                } @else {
+                No hay categorías disponibles.
+                }
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="footer-paginator">
+        <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="filteredCategorias().length"
+          [rowsPerPageOptions]="[10, 20, 30]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
+          currentPageReportTemplate="Mostrando {first}-{last} de {totalRecords}" class="custom-paginator">
+        </p-paginator>
+      </div>
+      }
+    </div>
+  </section>
+</div>
+
+<app-confirm-dialog></app-confirm-dialog>
+
+<app-categoria-form [visible]="visible()" [category]="selectedCategoria()" [loading]="saving()" (visibleChange)="visible.set($event)"
+  (save)="onSaveCategoria($event)" (cancel)="onCancelDialog()">
+</app-categoria-form>

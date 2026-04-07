@@ -1,0 +1,52 @@
+<form [formGroup]="form" class="sucursal-form" (ngSubmit)="onSubmit()">
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="nombre" formControlName="nombre" placeholder=" "
+                    [class.p-invalid]="form.get('nombre')?.invalid && form.get('nombre')?.touched" />
+                <label for="nombre">Nombre de la Sucursal <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="direccion" formControlName="direccion" placeholder=" "
+                    [class.p-invalid]="form.get('direccion')?.invalid && form.get('direccion')?.touched" />
+                <label for="direccion">Dirección <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="telefono" formControlName="telefono" placeholder=" "
+                    [class.p-invalid]="form.get('telefono')?.invalid && form.get('telefono')?.touched" />
+                <label for="telefono">Teléfono <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="email" formControlName="email" type="email" placeholder=" "
+                    [class.p-invalid]="form.get('email')?.invalid && form.get('email')?.touched" />
+                <label for="email">Correo Electrónico <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    @if (data()) {
+    <div class="row">
+        <div class="form-row">
+            <div class="status-container">
+                <div class="status-info">
+                    <span class="status-label">Estado</span>
+                    <span class="status-text">{{ form.get('activo')?.value ? 'Activo' : 'Inactivo' }}</span>
+                </div>
+                <p-toggleswitch formControlName="activo"></p-toggleswitch>
+            </div>
+        </div>
+    </div>
+    }
+</form>

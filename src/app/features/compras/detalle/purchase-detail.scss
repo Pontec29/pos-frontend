@@ -1,0 +1,8 @@
+.p-card {
+    height: 100%;
+}
+
+:host ::ng-deep .p-breadcrumb {
+    padding: 0;
+    background: transparent;
+}

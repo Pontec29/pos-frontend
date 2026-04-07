@@ -1,0 +1,89 @@
+<form [formGroup]="form" class="usuario-form" (ngSubmit)="onSubmit()">
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="username" formControlName="username" placeholder=" "
+                    [class.p-invalid]="form.get('username')?.invalid && form.get('username')?.touched" />
+                <label for="username">Usuario <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="email" formControlName="email" type="email" placeholder=" "
+                    [class.p-invalid]="form.get('email')?.invalid && form.get('email')?.touched" />
+                <label for="email">Correo Electrónico <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="firstName" formControlName="firstName" placeholder=" "
+                    [class.p-invalid]="form.get('firstName')?.invalid && form.get('firstName')?.touched" />
+                <label for="firstName">Nombres <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="lastName" formControlName="lastName" placeholder=" "
+                    [class.p-invalid]="form.get('lastName')?.invalid && form.get('lastName')?.touched" />
+                <label for="lastName">Apellidos <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <p-select [options]="documentTypes()" formControlName="documentType" optionLabel="name"
+                    optionValue="code" placeholder=" " styleClass="w-full"
+                    (onChange)="onDocumentTypeChange($event.value)"></p-select>
+                <label for="documentType">Tipo Doc. <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="documentNumber" formControlName="documentNumber" placeholder=" "
+                    [class.p-invalid]="form.get('documentNumber')?.invalid && form.get('documentNumber')?.touched" />
+                <label for="documentNumber">Núm. Doc. <span style="color: red;">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <p-inputMask mask="(999) 999-999" formControlName="phone" placeholder=" "
+                    styleClass="w-full"></p-inputMask>
+                <label for="phone">Teléfono</label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <p-password formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="w-full"
+                    inputStyleClass="w-full" placeholder=" "
+                    [class.p-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+                </p-password>
+                <label for="password">Contraseña {{ !isEditMode() ? '*' : '' }}</label>
+            </p-floatlabel>
+            @if (isEditMode()) {
+            <small class="form-hint">Dejar vacío para mantener la actual</small>
+            }
+        </div>
+    </div>
+
+    @if (data()) {
+    <div class="row">
+        <div class="form-row">
+            <div class="status-container">
+                <div class="status-info">
+                    <span class="status-label">Estado</span>
+                    <span class="status-text">{{ form.get('active')?.value ? 'Activo' : 'Inactivo' }}</span>
+                </div>
+                <p-toggleswitch formControlName="active"></p-toggleswitch>
+            </div>
+        </div>
+    </div>
+    }
+</form>

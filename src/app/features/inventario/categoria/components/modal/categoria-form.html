@@ -1,0 +1,50 @@
+<p-dialog [visible]="visible()" (visibleChange)="visibleChange.emit($event)" [modal]="true" [style]="{width:'500px'}"
+  [draggable]="false" [closable]="false" styleClass="custom-modal" [maskStyleClass]="'custom-modal-mask'">
+  <ng-template pTemplate="header">
+    <div class="modal-header-content">
+      <div class="icon-box">
+        <i class="pi pi-tags"></i>
+      </div>
+      <div class="header-text">
+        <h3>{{ isEditMode ? 'Editar Categoría' : 'Nueva Categoría' }}</h3>
+        <p>Complete la información de la categoría</p>
+      </div>
+    </div>
+  </ng-template>
+
+  <form [formGroup]="categoryForm" class="form-container">
+    <div class="form-grid">
+      <!-- Nombre -->
+      <div class="field">
+        <label for="name" class="field-label required">Nombre</label>
+        <div class="input-wrapper">
+          <input pInputText id="name" formControlName="name" placeholder="Ej. Bebidas, Lácteos..."
+            [ngClass]="{'ng-invalid ng-dirty': categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched}" />
+            @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+              <i class="pi pi-exclamation-circle error-icon"></i>
+            }
+        </div>
+        @if (categoryForm.get('name')?.invalid && categoryForm.get('name')?.touched) {
+          <small class="error-text">
+            El nombre es requerido
+          </small>
+        }
+      </div>
+
+      <!-- Descripción -->
+      <div class="field full-width">
+        <label for="description" class="field-label">Descripción</label>
+        <textarea pInputTextarea id="description" formControlName="description" rows="4"
+          placeholder="Ingrese una descripción detallada..." class="custom-textarea"></textarea>
+      </div>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <div class="modal-footer">
+      <app-button preset="cancel" label="Cancelar" (clicked)="onCancel()"></app-button>
+      <app-button preset="save" [label]="isEditMode ? 'Actualizar' : 'Guardar'" (clicked)="onSave()"
+        [disabled]="categoryForm.invalid || loading()" [loading]="loading()"></app-button>
+    </div>
+  </ng-template>
+</p-dialog>

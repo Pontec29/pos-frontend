@@ -1,0 +1,81 @@
+@let data = normalized();
+
+<div class="card-view" [class.is-loading]="loading()" [attr.aria-busy]="loading() ? 'true' : null">
+  <div class="card-view__header">
+    <div class="card-view__badge" [class.is-error]="hasErrors()" aria-live="polite">
+      @if (loading()) {
+      <span class="skeleton skeleton--pill" aria-hidden="true"></span>
+      } @else if (!hasData()) {
+      <span>Sin datos</span>
+      } @else if (hasErrors()) {
+      <span>Datos incompletos</span>
+      } @else {
+      <span>Stock: {{ data.stock ?? '—' }}</span>
+      }
+    </div>
+    <div class="card-view__code">
+      @if (loading()) {
+      <span class="skeleton skeleton--chip" aria-hidden="true"></span>
+      } @else {
+      <span>{{ data.code ?? '—' }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="card-view__body">
+    <div class="card-view__top">
+      <h6 class="card-view__title">
+        @if (loading()) {
+        <span class="skeleton skeleton--line" aria-hidden="true"></span>
+        } @else {
+        {{ data.name ?? 'Producto sin nombre' }}
+        }
+      </h6>
+
+      @if (loading()) {
+      <p class="card-view__subtitle" aria-hidden="true">
+        <span class="skeleton skeleton--line skeleton--line-sm"></span>
+      </p>
+      } @else if (data.lab) {
+      <p class="card-view__subtitle">
+        <i class="pi pi-building"></i>
+        <span class="card-view__address-text">{{ data.lab }}</span>
+      </p>
+      } @else {
+      <p class="card-view__subtitle is-muted">Laboratorio no disponible</p>
+      }
+    </div>
+
+    <div class="card-view__footer">
+      <div class="card-view__prices" role="group" aria-label="Precios">
+        <div class="card-view__priceRow">
+          <span class="card-view__price-label">Caja</span>
+          <span class="card-view__price-value">
+            @if (loading()) {
+            <span class="skeleton skeleton--money" aria-hidden="true"></span>
+            } @else {
+            {{ formatMoney(data.priceBox) }}
+            }
+          </span>
+        </div>
+
+        <div class="card-view__priceRow">
+          <span class="card-view__price-label">Unidad</span>
+          <span class="card-view__price-subvalue">
+            @if (loading()) {
+            <span class="skeleton skeleton--money skeleton--money-sm" aria-hidden="true"></span>
+            } @else {
+            {{ formatMoney(data.priceUnit) }}
+            }
+          </span>
+        </div>
+      </div>
+
+      <button type="button" class="card-view__add" (click)="handleAdd()"
+        [disabled]="loading() || !hasData() || hasErrors()">
+        <i class="pi pi-plus" aria-hidden="true"></i>
+        <span>Agregar</span>
+      </button>
+    </div>
+  </div>
+</div>
