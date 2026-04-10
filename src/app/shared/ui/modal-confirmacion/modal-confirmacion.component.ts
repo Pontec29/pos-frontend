@@ -3,14 +3,14 @@ import { CommonModule } from '@angular/common';
 import { ConfirmDialogModule, ConfirmDialog } from 'primeng/confirmdialog';
 
 @Component({
-    selector: 'app-confirm-dialog',
+    selector: 'app-modal-confirmacion',
     standalone: true,
     imports: [CommonModule, ConfirmDialogModule],
-    templateUrl: './confirm-dialog.component.html',
-    styleUrl: './confirm-dialog.component.scss',
+    templateUrl: './modal-confirmacion.component.html',
+    styleUrl: './modal-confirmacion.component.scss',
     encapsulation: ViewEncapsulation.None
 })
-export class AppConfirmDialog {
+export class ModalConfirmacionComponent {
     @ViewChild('cd') confirmDialog?: ConfirmDialog;
 
     handleAccept() {

@@ -29,20 +29,20 @@ export interface CustomConfirmOptions {
  * 
  * @example
  * // Uso simple
- * confirmDialogService.confirm('delete', 'Usuario', () => {
+ * ModalConfirmacionService.confirm('delete', 'Usuario', () => {
  *   this.deleteUser();
  * });
  * 
  * @example
  * // Con nombre dinámico
- * confirmDialogService.confirm('delete', user.name, () => {
+ * ModalConfirmacionService.confirm('delete', user.name, () => {
  *   this.userService.delete(user.id);
  * });
  */
 @Injectable({
     providedIn: 'root'
 })
-export class ConfirmDialogService {
+export class ModalConfirmacionService {
     private readonly confirmationService = inject(ConfirmationService);
 
     /**

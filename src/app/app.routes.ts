@@ -114,15 +114,11 @@ export const routes: Routes = [
           { path: '', loadComponent: () => import('@compras/compras') },
           {
             path: 'nueva',
-            loadComponent: () => import('@compras/components/form-compra/form-compra'),
+            loadComponent: () => import('@compras/components/nueva-compra/nueva-compra'),
           },
           {
             path: 'proveedores',
             loadComponent: () => import('./features/proveedores/proveedores'),
-          },
-          {
-            path: ':id',
-            loadComponent: () => import('./features/compras/detalle/purchase-detail'),
           },
         ],
       },

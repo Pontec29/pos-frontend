@@ -8,7 +8,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { NuevoIngresoService } from './services/nuevo-ingreso.service';
 import { MovimientoResumenIngreso } from './modelo/nuevo-ingreso.model';
 import { AppButton } from '@shared/ui/button';
-import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
+import { ModalConfirmacionService } from '@shared/ui/modal-confirmacion/modal-confirmacion.service';
 
 @Component({
   selector: 'app-nuevo-ingreso',
@@ -30,7 +30,7 @@ export default class NuevoIngreso implements OnInit {
   private readonly router = inject(Router);
   private readonly ingresoService = inject(NuevoIngresoService);
   private readonly messageService = inject(MessageService);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly confirmDialog = inject(ModalConfirmacionService);
 
   readonly entradas = signal<MovimientoResumenIngreso[]>([]);
   readonly cargando = signal(false);

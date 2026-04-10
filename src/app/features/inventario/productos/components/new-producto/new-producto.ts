@@ -40,6 +40,7 @@ import { MarcaForm } from "@inventario/marca/components/modal/marca-form";
 import { PresentacionUpSert } from '@inventario/productos/domain/productos.interface';
 import { LoaderService } from '@shared/services/loader.service';
 import { UnidadMedidaService } from '../../../../configuracion/unidades-medida/services/unidad-medida.service';
+import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
 import type { UnidadMedidaListar } from '../../../../configuracion/unidades-medida/domain/unidad-medida.interface';
 
 export interface PresentacionRowView extends PresentacionUpSert {
@@ -67,6 +68,7 @@ export interface PresentacionRowView extends PresentacionUpSert {
     FloatLabelModule,
     MarcaForm,
     AppButton,
+    ModalConfirmacionComponent
   ],
   providers: [MessageService, ConfirmationService],
   templateUrl: './new-producto.html',

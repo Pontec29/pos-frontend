@@ -1,0 +1,252 @@
+<div class="erp-sales-container">
+    <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="erp-layout-grid">
+
+            <div class="erp-main-content">
+
+                <div class="erp-card erp-header-card">
+                    <div class="header-info">
+                        <h1 class="header-title">Registro de Compra</h1>
+                        <p class="text-sm text-muted">Ingreso de mercadería por compra a proveedor</p>
+                    </div>
+
+                    <div class="header-actions">
+                        <div class="voucher-type-selector">
+                            <label class="radio-option">
+                                <input type="radio" value="01" formControlName="ID_TIPO_COMPROBANTE">
+                                <span>Factura</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" value="03" formControlName="ID_TIPO_COMPROBANTE">
+                                <span>Boleta</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" value="07" formControlName="ID_TIPO_COMPROBANTE">
+                                <span>N. Crédito</span>
+                            </label>
+                        </div>
+
+                        <div class="correlative-inputs">
+                            <div class="input-group">
+                                <span class="box-label">Serie</span>
+                                <input pInputText formControlName="SERIE" placeholder="F001" maxlength="4" class="header-input serie">
+                            </div>
+                            <div class="input-divider">-</div>
+                            <div class="input-group">
+                                <span class="box-label">Número</span>
+                                <input pInputText formControlName="NUMERO" placeholder="000123" maxlength="10" class="header-input correlative">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card">
+                    <div class="section-header">
+                        <i class="pi pi-truck"></i>
+                        <h2 class="section-title">Datos del Proveedor</h2>
+                    </div>
+
+                    <div class="row items-end">
+                        <div class="col-12 col-md-9 form-field">
+                            <label><i class="pi pi-briefcase mr-1"></i> Proveedor (Razón Social o RUC)</label>
+                            <p-autoComplete 
+                                [ngModel]="selectedSupplier()" 
+                                (ngModelChange)="selectedSupplier.set($event)"
+                                [ngModelOptions]="{standalone: true}"
+                                [suggestions]="filteredSuppliers()" 
+                                (completeMethod)="filterSuppliers($event)" 
+                                field="businessName" 
+                                (onSelect)="onSupplierSelect($event)"
+                                placeholder="Buscar proveedor por nombre o RUC..." 
+                                [forceSelection]="true"
+                                fluid>
+                            </p-autoComplete>
+                        </div>
+
+                        <div class="col-12 col-md-3 form-field">
+                            <label><i class="pi pi-money-bill mr-1"></i> Moneda</label>
+                            <p-select formControlName="ID_MONEDA" [options]="currencies" optionLabel="label" optionValue="value" fluid></p-select>
+                        </div>
+                    </div>
+
+                    <div class="row mt-3 items-end">
+                        <div class="col-12 col-md-3 form-field">
+                            <label><i class="pi pi-calendar mr-1"></i> Fecha Emisión</label>
+                            <p-datepicker formControlName="FECHA_EMISION" [showIcon]="true" dateFormat="dd/mm/yy" fluid></p-datepicker>
+                        </div>
+                        <div class="col-12 col-md-3 form-field">
+                            <label><i class="pi pi-calendar-times mr-1"></i> Fecha Vencimiento</label>
+                            <p-datepicker formControlName="FECHA_VENCIMIENTO" [showIcon]="true" dateFormat="dd/mm/yy" fluid></p-datepicker>
+                        </div>
+                        <div class="col-12 col-md-6 form-field">
+                            <label><i class="pi pi-pencil mr-1"></i> Observaciones</label>
+                            <input pInputText formControlName="OBSERVACIONES" placeholder="Notas adicionales sobre la compra..." class="w-full">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card">
+                    <div class="section-header">
+                        <i class="pi pi-plus-circle"></i>
+                        <h3 class="section-title">Detalle de Productos</h3>
+                    </div>
+
+                    <div class="form-grid items-end mb-2">
+                        <div class="col-12 col-md-4 form-field">
+                            <label><i class="pi pi-box mr-1"></i> Producto</label>
+                            <p-autoComplete 
+                                [ngModel]="newProduct()" 
+                                (ngModelChange)="newProduct.set($event)"
+                                [ngModelOptions]="{standalone: true}"
+                                [suggestions]="filteredProducts()" 
+                                (completeMethod)="filterProducts($event)" 
+                                field="name" 
+                                placeholder="Nombre o código del producto" 
+                                fluid>
+                            </p-autoComplete>
+                        </div>
+
+                        <div class="col-6 col-md-2 form-field">
+                            <label><i class="pi pi-tag mr-1"></i> Cantidad</label>
+                            <p-inputNumber 
+                                [ngModel]="newQuantity()" 
+                                (ngModelChange)="newQuantity.set($event)"
+                                [ngModelOptions]="{standalone: true}" 
+                                [min]="0.01" placeholder="0.00" fluid>
+                            </p-inputNumber>
+                        </div>
+
+                        <div class="col-6 col-md-2 form-field">
+                            <label><i class="pi pi-money-bill mr-1"></i> Costo Unit.</label>
+                            <p-inputNumber 
+                                [ngModel]="newUnitCost()" 
+                                (ngModelChange)="newUnitCost.set($event)"
+                                [ngModelOptions]="{standalone: true}" 
+                                [min]="0" mode="decimal" [minFractionDigits]="2" placeholder="0.00" fluid>
+                            </p-inputNumber>
+                        </div>
+
+                        <div class="col-6 col-md-2 form-field">
+                            <label><i class="pi pi-info-circle mr-1"></i> Lote</label>
+                            <input pInputText 
+                                [ngModel]="newLotCode()" 
+                                (ngModelChange)="newLotCode.set($event)"
+                                [ngModelOptions]="{standalone: true}" 
+                                placeholder="ABC-123" class="w-full">
+                        </div>
+
+                        <div class="col-6 col-md-2 form-field">
+                            <button pButton type="button" icon="pi pi-plus" label="Agregar" (click)="addLine()" [disabled]="!newProduct() || !newQuantity() || !newUnitCost()" class="btn-add-item w-full"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="erp-card erp-table-container">
+                    <table class="erp-table">
+                        <thead>
+                            <tr>
+                                <th class="text-center" style="width: 50px;">#</th>
+                                <th>Producto</th>
+                                <th class="text-center" style="width: 100px;">Cant.</th>
+                                <th class="text-right" style="width: 120px;">Costo Unit.</th>
+                                <th class="text-right" style="width: 120px;">Subtotal</th>
+                                <th class="text-right" style="width: 100px;">I.G.V.</th>
+                                <th class="text-right" style="width: 120px;">Total</th>
+                                <th class="action-col" style="width: 60px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let item of detailsControls; let i = index">
+                                <td class="text-center text-muted">{{ i + 1 }}</td>
+                                <td>
+                                    <span class="product-name font-medium">{{ item.get('PRODUCTO_NOMBRE')?.value }}</span>
+                                    <div class="flex gap-2 mt-1">
+                                        <small class="text-muted" *ngIf="item.get('CODIGO_LOTE')?.value">Lote: {{ item.get('CODIGO_LOTE')?.value }}</small>
+                                        <small class="text-muted" *ngIf="item.get('FECHA_VENCIMIENTO')?.value">Venc: {{ item.get('FECHA_VENCIMIENTO')?.value | date: 'dd/MM/yy' }}</small>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="font-medium">{{ item.get('CANTIDAD')?.value | number:'1.2-2' }}</span>
+                                </td>
+                                <td class="text-right">
+                                    {{ item.get('VALOR_UNITARIO')?.value | number:'1.2-2' }}
+                                </td>
+                                <td class="text-right">{{ item.get('SUBTOTAL')?.value | number:'1.2-2' }}</td>
+                                <td class="text-right text-muted">{{ item.get('IGV')?.value | number:'1.2-2' }}</td>
+                                <td class="text-right font-bold">{{ item.get('TOTAL')?.value | number:'1.2-2' }}</td>
+                                <td class="text-center">
+                                    <button class="btn-delete" type="button" (click)="removeLine(i)">
+                                        <i class="pi pi-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr *ngIf="detalles.length === 0">
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="pi pi-shopping-cart text-3xl block mb-2 opacity-20"></i>
+                                    No hay productos agregados a la compra
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="erp-sidebar">
+                <div class="erp-card summary-card">
+                    <h2 class="summary-title">Resumen de Compra</h2>
+                    <div class="summary-totals">
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span class="amount">{{ subtotalGeneral() | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>I.G.V. (18%):</span>
+                            <span class="amount">{{ igvTotal() | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="total-display">
+                            <span class="total-label">Total</span>
+                            <span class="total-number">{{ totalGeneral() | number:'1.2-2' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="actions-group mt-5">
+                        <button type="submit" class="btn-issue-voucher mb-2" [disabled]="form.invalid || saving()">
+                            <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"></i>
+                            {{ saving() ? 'Procesando...' : 'Guardar Compra' }}
+                        </button>
+                        <button type="button" class="btn-cancel w-full" (click)="cancel()">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+
+                <div class="erp-card">
+                    <div class="section-header mb-3">
+                        <h3 class="section-title">Información Adicional</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="col-12 form-field">
+                            <label>Almacén de Destino</label>
+                            <p-select [options]="[{label: 'Almacén Principal', value: 1}]" formControlName="ID_ALMACEN" fluid></p-select>
+                        </div>
+                        <div class="col-12 form-field mt-3">
+                            <label>Tipo de Cambio</label>
+                            <p-inputnumber formControlName="TIPO_CAMBIO" mode="decimal" [minFractionDigits]="3" fluid></p-inputnumber>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sunat-alert">
+                    <i class="pi pi-info-circle"></i>
+                    <div>
+                        <strong>Validación</strong>
+                        <p class="mt-1">Asegúrese de que los datos del comprobante coincidan con el documento físico o XML del proveedor.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<p-toast></p-toast>

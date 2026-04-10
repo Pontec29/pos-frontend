@@ -10,9 +10,10 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TableModule } from 'primeng/table';
+import { Toast } from "primeng/toast";
 
 @Component({
-  selector: 'app-form-compra',
+  selector: 'app-nueva-compra',
   imports: [
     CommonModule,
     FormsModule,
@@ -20,17 +21,20 @@ import { TableModule } from 'primeng/table';
     ...PRIMENG_FORM_MODULES,
     ...PRIMENG_FILTER_MODULES,
     CardModule,
-    TableModule
+    TableModule,
+    Toast
   ],
-  templateUrl: './form-compra.html',
-  styleUrl: './form-compra.scss',
+  templateUrl: './nueva-compra.html',
+  styleUrl: './nueva-compra.scss',
 })
-export default class FormCompra {
+export default class NuevaCompra {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private readonly messageService = inject(MessageService);
 
-  private readonly ComprasService = inject(ComprasService);
+  private readonly compService = inject(ComprasService);
+  
+  saving = signal(false);
 
   // ! SOLO RECIBE DATA PARA ACTUALIZAR UNA COMPRA
   dataCompras = input<CompraUpsertDto>();
@@ -214,8 +218,10 @@ export default class FormCompra {
       }))
     };
 
-    this.ComprasService.create(compra).subscribe({
-      next: (response) => {
+    this.saving.set(true);
+    this.compService.create(compra).subscribe({
+      next: (response: any) => {
+        this.saving.set(false);
         if (response.success) {
           this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Compra registrada correctamente' });
           this.router.navigate(['/compras']);
@@ -223,7 +229,8 @@ export default class FormCompra {
           this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'No se pudo registrar la compra' });
         }
       },
-      error: (err) => {
+      error: (err: any) => {
+        this.saving.set(false);
         console.error('Error al guardar compra:', err);
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error al guardar la compra' });
       }

@@ -953,3 +953,125 @@ $sb-highlight: #1072b9;
     border-radius: 0;
   }
 }
+
+// === Popover de Usuario (Diseño Premium) ===
+::ng-deep .user-menu-popover {
+  .p-popover-content {
+    padding: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #ffffff;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-color);
+  }
+
+  .user-menu-wrapper {
+    width: 260px;
+    background: #ffffff;
+    border-radius: 12px;
+  }
+
+  .menu-header {
+    background: #f9fafb;
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border-color);
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+
+      .user-name {
+        font-weight: 700;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        line-height: 1.2;
+      }
+
+      .user-email {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        word-break: break-all;
+        margin-top: 2px;
+      }
+    }
+  }
+
+  .menu-list {
+    padding: 0.5rem;
+    list-style: none;
+    margin: 0;
+
+    .menu-list-item {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      gap: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
+      position: relative;
+
+      i {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        width: 20px;
+        text-align: center;
+      }
+
+      .shortcut {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: var(--text-tertiary);
+        background: var(--gray-100);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 400;
+      }
+
+      &:hover {
+        background: var(--primary-lighter);
+        color: var(--primary);
+
+        i { color: var(--primary); }
+        .shortcut { background: var(--primary-light); color: var(--primary); }
+      }
+    }
+  }
+
+  .menu-separator {
+    height: 1px;
+    background: var(--border-color);
+    margin: 4px 0;
+  }
+
+  .menu-footer {
+    padding: 0.5rem;
+
+    .logout-action {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      gap: 0.75rem;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--status-red);
+      font-size: 0.9rem;
+      font-weight: 600;
+      transition: all 0.2s;
+
+      i { font-size: 1.1rem; }
+
+      &:hover {
+        background: var(--status-red-soft);
+      }
+    }
+  }
+}
+

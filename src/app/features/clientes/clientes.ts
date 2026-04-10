@@ -3,7 +3,7 @@ import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 import { AppButton } from '@shared/ui/button';
-import { AppConfirmDialog } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
 import { PRIMENG_FILTER_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-imports';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { MenuModule } from 'primeng/menu';
@@ -24,7 +24,7 @@ import { ClientesService } from './services/clientes';
         CommonModule,
         FormsModule,
         AppButton,
-        AppConfirmDialog,
+        ModalConfirmacionComponent,
         ...PRIMENG_TABLE_MODULES,
         ...PRIMENG_FILTER_MODULES,
         TooltipModule,

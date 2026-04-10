@@ -7,7 +7,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { PRIMENG_TABLE_MODULES, PRIMENG_FORM_MODULES, PRIMENG_FILTER_MODULES } from '@shared/ui/prime-imports';
 import { PaginatorState } from 'primeng/paginator';
-import { ConfirmDialogService } from '../../../shared/ui/confirm-dialog/confirm-dialog.service';
+import { ModalConfirmacionService } from '../../../shared/ui/modal-confirmacion/modal-confirmacion.service';
 import { AppButton } from '../../../shared/ui/button';
 import { Cargo } from './domain/cargo.interface';
 import { CargosService } from './services/cargos.service';
@@ -36,7 +36,7 @@ import { ModalData } from '@shared/domains/apartadoType.model';
 export default class Cargos implements OnInit {
   private readonly cargosService = inject(CargosService);
   private readonly messageService = inject(MessageService);
-  private readonly confirmDialog = inject(ConfirmDialogService);
+  private readonly confirmDialog = inject(ModalConfirmacionService);
 
   // Pagination & Search
   rows = signal(10);

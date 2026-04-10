@@ -8,7 +8,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 
 import { AppButton } from '@shared/ui/button';
-import { ConfirmDialogService } from '@shared/ui/confirm-dialog/confirm-dialog.service';
+import { ModalConfirmacionService } from '@shared/ui/modal-confirmacion/modal-confirmacion.service';
 import { PRIMENG_FILTER_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-imports';
 
 
@@ -40,7 +40,7 @@ import { SucursalAdapter } from './domain/sucursal.adapter';
 })
 export default class Sucursales implements OnInit {
     private readonly messageService = inject(MessageService);
-    private readonly confirmDialog = inject(ConfirmDialogService);
+    private readonly confirmDialog = inject(ModalConfirmacionService);
     private readonly sucursalService = inject(SucursalService);
 
 

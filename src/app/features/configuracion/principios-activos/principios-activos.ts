@@ -5,7 +5,7 @@ import { MessageService, ConfirmationService } from 'primeng/api';
 import { PRIMENG_TABLE_MODULES, PRIMENG_FILTER_MODULES } from '../../../shared/ui/prime-imports';
 import { AppButton } from '../../../shared/ui/button';
 import { LoadingSpinner } from '../../../shared/ui/loading-spinner/loading-spinner';
-import { AppConfirmDialog } from '../../../shared/ui/confirm-dialog/confirm-dialog.component';
+import { ModalConfirmacionComponent } from '../../../shared/ui/modal-confirmacion/modal-confirmacion.component';
 import { ActivePrincipleService } from './services/active-principle.service';
 import { ActivePrinciple, ActivePrincipleRequest } from '../../../core/models/inventory.model';
 import { DialogModule } from 'primeng/dialog';
@@ -22,7 +22,7 @@ import { TextareaModule } from 'primeng/textarea';
         ...PRIMENG_FILTER_MODULES,
         AppButton,
         LoadingSpinner,
-        AppConfirmDialog,
+        ModalConfirmacionComponent,
         DialogModule,
         InputTextModule,
         TextareaModule

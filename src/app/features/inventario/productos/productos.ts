@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MenuItem, MessageService } from 'primeng/api';
 import { ProductoService } from './services/producto.service';
 import { AppButton } from '@shared/ui/button';
-import { AppConfirmDialog } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
 import { PRIMENG_FILTER_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-imports';
 import { Producto } from './domain/productos.interface';
 import { Router } from '@angular/router';
@@ -25,7 +25,7 @@ import { CurrencyFormatPipe } from '@shared/pipe/currencyFormat.pipe';
     ...PRIMENG_TABLE_MODULES,
     ...PRIMENG_FILTER_MODULES,
     AppButton,
-    AppConfirmDialog,
+    ModalConfirmacionComponent,
     CurrencyFormatPipe,
     TagModule,
     TooltipModule,

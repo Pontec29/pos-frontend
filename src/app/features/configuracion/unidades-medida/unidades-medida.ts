@@ -6,7 +6,7 @@ import { PRIMENG_TABLE_MODULES, PRIMENG_FILTER_MODULES } from '@shared/ui/prime-
 import { AppButton } from '@shared/ui/button';
 import { LoadingSpinner } from '@shared/ui/loading-spinner/loading-spinner';
 import { ErrorState } from '@shared/ui/error-state/error-state';
-import { AppConfirmDialog } from '@shared/ui/confirm-dialog/confirm-dialog.component';
+import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
 import { ModalForm } from '@shared/components/modal-form/modal-form';
 import { ModalData } from '@shared/domains/apartadoType.model';
 import { UnidadMedidaService } from './services/unidad-medida.service';
@@ -22,7 +22,7 @@ import { Tag } from "primeng/tag";
         ...PRIMENG_TABLE_MODULES,
         ...PRIMENG_FILTER_MODULES,
         AppButton,
-        AppConfirmDialog,
+        ModalConfirmacionComponent,
         ModalForm,
         Tag
     ],
