@@ -1,4 +1,4 @@
-@use "mixins" as *;
+@use 'mixins' as *;
 
 // * ENCABEZADOS DE COLUMNAS (Table Header)
 $thead-bg: var(--gray-100); // Color de fondo de los encabezados
@@ -30,7 +30,6 @@ $paginator-btn-hover-text: var(--primary); // Color del texto al hover
 $paginator-btn-active-bg-start: var(--primary); // Color activo - inicio gradiente
 $paginator-btn-active-bg-end: var(--primary-hover); // Color activo - fin gradiente
 $paginator-btn-active-text: var(--text-inverse); // Color del texto activo
-
 
 $primary-color: var(--primary);
 $text-color: #333;
@@ -98,7 +97,6 @@ $danger-color: #ef4444;
       gap: 0.8rem;
       align-items: center;
     }
-
   }
 
   // ! CUERPO DE LA TABLA
@@ -110,7 +108,9 @@ $danger-color: #ef4444;
     display: flex;
     flex-direction: column;
     min-height: 0;
-    transition: background-color 300ms ease, backdrop-filter 300ms ease;
+    transition:
+      background-color 300ms ease,
+      backdrop-filter 300ms ease;
 
     &.compras-table {
       min-height: clamp(240px, 40vh, 360px);
@@ -335,12 +335,11 @@ $danger-color: #ef4444;
         vertical-align: middle;
       }
 
-
       .p-datatable-header {
         display: none;
       }
 
-      .p-datatable-thead>tr>th {
+      .p-datatable-thead > tr > th {
         background-color: #f9fafb;
         color: $text-secondary;
         font-weight: 600;
@@ -350,7 +349,7 @@ $danger-color: #ef4444;
         white-space: nowrap;
       }
 
-      .p-datatable-tbody>tr {
+      .p-datatable-tbody > tr {
         border-bottom: 1px solid $border-color;
         transition: background-color 0.2s;
 
@@ -358,7 +357,7 @@ $danger-color: #ef4444;
           background-color: #f9fafb;
         }
 
-        >td {
+        > td {
           padding: 1rem;
           color: $text-color;
           font-size: 0.9rem;

@@ -1,9 +1,9 @@
 <app-modal-confirmacion></app-modal-confirmacion>
 
-<div class="main-content">
-  <div class="page-header-container">
+<div class="erp-page-container">
+  <div class="erp-page-header">
     <div>
-      <h2 class="header-title-main">{{ isEditMode() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+      <h2 class="header-title">{{ isEditMode() ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
     </div>
     <div class="header-actions">
       <app-button label="Cancelar" icon="pi pi-times" severity="secondary" (clicked)="onCancel()"></app-button>
@@ -12,582 +12,239 @@
   </div>
 
   <form [formGroup]="productForm">
-    <section class="data-main-section">
-      <div class="image-upload-wrapper">
-        <div class="image-upload-dropzone" role="button" tabindex="0"
-          aria-label="Subir imagen del producto. Haz clic o arrastra una imagen" (click)="imageFileInput.click()"
-          (keydown.enter)="imageFileInput.click()" (keydown.space)="imageFileInput.click()"
-          (dragover)="onImageDragOver($event)" (dragleave)="onImageDragLeave($event)" (drop)="onImageDrop($event)"
-          [class.is-dragging]="imageDragActive()" [class.has-image]="!!imagePreviewUrl()">
-          @if (imagePreviewUrl()) {
-          <button type="button" class="image-upload-clear-btn" (click)="onClearImage($event)" pTooltip="Eliminar imagen"
-            tooltipPosition="top">
-            <i class="pi pi-times"></i>
-          </button>
-          }
-
-          @if (!imagePreviewUrl()) {
-          <div class="image-upload-placeholder">
-            <div class="image-upload-icon-circle">
-              <i class="pi pi-cloud-upload"></i>
-            </div>
-            <p class="image-upload-title">Haz clic para subir o arrastra</p>
-            <p class="image-upload-subtitle">SVG, PNG, JPG o GIF (Máx. 5MB)</p>
-          </div>
-          } @else {
-          <img class="image-upload-img" [src]="imagePreviewUrl()" alt="Vista previa de la imagen del producto" />
-          }
-
-          <input #imageFileInput type="file" id="productImageInput" class="image-upload-input" formControlName="image"
-            accept=".png,.jpg,.jpeg,.gif,.svg" (change)="onImageSelected($event)" aria-hidden="true" />
-        </div>
-
-        @if (imageError()) {
-        <div class="image-upload-feedback">
-          <i class="pi pi-exclamation-circle"></i>
-          <span>{{ imageError() }}</span>
-        </div>
-        }
-      </div>
-      <div class="card-principal">
-        <h3 class="section-header-title">Datos Principales</h3>
-        <div class="grid-main-data p-fluid">
-          <div class="field-group item-name field-span4">
-            <p-floatlabel>
-              <input pInputText id="nombreProducto" formControlName="nombreProducto" class="input-full text-lg"
-                autofocus />
-              <label for="nombreProducto">Nombre del Producto <span class="required-star">*</span></label>
-            </p-floatlabel>
-          </div>
-          <div class="field-group item-brand field-span3">
-            <div class="p-inputgroup input-full">
-              <p-floatlabel class="w-full">
-                <p-select [options]="marcas()" formControlName="marcaId" optionLabel="NOMBRE" optionValue="ID_MARCA"
-                  [filter]="true" filterBy="NOMBRE" [showClear]="true" class="w-full" inputId="marca"
-                  ></p-select>
-                <label for="marca">Marca <span class="required-star">*</span></label>
-              </p-floatlabel>
-              <button pButton icon="pi pi-plus" (click)="openMarcaDialog()" pTooltip="Nueva Marca" tooltipPosition="top"
-                class="p-button-success"></button>
-            </div>
-          </div>
-          <div class="field-group item-type field-span2">
-            <p-floatlabel class="w-full">
-              <p-select [options]="tiposProducto" formControlName="tipoProducto"
-                (onChange)="onTipoProductoChange($event)" optionLabel="label" optionValue="value" class="w-full"
-                inputId="tipoProducto" ></p-select>
-              <label for="tipoProducto">Tipo <span class="required-star">*</span></label>
-            </p-floatlabel>
-          </div>
-          <div class="field-group item-unit field-span3">
-            <p-floatlabel class="w-full">
-              <p-select [options]="unidadesMedidaBase()" formControlName="unidadMedidaId" optionLabel="DESCRIPCION_SUNAT"
-                optionValue="ID_UNIDAD_MEDIDA" [filter]="true" filterBy="DESCRIPCION_SUNAT" [showClear]="true"
-                class="w-full" inputId="unidadMedida"></p-select>
-              <label for="unidadMedida">Medida Base <span class="required-star">*</span></label>
-            </p-floatlabel>
-          </div>
-          <div class="field-group item-barcode field-span3">
-            <div class="p-inputgroup input-full">
-              <!-- <span class="p-inputgroup-addon"><i class="pi pi-barcode"></i></span> -->
-              <p-floatlabel class="w-full">
-                <input pInputText id="codigoBarra" formControlName="codigoBarra" class="w-full" />
-                <label for="codigoBarra">Código de Barras</label>
-              </p-floatlabel>
-              <button pButton icon="pi pi-refresh" (click)="generateEan13()" pTooltip="Generar EAN-13"
-                tooltipPosition="top"></button>
-            </div>
-          </div>
-          <div class="field-group item-sku field-span2">
-            <p-floatlabel class="w-full">
-              <input pInputText id="sku" formControlName="sku" class="w-full" />
-              <label for="sku">SKU</label>
-            </p-floatlabel>
-          </div>
-          <!-- <div class="field-group item-cod-interno field-span2">
-            <p-floatlabel class="w-full">
-              <input pInputText id="codigoInterno" formControlName="codigoInterno" class="w-full" />
-              <label for="codigoInterno">Código Interno <span class="required-star">*</span></label>
-            </p-floatlabel>
-          </div> -->
-          <div class="field-group item-category field-span3">
-            <div class="p-inputgroup input-full">
-              <p-floatlabel class="w-full">
-                <p-select [options]="categories()" formControlName="categoriaId" optionLabel="NOMBRE"
-                  optionValue="ID_CATEGORIA" [filter]="true" filterBy="NOMBRE" [showClear]="true" class="w-full"
-                  inputId="category" ></p-select>
-                <label for="category" style="background-color: transparent;">Categoría</label>
-              </p-floatlabel>
-              <button pButton icon="pi pi-plus" (click)="openCategoryDialog()" pTooltip="Nueva Categoría"
-                tooltipPosition="top" class="p-button-success"></button>
-            </div>
-          </div>
-          <div class="field-group item-desc field-full">
-            <p-floatlabel class="w-full">
-              <input pInputTextarea id="description" formControlName="description" style="resize: none; height: 80px;"
-                class="w-full">
-              <label for="description">Descripción</label>
-            </p-floatlabel>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <p-tabs value="0" class="tabs-container">
-      <p-tablist>
-        <p-tab value="0">
-          <span class="tab-content">
-            <i class="pi pi-dollar"></i>
-            <span class="tab-label">Precios</span>
-          </span>
-        </p-tab>
-        <p-tab value="1">
-          <span class="tab-content">
-            <i class="pi pi-dollar"></i>
-            <span class="tab-label">Unidades y Presentaciones</span>
-          </span>
-        </p-tab>
-        <p-tab value="2">
-          <span class="tab-content">
-            <i class="pi pi-cog"></i>
-            <span class="tab-label">Configuración</span>
-          </span>
-        </p-tab>
-      </p-tablist>
-
-      <p-tabpanels>
-        <p-tabpanel value="0">
-          <div class="form-tab-content">
-            <section class="price-section">
-              <div class="title-section">
-                <i class="pi pi-money-bill"></i>
-                <span>Precios y Moneda</span>
+    <div class="erp-grid">
+      <!-- Columna Izquierda: Imagen -->
+      <div class="erp-col-3 erp-col-md-12">
+        <div class="erp-card">
+          <h3 class="card-title">Imagen</h3>
+          <div class="image-upload-dropzone" role="button" tabindex="0"
+            aria-label="Subir imagen" (click)="imageFileInput.click()"
+            [class.has-image]="!!imagePreviewUrl()">
+            
+            @if (imagePreviewUrl()) {
+              <button type="button" class="image-upload-clear-btn" (click)="onClearImage($event)">
+                <i class="pi pi-times"></i>
+              </button>
+              <img class="image-upload-img" [src]="imagePreviewUrl()" alt="Vista previa" />
+            } @else {
+              <div class="image-upload-placeholder">
+                <i class="pi pi-cloud-upload text-4xl mb-3"></i>
+                <p class="font-bold">Subir imagen</p>
+                <p class="text-sm text-secondary">SVG, PNG, JPG (Máx. 5MB)</p>
               </div>
+            }
 
-              <div class="erp-grid-prices" style="margin-top: 25px;">
-                <div class="form-row">
-                  <p-floatlabel>
+            <input #imageFileInput type="file" id="productImageInput" class="hidden" formControlName="image"
+              accept=".png,.jpg,.jpeg,.gif,.svg" (change)="onImageSelected($event)" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Columna Derecha: Datos -->
+      <div class="erp-col-9 erp-col-md-12">
+        <div class="erp-card">
+          <h3 class="card-title">Datos Principales</h3>
+          <div class="erp-grid">
+            <div class="erp-col-6 erp-col-md-12">
+              <p-floatlabel variant="in">
+                <input pInputText id="nombreProducto" formControlName="nombreProducto" autofocus />
+                <label for="nombreProducto">Nombre del Producto <span class="required-star">*</span></label>
+              </p-floatlabel>
+            </div>
+
+            <div class="erp-col-3 erp-col-md-6 erp-col-sm-12">
+              <div class="p-inputgroup">
+                <p-floatlabel variant="in" class="w-full">
+                  <p-select [options]="marcas()" formControlName="marcaId" optionLabel="NOMBRE" optionValue="ID_MARCA"
+                    [filter]="true" filterBy="NOMBRE" [showClear]="true" inputId="marca"></p-select>
+                  <label for="marca">Marca <span class="required-star">*</span></label>
+                </p-floatlabel>
+                <button pButton icon="pi pi-plus" (click)="openMarcaDialog()" class="p-button-success"></button>
+              </div>
+            </div>
+
+            <div class="erp-col-3 erp-col-md-6 erp-col-sm-12">
+              <p-floatlabel variant="in">
+                <p-select [options]="tiposProducto" formControlName="tipoProducto"
+                  (onChange)="onTipoProductoChange($event)" optionLabel="label" optionValue="value"
+                  inputId="tipoProducto"></p-select>
+                <label for="tipoProducto">Tipo <span class="required-star">*</span></label>
+              </p-floatlabel>
+            </div>
+
+            <div class="erp-col-3 erp-col-md-6 erp-col-sm-12">
+              <p-floatlabel variant="in">
+                <p-select [options]="unidadesMedidaBase()" formControlName="unidadMedidaId" optionLabel="DESCRIPCION_SUNAT"
+                  optionValue="ID_UNIDAD_MEDIDA" [filter]="true" filterBy="DESCRIPCION_SUNAT"
+                  inputId="unidadMedida"></p-select>
+                <label for="unidadMedida">Medida Base <span class="required-star">*</span></label>
+              </p-floatlabel>
+            </div>
+
+            <div class="erp-col-4 erp-col-md-6 erp-col-sm-12">
+              <div class="p-inputgroup">
+                <p-floatlabel variant="in" class="w-full">
+                  <input pInputText id="codigoBarra" formControlName="codigoBarra" />
+                  <label for="codigoBarra">Código de Barras</label>
+                </p-floatlabel>
+                <button pButton icon="pi pi-refresh" (click)="generateEan13()"></button>
+              </div>
+            </div>
+
+            <div class="erp-col-2 erp-col-md-6 erp-col-sm-12">
+              <p-floatlabel variant="in">
+                <input pInputText id="sku" formControlName="sku" />
+                <label for="sku">SKU</label>
+              </p-floatlabel>
+            </div>
+
+            <div class="erp-col-3 erp-col-md-6 erp-col-sm-12">
+              <div class="p-inputgroup">
+                <p-floatlabel variant="in" class="w-full">
+                  <p-select [options]="categories()" formControlName="categoriaId" optionLabel="NOMBRE"
+                    optionValue="ID_CATEGORIA" [filter]="true" filterBy="NOMBRE" [showClear]="true"
+                    inputId="category"></p-select>
+                  <label for="category">Categoría</label>
+                </p-floatlabel>
+                <button pButton icon="pi pi-plus" (click)="openCategoryDialog()" class="p-button-success"></button>
+              </div>
+            </div>
+
+            <div class="erp-col-12">
+              <p-floatlabel variant="in">
+                <textarea pInputTextarea id="description" formControlName="description" class="w-full" style="height: 80px;"></textarea>
+                <label for="description">Descripción</label>
+              </p-floatlabel>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Pestañas Adicionales -->
+      <div class="erp-col-12">
+        <p-tabs value="0" class="erp-card" style="padding: 0;">
+          <p-tablist style="padding: 0 1rem; border-bottom: 1px solid var(--border-light);">
+            <p-tab value="0"><i class="pi pi-dollar mr-2"></i> Precios</p-tab>
+            <p-tab value="1"><i class="pi pi-th-large mr-2"></i> Presentaciones</p-tab>
+            <p-tab value="2"><i class="pi pi-cog mr-2"></i> Configuración</p-tab>
+          </p-tablist>
+
+          <p-tabpanels style="padding: 2rem;">
+            <!-- Tab Precios -->
+            <p-tabpanel value="0">
+              <div class="erp-grid">
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
                     <p-select [options]="monedas()" formControlName="monedaId" optionLabel="codigo" optionValue="codigo"
-                      placeholder="Seleccionar" class="input-full" inputId="monedaId" [disabled]="true">
-                    </p-select>
-                    <label for="monedaId" class="required">Moneda</label>
+                      inputId="monedaId" [disabled]="true"></p-select>
+                    <label for="monedaId">Moneda</label>
                   </p-floatlabel>
-                  @if (productForm.get('monedaId')?.invalid && productForm.get('monedaId')?.touched) {
-                  <small class="p-error">
-                    La moneda es obligatoria
-                  </small>
-                  }
                 </div>
-
-                <div class="form-row">
-                  <p-floatlabel>
-                    <p-inputNumber formControlName="precioCompra" mode="currency" [currency]="currencyCode()"
-                      locale="es-PE" [minFractionDigits]="2" class="input-full" inputId="precioCompra">
-                    </p-inputNumber>
-                    <label for="precioCompra">Precio de compra</label>
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-inputNumber formControlName="precioCompra" mode="currency" [currency]="currencyCode()" locale="es-PE"></p-inputNumber>
+                    <label>Precio Compra</label>
                   </p-floatlabel>
-                  @if(productForm.get('precioCompra')?.hasError('required') && productForm.get('precioCompra')?.touched)
-                  {
-                  <small class="p-error">
-                    El precio de compra es obligatorio
-                  </small>
-                  }
                 </div>
-
-                <div class="form-row sale-price">
-                  <p-floatlabel>
-                    <p-inputNumber formControlName="precioVenta" mode="currency" [currency]="currencyCode()"
-                      locale="es-PE" [minFractionDigits]="2" class="input-full" inputId="precioVenta">
-                    </p-inputNumber>
-                    <label for="precioVenta">Precio de venta</label>
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-inputNumber formControlName="precioVenta" mode="currency" [currency]="currencyCode()" locale="es-PE"></p-inputNumber>
+                    <label>Precio Venta</label>
                   </p-floatlabel>
-                  @if (productForm.get('precioVenta')?.hasError('relation') && (productForm.get('precioVenta')?.dirty ||
-                  productForm.get('precioVenta')?.touched)) {
-                  <small class="p-error">
-                    Debe ser mayor que el precio mínimo
-                  </small>
-                  }
                 </div>
-
-                <div class="form-row">
-                  <p-floatlabel>
-                    <p-inputNumber formControlName="precioMinimoVenta" mode="currency" [currency]="currencyCode()"
-                      locale="es-PE" [minFractionDigits]="2" class="input-full" inputId="precioMinimoVenta">
-                    </p-inputNumber>
-                    <label for="precioMinimoVenta">Precio mínimo de venta</label>
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-inputNumber formControlName="precioMinimoVenta" mode="currency" [currency]="currencyCode()" locale="es-PE"></p-inputNumber>
+                    <label>Precio Mínimo</label>
                   </p-floatlabel>
-                  @if (productForm.get('precioMinimoVenta')?.hasError('relation') &&
-                  (productForm.get('precioMinimoVenta')?.dirty || productForm.get('precioMinimoVenta')?.touched)) {
-                  <small class="p-error">
-                    Debe ser mayor que el precio de compra
-                  </small>
-                  }
+                </div>
+              </div>
+            </p-tabpanel>
+
+            <!-- Tab Presentaciones -->
+            <p-tabpanel value="1">
+              <div class="erp-grid items-end mb-4" formGroupName="presentaciones" style="background: var(--gray-50); padding: 1.5rem; border-radius: 12px;">
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-select [options]="unidadMedida()" formControlName="unidadId" optionLabel="DESCRIPCION_SUNAT"
+                      optionValue="ID_UNIDAD_MEDIDA" [filter]="true"></p-select>
+                    <label>Medida</label>
+                  </p-floatlabel>
+                </div>
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-inputNumber formControlName="priceBase" mode="currency" currency="PEN" locale="es-PE"></p-inputNumber>
+                    <label>Precio</label>
+                  </p-floatlabel>
+                </div>
+                <div class="erp-col-2 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <p-inputNumber formControlName="factor" [min]="1"></p-inputNumber>
+                    <label>Factor</label>
+                  </p-floatlabel>
+                </div>
+                <div class="erp-col-3 erp-col-md-6">
+                  <p-floatlabel variant="in">
+                    <input pInputText formControlName="barcode" />
+                    <label>Barras</label>
+                  </p-floatlabel>
+                </div>
+                <div class="erp-col-1">
+                  <button pButton icon="pi pi-plus" (click)="agregarProducto()" [disabled]="!formularioValido"></button>
                 </div>
               </div>
 
-              <div class="divider"></div>
+              <p-table [value]="presentationsData()" class="p-datatable-sm">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th>Medida</th>
+                    <th>Precio</th>
+                    <th>Factor</th>
+                    <th>Barras</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+                  <tr>
+                    <td>{{ row.unitName }}</td>
+                    <td>{{ row.PRECIO_VENTA | number:'1.2-2' }}</td>
+                    <td>{{ row.FACTOR_CONVERSION_BASE }}</td>
+                    <td>{{ row.CODIGO_BARRAS }}</td>
+                    <td class="text-center">
+                      <button pButton icon="pi pi-trash" class="p-button-danger p-button-text" (click)="confirmarEliminarPresentacion(rowIndex)"></button>
+                    </td>
+                  </tr>
+                </ng-template>
+              </p-table>
+            </p-tabpanel>
 
-              <div class="erp-grid-prices">
-                <div class="form-row">
-                  <label>Margen bruto sobre venta</label>
-                  <div class="margin-summary positive">
-                    <i class="pi pi-chart-line"></i>
-                    <span>{{ margenBruto() | number:'1.2-2' }} %</span>
-                  </div>
-                </div>
-                <div class="form-row">
-                  <label>Margen mínimo</label>
-                  <div class="margin-summary warning">
-                    <i class="pi pi-percentage"></i>
-                    <span>{{ margenMinimo() | number:'1.2-2' }} %</span>
-                  </div>
-                </div>
-              </div>
-            </section>
-          </div>
-        </p-tabpanel>
-
-        <p-tabpanel value="1">
-          <div class="grid-pharmacy">
-            <div class="full-row mb-4">
-              <div class="pricing-panel" formGroupName="presentaciones">
-                <h4 class="section-title-small">
-                  <i class="pi pi-th-large"></i>
-                  Agregar presentación
-                </h4>
-                <div class="presentations-add-grid" style="margin-top: 25px;">
-                  <div class="field-group"
-                    [ngClass]="{'invalid': productForm.get('presentaciones.unidadId')?.invalid && (productForm.get('presentaciones.unidadId')?.dirty || productForm.get('presentaciones.unidadId')?.touched)}">
-                    <p-floatlabel>
-                      <p-select [options]="unidadMedida()" formControlName="unidadId" optionLabel="DESCRIPCION_SUNAT"
-                        optionValue="ID_UNIDAD_MEDIDA" [filter]="true" filterBy="DESCRIPCION_SUNAT" class="input-full"
-                        inputId="unidadId">
-                      </p-select>
-                      <label for="unidadId">Unidad de Medida</label>
-                    </p-floatlabel>
-                  </div>
-                  <!-- <div class="field-group" [ngClass]="{'invalid': productForm.get('presentaciones.currencyId')?.invalid && (productForm.get('presentaciones.currencyId')?.dirty || productForm.get('presentaciones.currencyId')?.touched)}">
-                    <label>Tipo de moneda</label>
-                    <p-select [options]="monedas()" formControlName="currencyId" optionLabel="codigo" optionValue="id"
-                      [filter]="true" filterBy="codigo" placeholder="Seleccionar" class="input-full">
-                    </p-select>
-                  </div> -->
-                  <div class="field-group"
-                    [ngClass]="{'invalid': productForm.get('presentaciones.priceBase')?.invalid && (productForm.get('presentaciones.priceBase')?.dirty || productForm.get('presentaciones.priceBase')?.touched)}">
-                    <p-floatlabel>
-                      <p-inputNumber formControlName="priceBase" mode="currency" currency="PEN" locale="es-PE"
-                        [minFractionDigits]="2" class="input-full" inputId="priceBase">
-                      </p-inputNumber>
-                      <label for="priceBase">Precio Venta</label>
-                    </p-floatlabel>
-                  </div>
-                  <div class="field-group"
-                    [ngClass]="{'invalid': productForm.get('presentaciones.factor')?.invalid && (productForm.get('presentaciones.factor')?.dirty || productForm.get('presentaciones.factor')?.touched)}">
-                    <p-floatlabel>
-                      <p-inputNumber formControlName="factor" [min]="1" [showButtons]="true" buttonLayout="horizontal"
-                        spinnerMode="horizontal" [step]="1" decrementButtonClass="p-button-secondary"
-                        incrementButtonClass="p-button-secondary" incrementButtonIcon="pi pi-plus"
-                        decrementButtonIcon="pi pi-minus" inputclass="input-full text-center" inputId="factor">
-                      </p-inputNumber>
-                      <label for="factor">Factor</label>
-                    </p-floatlabel>
-                  </div>
-                  <div class="field-group"
-                    [ngClass]="{'invalid': productForm.get('presentaciones.barcode')?.invalid && (productForm.get('presentaciones.barcode')?.dirty || productForm.get('presentaciones.barcode')?.touched)}">
-                    <div class="p-inputgroup input-full">
-                      <span class="p-inputgroup-addon">
-                        <i class="pi pi-barcode"></i>
-                      </span>
-                      <p-floatlabel>
-                        <input pInputText formControlName="barcode" class="input-full" id="barcodePresentation" />
-                        <label for="barcodePresentation">Cod. Barras</label>
-                      </p-floatlabel>
-                      <button pButton type="button" icon="pi pi-refresh" (click)="generatePresentationEan13()"
-                        pTooltip="Generar EAN-13" tooltipPosition="top">
-                      </button>
-                    </div>
-                  </div>
-                  <div class="presentations-add-actions">
-                    <button pButton label="Agregar" icon="pi pi-plus" pTooltip="Complete todos los campos"
-                      [tooltipDisabled]="formularioValido" (click)="agregarProducto()" [disabled]="!formularioValido">
-                    </button>
-                  </div>
-                </div>
-
-                <p-table [value]="presentationsData()" class="presentations-table p-datatable-sm"
-                  [tableStyle]="{ 'min-width': '52rem' }">
-                  <ng-template pTemplate="header">
-                    <tr>
-                      <th>
-                        <span class="table-header-title">Unidad de Medida</span>
-                      </th>
-                      <th>
-                        <span class="table-header-title">Precio de venta</span>
-                      </th>
-                      <th>
-                        <span class="table-header-title">Factor (cnt. base)</span>
-                      </th>
-                      <th>
-                        <span class="table-header-title">Cod. Barras</span>
-                      </th>
-                      <th class="text-center">
-                        <span class="table-header-title">Acciones</span>
-                      </th>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
-                    <tr [ngClass]="{'presentation-primary-row': row.ES_PRINCIPAL}">
-                      <td>
-                        {{ row.unitName }}
-                      </td>
-                      <td>
-                        {{ row.PRECIO_VENTA | number:'1.2-2' }}
-                      </td>
-                      <td>
-                        {{ row.FACTOR_CONVERSION_BASE }}
-                      </td>
-                      <td>
-                        {{ row.CODIGO_BARRAS }}
-                      </td>
-                      <td class="text-center">
-                        <div class="checkbox-row">
-                          <p-checkbox [binary]="true" [(ngModel)]="row.ES_PRINCIPAL"
-                            [ngModelOptions]="{standalone: true}"
-                            (onChange)="onTogglePrimaryPresentation(rowIndex, $event.checked)"
-                            inputId="primary-{{ rowIndex }}">
-                          </p-checkbox>
-                          <button pButton type="button" icon="pi pi-trash"
-                            class="p-button-rounded p-button-danger p-button-text"
-                            (click)="confirmarEliminarPresentacion(rowIndex)">
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  </ng-template>
-                  <ng-template pTemplate="emptymessage">
-                    <tr style="padding: 1.5rem;">
-                      <td colspan="5" class="presentations-empty-cell">
-                        <i class="pi pi-box"></i>
-                        <span>
-                          No hay presentaciones adicionales. Se vende solo por la unidad base.
-                        </span>
-                      </td>
-                    </tr>
-                  </ng-template>
-                </p-table>
-              </div>
-            </div>
-          </div>
-        </p-tabpanel>
-
-        <p-tabpanel value="2">
-          <section class="config-panel">
-            <div class="config-grid p-fluid">
-
-              <div class="sunat-fiscal-section">
-                <div class="section-header">
-                  <div class="header-icon-container">
-                    <i class="pi pi-building"></i>
-                  </div>
-                  <div>
-                    <h4 class="config-section-title">SUNAT / Fiscal</h4>
-                    <p class="config-section-subtitle">
-                      Configuración de impuestos y afectaciones tributarias
-                    </p>
-                  </div>
-                </div>
-
-                <div class="fiscal-grid">
-                  <!-- Afectación IGV -->
-                  <div class="field-group fiscal-field">
-                    <label for="afectacionIgvId" class="font-bold block mb-2 text-900">
-                      <i class="pi pi-percentage mr-2 text-primary"></i>Tipo de Afectación IGV
-                    </label>
+            <!-- Tab Configuración -->
+            <p-tabpanel value="2">
+              <div class="erp-grid">
+                <div class="erp-col-6">
+                  <h4 class="font-bold mb-3">SUNAT / Fiscal</h4>
+                   <p-floatlabel variant="in">
                     <p-select [options]="afectacionIgv()" formControlName="afectacionIgvId" optionLabel="descripcion"
-                      optionValue="id" class="w-full" inputId="afectacionIgvId" placeholder="Seleccione una afectación"
-                      [showClear]="true" appendTo="body">
-                      <ng-template pTemplate="selectedItem" let-selectedOption>
-                        <div class="flex align-items-center gap-2">
-                          <div>{{ selectedOption.descripcion }}</div>
-                        </div>
-                      </ng-template>
-                      <ng-template let-country pTemplate="item">
-                        <div class="flex align-items-center gap-2">
-                          <div>{{ country.descripcion }}</div>
-                        </div>
-                      </ng-template>
-                    </p-select>
-                    <small class="helper-text block mt-1">Determina el cálculo del IGV en la venta.</small>
-                    @if (productForm.get('afectacionIgvId')?.invalid && (productForm.get('afectacionIgvId')?.dirty ||
-                    productForm.get('afectacionIgvId')?.touched)) {
-                    <small class="p-error block mt-1">Este campo es requerido.</small>
-                    }
-                  </div>
-
-                  <!-- ICBPER Checkbox -->
-                  <div class="fiscal-field checkbox-container">
-                    <label class="font-bold block mb-2 text-900">
-                      <i class="pi pi-verified mr-2 text-primary"></i>Impuestos Adicionales
-                    </label>
-                    <div class="field-checkbox-wrapper">
-                      <p-checkbox formControlName="complementaryTax" [binary]="true" inputId="icbper"
-                        styleClass="mr-2"></p-checkbox>
-                      <div class="checkbox-label-content">
-                        <label for="icbper">Impuesto Bolsas Plásticas (ICBPER)</label>
-                        <small>Habilita el cobro adicional por bolsas plásticas.</small>
-                      </div>
-                      <i class="pi pi-info-circle text-primary ml-auto"
-                        pTooltip="Aplica para ventas que incluyan entrega de bolsas plásticas sujetas a impuesto."
-                        tooltipPosition="left"></i>
-                    </div>
+                      optionValue="id"></p-select>
+                    <label>Tipo Afectación IGV</label>
+                  </p-floatlabel>
+                </div>
+                <div class="erp-col-6">
+                  <h4 class="font-bold mb-3">Trazabilidad</h4>
+                  <div class="flex gap-3">
+                    <p-radiobutton name="tipoControlStock" value="NORMAL" formControlName="tipoControlStock" label="Normal"></p-radiobutton>
+                    <p-radiobutton name="tipoControlStock" value="LOTE" formControlName="tipoControlStock" label="Lote"></p-radiobutton>
+                    <p-radiobutton name="tipoControlStock" value="SERIE" formControlName="tipoControlStock" label="Serie"></p-radiobutton>
                   </div>
                 </div>
               </div>
-
-              <div class="config-section">
-                <h4 class="config-section-title">
-                  <i class="pi pi-box" style="margin-right: 0.5rem"></i>
-                  Inventario y Trazabilidad
-                </h4>
-                <p class="config-section-subtitle">
-                  Define cómo se gestionará el stock y el seguimiento del producto.
-                </p>
-
-                <div class="traceability-container mt-3">
-                  <label class="traceability-label mb-2 block font-bold text-primary">
-                    <i class="pi pi-layers mr-2"></i>Tipo de Trazabilidad
-                  </label>
-                  <div class="traceability-options">
-                    <!-- Estándar -->
-                    <div class="traceability-option"
-                      [class.selected]="productForm.get('tipoControlStock')?.value === 'NORMAL'"
-                      (click)="onTipoTrazabilidadSelect('NORMAL')">
-                      <div class="option-icon">
-                        <i class="pi pi-box"></i>
-                      </div>
-                      <div class="option-content">
-                        <span class="option-title">Normal</span>
-                        <span class="option-desc">Control por unidades simples</span>
-                      </div>
-                    </div>
-
-                    <!-- Por Lote -->
-                    <div class="traceability-option"
-                      [class.selected]="productForm.get('tipoControlStock')?.value === 'LOTE'"
-                      (click)="onTipoTrazabilidadSelect('LOTE')">
-                      <div class="option-icon">
-                        <i class="pi pi-tag"></i>
-                      </div>
-                      <div class="option-content">
-                        <span class="option-title">Por Lote</span>
-                        <span class="option-desc">Fecha de vencimiento</span>
-                      </div>
-                    </div>
-
-                    <!-- Por Serie -->
-                    <div class="traceability-option"
-                      [class.selected]="productForm.get('tipoControlStock')?.value === 'SERIE'"
-                      (click)="onTipoTrazabilidadSelect('SERIE')">
-                      <div class="option-icon">
-                        <i class="pi pi-qrcode"></i>
-                      </div>
-                      <div class="option-content">
-                        <span class="option-title">Por Serie</span>
-                        <span class="option-desc">Identificador único</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="traceability-fields mt-4">
-                  <!-- Stock Inicial -->
-                  <div class="field-group">
-                    <label class="block mb-1 text-sm font-bold text-500">STOCK INICIAL</label>
-                    <p-inputNumber formControlName="stockInicial" class="input-full" inputId="stockInicial" [min]="0"
-                      placeholder="0"></p-inputNumber>
-                  </div>
-
-                  <!-- LOTE -->
-                  @if (productForm.get('tipoControlStock')?.value === 'LOTE') {
-                  <div class="lote-fields-container lote-full-width"
-                    style="background-color: #fffbeb; border: 1px solid #fcd34d;">
-                    <div class="field-group">
-                      <label class="block mb-1 text-sm font-bold text-700" style="color: #92400e;">CÓDIGO DE
-                        LOTE</label>
-                      <input pInputText formControlName="codigoLote" class="input-full" id="codigoLote" />
-                    </div>
-                    <div class="field-group">
-                      <label class="block mb-1 text-sm font-bold text-700" style="color: #92400e;">VENCIMIENTO</label>
-                      <p-datepicker formControlName="fechaVencimiento" [showIcon]="true" inputId="fechaVencimiento"
-                        class="input-full" appendTo="body" placeholder="dd/mm/aaaa"></p-datepicker>
-                    </div>
-                  </div>
-                  }
-
-                  <!-- Fields for SERIE -->
-                  @if (productForm.get('tipoControlStock')?.value === 'SERIE') {
-                  <div class="serie-section mt-3 p-3 border-round-lg"
-                    style="background-color: #f3e8ff; border: 1px solid #d8b4fe;">
-                    <div class="field-group">
-                      <label class="block mb-1 text-sm font-bold text-700" style="color: #6b21a8;">NÚMERO DE SERIE
-                        ÚNICO</label>
-                      <div class="serie-container">
-                        <input pInputText formControlName="numeroSerie" class="serie-input" id="numeroSerie"
-                          placeholder="Ej: SN-99238-X" (keydown.enter)="$event.preventDefault(); agregarSerie()" />
-                        <app-button label="Guardar" type="primary" class="serie-btn"
-                          (click)="agregarSerie()"></app-button>
-                      </div>
-                      @if (productForm.get('numeroSerie')?.invalid && (productForm.get('numeroSerie')?.dirty ||
-                      productForm.get('numeroSerie')?.touched)) {
-                      <small class="p-error">El número de serie es requerido</small>
-                      }
-                    </div>
-
-                    @if (seriales().length > 0) {
-                    <div class="seriales-list mt-3">
-                      <h5 class="text-sm font-bold mb-2 text-700" style="color: #6b21a8;">Series Agregadas ({{
-                        seriales().length }})</h5>
-                      <ul class="pl-3 m-0 list-none">
-                        @for (serie of seriales(); track $index) {
-                        <li class="flex align-items-center justify-content-between mb-2 p-2 border-round"
-                          style="background-color: rgba(255,255,255,0.5); color: #6b21a8;">
-                          <span class="font-medium">{{ serie }}</span>
-                          <button pButton icon="pi pi-trash"
-                            class="p-button-rounded p-button-danger p-button-text p-button-sm"
-                            (click)="eliminarSerie($index)" pTooltip="Eliminar serie" tooltipPosition="left"></button>
-                        </li>
-                        }
-                      </ul>
-                    </div>
-                    }
-                  </div>
-                  }
-                </div>
-              </div>
-
-              <div class="config-section full-row">
-                <h4 class="config-section-title">Otras configuraciones</h4>
-                <p class="config-section-subtitle">
-                  Ajusta la visibilidad y el estado general del producto.
-                </p>
-                <div class="field-checkbox-group">
-                  <p-toggleswitch formControlName="active"></p-toggleswitch>
-                  <label>Producto activo</label>
-                </div>
-                <div class="field-checkbox-group">
-                  <p-toggleswitch formControlName="activeOnlineStore"></p-toggleswitch>
-                  <label class="ml-2">Visible en e-commerce (Tienda virtual)</label>
-                </div>
-              </div>
-
-            </div>
-          </section>
-        </p-tabpanel>
-      </p-tabpanels>
-    </p-tabs>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </div>
+    </div>
   </form>
 </div>
 
 <app-categoria-form [visible]="showCategoryDialog()" (cancel)="showCategoryDialog.set(false)"></app-categoria-form>
-
 <app-marca-form [visible]="showMarcaDialog()" (cancel)="showMarcaDialog.set(false)"></app-marca-form>

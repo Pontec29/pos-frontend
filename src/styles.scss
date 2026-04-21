@@ -1,4 +1,5 @@
 @import 'primeicons/primeicons.css';
+@import 'styles/erp-theme.scss';
 
 //! No borrar solo trasladae
 
@@ -10,9 +11,9 @@
   width: 100%;
 }
 
-.p-inputtext {
-  margin-top: 0.7rem;
-}
+// .p-inputtext {
+//   margin-top: 0.7rem;
+// }
 
 // Estilos globales de PrimeNG para el componente
 .p-dialog {

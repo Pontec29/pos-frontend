@@ -11,6 +11,10 @@ import { PRIMENG_FILTER_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-
 import { MarcaListar, MarcaUpSert } from './domain/marca.interface';
 import { Subject, debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { MarcaForm } from './components/modal/marca-form';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-marca',
@@ -24,7 +28,10 @@ import { MarcaForm } from './components/modal/marca-form';
     LoadingSpinner,
     ErrorState,
     ModalConfirmacionComponent,
-    MarcaForm
+    MarcaForm,
+    TagModule,
+    TooltipModule,
+    MenuModule
 ],
   providers: [ConfirmationService],
   templateUrl: './marca.html',
@@ -50,6 +57,10 @@ export default class MarcaPage implements OnInit {
     { label: 'Inactivo', value: false }
   ]);
   statusFilter = signal<boolean | null>(null);
+  
+  menuItems: MenuItem[] = [];
+  selectedMarcaForMenu = signal<MarcaListar | null>(null);
+
   private readonly statusFilterChange$ = new Subject<boolean | null>();
 
   filteredMarcas = computed(() => {
@@ -62,11 +73,19 @@ export default class MarcaPage implements OnInit {
     );
   });
 
+  paginatedMarcas = computed(() => {
+    const list = this.filteredMarcas();
+    const start = this.first();
+    const end = start + this.rows();
+    return list.slice(start, end);
+  });
+
   // Paginación
   rows = signal(10);
   first = signal(0);
 
   ngOnInit() {
+    this.initializeMenu();
     this.loadMarcas();
 
     this.statusFilterChange$
@@ -214,9 +233,46 @@ export default class MarcaPage implements OnInit {
     this.rows.set(event.rows);
   }
 
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+    this.first.set(0);
+  }
+
   onStatusChange(statusValue: boolean | null): void {
     this.statusFilter.set(statusValue);
+    this.first.set(0);
     this.statusFilterChange$.next(statusValue);
+  }
+
+  getActivoSeverity(activo: boolean | null | undefined): 'success' | 'danger' | 'warn' | 'info' {
+    if (activo === true) return 'success';
+    if (activo === false) return 'danger';
+    return 'info';
+  }
+
+  private initializeMenu(): void {
+    this.menuItems = [
+      {
+        label: 'Editar',
+        icon: 'pi pi-pencil',
+        command: () => {
+          const marca = this.selectedMarcaForMenu();
+          if (marca) this.editMarca(marca);
+        }
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Eliminar',
+        icon: 'pi pi-trash',
+        styleClass: 'text-red-500',
+        command: () => {
+          const marca = this.selectedMarcaForMenu();
+          if (marca) this.deleteMarca(marca);
+        }
+      }
+    ];
   }
 
   loadMarcas(active?: boolean): void {

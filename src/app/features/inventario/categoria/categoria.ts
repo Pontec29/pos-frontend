@@ -11,6 +11,10 @@ import { PRIMENG_FILTER_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-
 import { Categoria, CategoriaUpSert } from './domain/categoria.interface';
 import { finalize } from 'rxjs';
 import { CategoriaForm } from './components/modal/categoria-form';
+import { TagModule } from 'primeng/tag';
+import { TooltipModule } from 'primeng/tooltip';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-categoria',
@@ -21,10 +25,11 @@ import { CategoriaForm } from './components/modal/categoria-form';
     ...PRIMENG_TABLE_MODULES,
     ...PRIMENG_FILTER_MODULES,
     AppButton,
-    LoadingSpinner,
-    ErrorState,
     ModalConfirmacionComponent,
-    CategoriaForm
+    CategoriaForm,
+    TagModule,
+    TooltipModule,
+    MenuModule
   ],
   providers: [ConfirmationService],
   templateUrl: './categoria.html',
@@ -51,6 +56,9 @@ export default class CategoriaPage implements OnInit {
   ]);
   statusFilter = signal<boolean | null>(null);
 
+  menuItems: MenuItem[] = [];
+  selectedCategoriaForMenu = signal<Categoria | null>(null);
+
 
   filteredCategorias = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -69,11 +77,19 @@ export default class CategoriaPage implements OnInit {
     );
   });
 
+  paginatedCategorias = computed(() => {
+    const list = this.filteredCategorias();
+    const start = this.first();
+    const end = start + this.rows();
+    return list.slice(start, end);
+  });
+
   // Paginación
   rows = signal(10);
   first = signal(0);
 
   ngOnInit() {
+    this.initializeMenu();
     this.loadCategorias();
   }
 
@@ -225,8 +241,45 @@ export default class CategoriaPage implements OnInit {
     this.rows.set(event.rows);
   }
 
+  onSearchChange(value: string): void {
+    this.searchQuery.set(value);
+    this.first.set(0);
+  }
+
   onStatusChange(statusValue: boolean | null): void {
     this.statusFilter.set(statusValue);
+    this.first.set(0);
+  }
+
+  getActivoSeverity(activo: boolean | null | undefined): 'success' | 'danger' | 'warn' | 'info' {
+    if (activo === true) return 'success';
+    if (activo === false) return 'danger';
+    return 'info';
+  }
+
+  private initializeMenu(): void {
+    this.menuItems = [
+      {
+        label: 'Editar',
+        icon: 'pi pi-pencil',
+        command: () => {
+          const categoria = this.selectedCategoriaForMenu();
+          if (categoria) this.editCategoria(categoria);
+        }
+      },
+      {
+        separator: true
+      },
+      {
+        label: 'Eliminar',
+        icon: 'pi pi-trash',
+        styleClass: 'text-red-500',
+        command: () => {
+          const categoria = this.selectedCategoriaForMenu();
+          if (categoria) this.deleteCategoria(categoria);
+        }
+      }
+    ];
   }
 
   loadCategorias(active?: boolean): void {

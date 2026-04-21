@@ -89,6 +89,7 @@ export const routes: Routes = [
           { path: 'categorias', loadComponent: () => import('@inventario/categoria/categoria') },
           { path: 'lotes', loadComponent: () => import('./features/inventario/lotes/lotes') },
           { path: 'alertas', loadComponent: () => import('./features/inventario/alertas/alertas') },
+          { path: 'marcas', loadComponent: () => import('./features/inventario/marca/marca') },
           {
             path: 'resumen-stock',
             loadComponent: () =>

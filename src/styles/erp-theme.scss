@@ -1,0 +1,158 @@
+@use 'mixins' as *;
+
+// === ERP Global Theme Classes ===
+
+.erp-page-container {
+  min-height: calc(100vh - 64px);
+  background-color: var(--color-background);
+  padding: var(--space-6);
+  color: var(--text-primary);
+  animation: erpFadeIn 0.4s ease-out;
+
+  @media (max-width: 768px) {
+    padding: var(--space-4);
+  }
+}
+
+.erp-card {
+  background: var(--surface-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-7);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border-light);
+  height: 100%;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+
+  &.hoverable:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .card-title {
+    font-size: var(--text-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: var(--space-6);
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+
+    &::before {
+      content: '';
+      width: 4px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: var(--radius-full);
+    }
+  }
+}
+
+// === Grid System ===
+.erp-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: var(--space-6);
+
+  @media (max-width: 992px) {
+    gap: var(--space-4);
+  }
+}
+
+@for $i from 1 through 12 {
+  .erp-col-#{$i} {
+    grid-column: span #{$i};
+  }
+}
+
+@media (max-width: 992px) {
+  @for $i from 1 through 12 {
+    .erp-col-md-#{$i} {
+      grid-column: span #{$i};
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  @for $i from 1 through 12 {
+    .erp-col-sm-12 {
+      grid-column: span 12;
+    }
+  }
+}
+
+// === Header Premium ===
+.erp-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-7);
+  background: linear-gradient(to right, white, rgba(255, 255, 255, 0.5));
+  padding: 1.5rem 2rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
+
+  .header-title {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: 800;
+    background: linear-gradient(135deg, #004080 0%, #0066cc 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -0.02em;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: var(--space-3);
+  }
+}
+
+// === PrimeNG Fixes for ERP ===
+
+.p-inputgroup {
+  display: flex !important;
+  align-items: stretch;
+  width: 100%;
+
+  .p-floatlabel {
+    flex: 1;
+    display: flex;
+  }
+
+  button {
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+    white-space: nowrap;
+  }
+
+  // Si hay un floatlabel variant="in" dentro de un inputgroup
+  .p-floatlabel[variant='in'] {
+    input,
+    .p-select {
+      border-top-right-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      width: 100%;
+    }
+  }
+}
+
+.p-select {
+  width: 100%;
+}
+
+// === Restaurar Estilos para FloatLabel IN ===
+
+@keyframes erpFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,53 +1,40 @@
-<div>
-  <section class="page-header">
-    <div class="title-row">
-      <div class="title-content">
-        <h1>Categorías</h1>
-        <p class="subtitle">Gestión de categorías del inventario</p>
-      </div>
-      <div class="actions">
-        <app-button preset="add" label="Nueva Categoría" (clicked)="openNew()"></app-button>
-      </div>
+<div class="container">
+  <section class="header-content">
+    <div class="header-content--title">
+      <h6>Categorías</h6>
+      <p class="subtitle">Gestión de categorías del inventario</p>
+    </div>
+    <div class="header-content--actions">
+      <app-button preset="add" label="Nueva Categoría" (clicked)="openNew()"></app-button>
     </div>
   </section>
 
-  <section>
-    <div class="table-main">
-      @if (loading()) {
-      <app-loading-spinner message="Cargando categorías..." size="medium"></app-loading-spinner>
-      } @else if (error()) {
-      <app-error-state [message]="error()!" (retry)="loadCategorias()"></app-error-state>
-      } @else {
-      <div class="header-search">
-        <div class="filters-bar">
-          <div class="search-group">
-            <p-iconField iconPosition="right">
-              <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-                placeholder="Buscar por nombre..." style="width: 320px;" />
-              <p-inputicon class="pi pi-search" />
-            </p-iconField>
-          </div>
-          <div class="filter-chips">
-            <div class="filter-chip">
-              <label>Estado:</label>
-              <p-select [options]="statusOptions()" placeholder="Todos" [showClear]="true" [ngModel]="statusFilter()"
-                (ngModelChange)="onStatusChange($event)">
-              </p-select>
-            </div>
-          </div>
+  <section class="main-content">
+    <div class="table-section">
+      <div class="table-section__header-actions">
+        <div class="table-section__header-actions--left">
+          <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por nombre..." class="search-input" aria-label="Buscar por nombre" />
+          </span>
+        </div>
+
+        <div class="table-section__header-actions--right">
+          <label>Estado:</label>
+          <p-select [options]="statusOptions()" placeholder="Todos" [showClear]="true" [ngModel]="statusFilter()" (ngModelChange)="onStatusChange($event)">
+          </p-select>
         </div>
       </div>
-      <div class="main-table">
-        <p-table [value]="filteredCategorias()" [rowHover]="true" [scrollable]="true" scrollHeight="412px"
-          dataKey="ID_CATEGORIA">
+
+      <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
+        <p-table [value]="paginatedCategorias()" [loading]="loading()" [rowHover]="true" class="p-datatable-sm custom-table" dataKey="ID_CATEGORIA">
           <ng-template pTemplate="header">
-            <tr class="table-header">
-              <th pSortableColumn="ID_CATEGORIA" style="width: 100px">ID <p-sortIcon
-                  field="ID_CATEGORIA"></p-sortIcon></th>
-              <th pSortableColumn="NOMBRE">Nombre <p-sortIcon field="NOMBRE"></p-sortIcon></th>
-              <th pSortableColumn="DESCRIPCION">Descripción <p-sortIcon field="DESCRIPCION"></p-sortIcon></th>
-              <th pSortableColumn="ACTIVO" style="width: 150px">Estado <p-sortIcon field="ACTIVO"></p-sortIcon></th>
-              <th style="width: 120px; text-align: center">Acciones</th>
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th style="width: 120px">Estado</th>
+              <th style="width: 9rem" class="text-center">Acciones</th>
             </tr>
           </ng-template>
 
@@ -55,21 +42,27 @@
             <tr>
               <td>{{ categoria.ID_CATEGORIA }}</td>
               <td>
-                <div class="product-name">
-                  <span class="name">{{ categoria.NOMBRE }}</span>
+                <div class="user-info-cell">
+                  <div class="avatar-circle" aria-hidden="true">
+                    {{ (categoria.NOMBRE || '').substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ categoria.NOMBRE }}</span>
+                  </div>
                 </div>
               </td>
               <td>{{ categoria.DESCRIPCION || '-' }}</td>
               <td>
-                <span class="status-badge"
-                  [ngClass]="categoria.ACTIVO ? 'status-badge--active' : 'status-badge--inactive'">
-                  {{ categoria.ACTIVO ? 'Activo' : 'Inactivo' }}
-                </span>
+                <p-tag [value]="categoria.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(categoria.ACTIVO)" [rounded]="true"></p-tag>
               </td>
-              <td>
-                <div class="table-actions">
-                  <app-button preset="edit" (clicked)="editCategoria(categoria)"></app-button>
-                  <app-button preset="delete" (clicked)="deleteCategoria(categoria)"></app-button>
+              <td class="text-center">
+                <div class="action-buttons">
+                  <button class="action-buttons--edit" (click)="editCategoria(categoria)" pTooltip="Editar" tooltipPosition="top">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button class="action-buttons--delete" (click)="deleteCategoria(categoria)" pTooltip="Eliminar" tooltipPosition="top">
+                    <i class="pi pi-trash"></i>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -77,31 +70,87 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td colspan="5" style="text-align: center;">
-                <i class="pi pi-exclamation-triangle"></i>
-                @if (searchQuery().length >= 1) {
-                No se encontraron categorías para los filtros seleccionados.
+              <td colspan="5">
+                @if (error()) {
+                <div class="table-state table-state--error" role="alert" aria-live="assertive">
+                  <div class="table-state__icon">
+                    <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
+                  </div>
+                  <div class="table-state__content">
+                    <div class="table-state__title">No se pudo cargar la información</div>
+                    <div class="table-state__subtitle">{{ error() }}</div>
+                    <button type="button" class="table-state__action" (click)="loadCategorias()">
+                      Reintentar
+                    </button>
+                  </div>
+                </div>
                 } @else {
-                No hay categorías disponibles.
+                <div class="table-state table-state--empty" role="status" aria-live="polite">
+                  <div class="table-state__icon">
+                    <i class="pi pi-search" aria-hidden="true"></i>
+                  </div>
+                  <div class="table-state__content">
+                    <div class="table-state__title">No se encontraron resultados</div>
+                    <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.</div>
+                  </div>
+                </div>
                 }
               </td>
             </tr>
           </ng-template>
         </p-table>
+
+        <!-- Mobile View -->
+        <div class="mobile-card-list">
+          @for (categoria of paginatedCategorias(); track categoria.ID_CATEGORIA) {
+          <div class="mobile-card">
+            <div class="mobile-card__header">
+              <div class="mobile-card__avatar-wrapper">
+                <div class="avatar-circle" aria-hidden="true">
+                  {{ (categoria.NOMBRE || '').substring(0, 2).toUpperCase() }}
+                </div>
+              </div>
+
+              <div class="mobile-card__info">
+                <div class="mobile-card__status-badge">
+                  <p-tag [value]="categoria.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(categoria.ACTIVO)" [rounded]="true"></p-tag>
+                </div>
+                <span class="mobile-card__name">{{ categoria.NOMBRE }}</span>
+              </div>
+
+              <div class="mobile-card__actions">
+                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded" (click)="selectedCategoriaForMenu.set(categoria); menu.toggle($event)" [ariaLabel]="'Acciones para categoría ' + categoria.NOMBRE"></button>
+              </div>
+            </div>
+          </div>
+          }
+
+          @if (filteredCategorias().length === 0 && !loading()) {
+          <div class="table-state table-state--empty mobile-card-empty" role="status" aria-live="polite">
+            <div class="table-state__icon">
+              <i class="pi pi-search" aria-hidden="true"></i>
+            </div>
+            <div class="table-state__content">
+              <div class="table-state__title">No se encontraron resultados</div>
+              <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.</div>
+            </div>
+          </div>
+          }
+        </div>
+
+        <p-menu #menu [model]="menuItems" [popup]="true" appendTo="body"></p-menu>
       </div>
-      <div class="footer-paginator">
-        <p-paginator [first]="first()" [rows]="rows()" [totalRecords]="filteredCategorias().length"
-          [rowsPerPageOptions]="[10, 20, 30]" (onPageChange)="onPageChange($event)" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first}-{last} de {totalRecords}" class="custom-paginator">
+
+      <div class="table-section__footer-paginated">
+        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filteredCategorias().length" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
         </p-paginator>
       </div>
-      }
+
     </div>
   </section>
 </div>
 
 <app-modal-confirmacion></app-modal-confirmacion>
 
-<app-categoria-form [visible]="visible()" [category]="selectedCategoria()" [loading]="saving()" (visibleChange)="visible.set($event)"
-  (save)="onSaveCategoria($event)" (cancel)="onCancelDialog()">
+<app-categoria-form [visible]="visible()" [category]="selectedCategoria()" [loading]="saving()" (visibleChange)="visible.set($event)" (save)="onSaveCategoria($event)" (cancel)="onCancelDialog()">
 </app-categoria-form>

@@ -1,24 +1,20 @@
 export const FloatLabelPreset = {
     root: {
+        fontSize: '14px',
+        fontWeight: '500',
+        color: '{surface.500}',
+        left: '0.85rem',
         active: {
-            fontSize: '12px',
-            fontWeight: '500',
-            color: '#333333', // Gris más neutro
-            left: '0.85rem',
+            fontSize: '11px',
+            fontWeight: '700',
+            color: '{primary.500}',
             background: 'transparent',
-            top: '-0.6rem'
-
+            top: '-0.5rem' // Standard floating (outside)
         },
         focus: {
-            color: 'inherit',
+            color: '{primary.500}',
         },
-        color: '#333333',
-        fontSize: '14px',
-        invalidColor: '#333333',
-        activeInvalidColor: '#333333',
-        fontWeight: '500',
-
+        invalidColor: '{red.500}',
+        activeInvalidColor: '{red.600}'
     }
-
-
 };
