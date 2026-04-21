@@ -52,14 +52,19 @@ export class ProductoService {
       return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
 
-  // searchProductoCode(code: string): Observable<ApiResponse<ProductoDetalle>> {
-  //   return this.http.get<ApiResponse<ProductoDetalleDTO>>(`${this.apiUrl}/codigo-barras/${code}`).pipe(
-  //     map((res) => ({
-  //       ...res,
-  //       data: ProductoAdapter.adaptDetalle(res.data)
-  //     }))
-  //   );
-  // }
+  updateStatus(id: number, active: boolean): Observable<ApiResponse<void>> {
+    // El backend maneja el cambio de estado inactivo mediante el verbo PATCH (soft delete) en el endpoint "/{id}"
+    return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}`, {});
+  }
+
+  getByBarcode(barcode: string): Observable<ApiResponse<ProductoView>> {
+    return this.http.get<ApiResponse<ProductoViewDTO>>(`${this.apiUrl}/codigo-barras/${barcode}`).pipe(
+      map((res) => ({
+        ...res,
+        data: ProductoAdapter.adaptToView(res.data)
+      }))
+    );
+  }
 
   private notifyChange() {
     this.getAll().subscribe({

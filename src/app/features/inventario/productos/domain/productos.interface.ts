@@ -97,6 +97,7 @@ export interface ProductoView {
   STOCK_APERTURA: StockAperturaUpSert;
   EDITABLE: boolean;
 
+  ACTIVO: boolean;
   PRESENTACIONES: PresentacionUpSert[];
 }
 

@@ -81,41 +81,41 @@ export default class ProductosPage implements OnInit {
   }
 
   editProducto(producto: Producto) {
-    if (producto.CODIGO_BARRAS) {
-      this.router.navigate(['/inventario/producto/editar', producto.CODIGO_BARRAS]);
+    if (producto.ID_PRODUCTO) {
+      this.router.navigate(['/inventario/producto/editar', producto.ID_PRODUCTO]);
     } else {
       this.messageService.add({
         severity: 'warn',
-        summary: 'Sin Código de Barras',
-        detail: 'Este producto no tiene un código de barras válido para la edición.'
+        summary: 'Sin ID',
+        detail: 'Este producto no tiene un ID válido para la edición.'
       });
     }
   }
 
   deleteProducto(producto: Producto) {
     this.confirmationService.confirm({
-      message: `¿Está seguro de eliminar el producto "${producto.NOMBRE}"?`,
-      header: 'Confirmar Eliminación',
+      message: `¿Está seguro de desactivar el producto "${producto.NOMBRE}"?`,
+      header: 'Confirmar Acción',
       icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Eliminar',
+      acceptLabel: 'Desactivar',
       rejectLabel: 'Cancelar',
       acceptButtonStyleClass: 'danger',
       accept: () => {
-        this.productoService.delete(producto.ID_PRODUCTO).subscribe({
+        this.productoService.updateStatus(producto.ID_PRODUCTO, false).subscribe({
           next: (response) => {
             if (response.success) {
               this.loadProductos();
               this.messageService.add({
                 severity: 'success',
                 summary: 'Exitoso',
-                detail: 'Producto eliminado correctamente',
+                detail: 'Producto desactivado correctamente',
                 life: 3000
               });
             } else {
               this.messageService.add({
                 severity: 'error',
                 summary: 'Error',
-                detail: response.message || 'No se pudo eliminar el producto',
+                detail: response.message || 'No se pudo desactivar el producto',
                 life: 3000
               });
             }
@@ -124,7 +124,7 @@ export default class ProductosPage implements OnInit {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
-              detail: 'No se pudo eliminar el producto',
+              detail: 'No se pudo desactivar el producto',
               life: 3000
             });
           }

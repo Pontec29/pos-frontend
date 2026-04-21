@@ -1,5 +1,9 @@
-export const InputTextPreset = {
+export const InputNumberPreset: any = {
     root: {
+        width: '100%'
+    },
+    input: {
+        width: '100%',
         background: '{surface.0}',
         borderColor: '{surface.300}',
         hoverBorderColor: '{primary.500}',

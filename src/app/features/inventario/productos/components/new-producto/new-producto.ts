@@ -21,6 +21,7 @@ import { AutoCompleteModule } from 'primeng/autocomplete';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectButtonModule } from 'primeng/selectbutton';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ChipModule } from 'primeng/chip';
 import { forkJoin, finalize } from 'rxjs';
 import { PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
 import { AppButton } from '@shared/ui/button';
@@ -37,7 +38,7 @@ import { CategoriaForm } from '@inventario/categoria/components/modal/categoria-
 import { CategoriaService } from '@inventario/categoria/services/categoria.service';
 import { Categoria } from '@inventario/categoria/domain/categoria.interface';
 import { MarcaForm } from "@inventario/marca/components/modal/marca-form";
-import { PresentacionUpSert } from '@inventario/productos/domain/productos.interface';
+import { PresentacionUpSert, ProductoView } from '@inventario/productos/domain/productos.interface';
 import { LoaderService } from '@shared/services/loader.service';
 import { UnidadMedidaService } from '../../../../configuracion/unidades-medida/services/unidad-medida.service';
 import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
@@ -63,6 +64,7 @@ export interface PresentacionRowView extends PresentacionUpSert {
     ToggleSwitchModule,
     SelectButtonModule,
     ConfirmDialogModule,
+    ChipModule,
     AppButton,
     CategoriaForm,
     FloatLabelModule,
@@ -111,6 +113,12 @@ export default class NewProductoPage implements OnInit {
     { label: 'Servicio', value: 'S' }
   ];
 
+  opcionesTrazabilidad = [
+    { label: '📦 Estándar', value: 'NORMAL' },
+    { label: '📅 Por Lote / Vcto', value: 'LOTE' },
+    { label: '🔢 Por Serie', value: 'SERIE' }
+  ];
+
   routeParams = toSignal(this.route.params, { initialValue: this.route.snapshot.params });
 
   @ViewChild('imageFileInput') imageFileInputRef?: ElementRef<HTMLInputElement>;
@@ -134,7 +142,7 @@ export default class NewProductoPage implements OnInit {
     marcaId: [null as number | null, [Validators.required]],
     unidadMedidaId: [null as number | null, [Validators.required]],
     tipoProducto: ['', [Validators.required]],
-    codigoBarra: ['', [Validators.required]],
+    codigoBarra: [''],
     sku: ['', [Validators.required]],
     // codigoInterno: ['', [Validators.required]],
     categoriaId: [null as number | null, [Validators.required]],
@@ -156,20 +164,20 @@ export default class NewProductoPage implements OnInit {
       isPrimary: [false]
     }),
 
-    afectacionIgvId: [null],
-    complementaryTax: [null],
-    controlStock: [null],
-    minStock: [null],
-    maxStock: [null],
-    negativeStock: [null],
+    afectacionIgvId: [null as string | null],
+    complementaryTax: [null as number | null],
+    controlStock: [null as boolean | null],
+    minStock: [null as number | null],
+    maxStock: [null as number | null],
+    negativeStock: [null as boolean | null],
     active: [true],
-    activeOnlineStore: [null],
+    activeOnlineStore: [null as boolean | null],
 
     // ! TRAZABILIDAD
     tipoControlStock: ['NORMAL'],
     stockInicial: [0, [Validators.min(0)]],
     codigoLote: [''],
-    fechaVencimiento: [null],
+    fechaVencimiento: [null as Date | null],
     numeroSerie: ['']
   });
 
@@ -193,7 +201,44 @@ export default class NewProductoPage implements OnInit {
   }
 
   ngOnInit() {
-    this.loadDependencies();
+    this.loading.set(true);
+
+    // 1. Cargar dependencias primero
+    forkJoin({
+      marcas: this.marcaService.getAll(),
+      categories: this.categoriaService.getAll(),
+      unidadMedida: this.unidadMedidaService.getAll(),
+      moneda: this.generalService.getAllMonedas(),
+      afectacionIgv: this.generalService.getAllAfectacionesIgv(),
+    }).subscribe({
+      next: (data) => {
+        if (data.categories.success) this.categories.set(data.categories.data);
+        if (data.marcas.success) this.marcas.set(data.marcas.data);
+        if (data.unidadMedida.success) this.unidadMedida.set(data.unidadMedida.data);
+        if (data.moneda.success) this.monedas.set(data.moneda.data);
+        if (data.afectacionIgv.success) this.afectacionIgv.set(data.afectacionIgv.data);
+
+        // 2. Carga drástica por ID (o identificador único en la ruta)
+        const identifier = this.route.snapshot.paramMap.get('id') || this.route.snapshot.paramMap.get('codigoBarras');
+
+        if (identifier && identifier !== 'new' && identifier !== 'undefined') {
+          const numericId = Number(identifier);
+          if (!isNaN(numericId)) {
+            this.productId.set(numericId);
+            this.isEditMode.set(true);
+            this.loadById(numericId);
+          } else {
+            this.loading.set(false);
+          }
+        } else {
+          this.loading.set(false);
+        }
+      },
+      error: () => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar dependencias' });
+        this.loading.set(false);
+      }
+    });
 
     const draft = this.presentaciones;
     if (draft) {
@@ -230,8 +275,8 @@ export default class NewProductoPage implements OnInit {
       this.autosave();
     });
 
-    const tipoTrazabilidad = this.productForm.get('tipoTrazabilidad')?.value || 'ESTANDAR';
-    this.updateTraceabilityState(tipoTrazabilidad);
+    const tipoControlStock = this.productForm.get('tipoControlStock')?.value || 'NORMAL';
+    this.updateTraceabilityState(tipoControlStock);
   }
 
   presentationsData = signal<PresentacionRowView[]>([]);
@@ -252,74 +297,100 @@ export default class NewProductoPage implements OnInit {
   }
 
 
-  loadProductByCode(code: string) {
+  loadById(id: number) {
     this.loading.set(true);
-    // this.productoService.searchProductoCode(code).subscribe({
-    //   next: (response) => {
-    //     if (response.success && response.data) {
-    //       const product = response.data;
-    //       this.productId.set(product.ID_PRODUCTO);
+    this.productoService.getById(id).pipe(
+      finalize(() => this.loading.set(false))
+    ).subscribe({
+      next: (response) => {
+        if (response.success && response.data) {
+          const product = response.data;
+          // Aseguramos que el productId sea el ID interno real devuelto por el API
+          this.productId.set(product.ID_PRODUCTO);
+          this.populateForm(product);
 
-    //       this.productForm.patchValue({
-    //         nombreProducto: product.NOMBRE,
-    //         marcaId: product.ID_MARCA,
-    //         tipoProducto: product.TIPO_PRODUCTO,
-    //         codigoBarra: product.CODIGO_BARRAS,
-    //         sku: product.SKU,
-    //         // codigoInterno: product.CODIGO_INTERNO,
-    //         categoriaId: product.ID_CATEGORIA,
-    //         description: product.DESCRIPCION,
+          // Actualizar la URL del navegador con el ID real si es diferente al identificador usado
+          const currentId = this.route.snapshot.paramMap.get('id') || this.route.snapshot.paramMap.get('codigoBarras');
+          if (currentId !== product.ID_PRODUCTO.toString()) {
+            this.router.navigate(['/inventario/productos/editar', product.ID_PRODUCTO], {
+              replaceUrl: true,
+              queryParamsHandling: 'preserve'
+            });
+          }
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'No se encontró información detallada del producto.'
+          });
+          this.router.navigate(['/inventario/productos']);
+        }
+      },
+      error: (err) => {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error al consumir el API de detalle por ID.'
+        });
+        this.router.navigate(['/inventario/productos']);
+      }
+    });
+  }
 
-    //         monedaId: product.ID_MONEDA,
-    //         precioCompra: product.PRECIO_COMPRA,
-    //         precioVenta: product.PRECIO_VENTA,
-    //         precioMinimoVenta: product.PRECIO_MINIMO_VENTA,
+  private populateForm(product: ProductoView) {
+    this.productForm.patchValue({
+      nombreProducto: product.NOMBRE,
+      marcaId: product.ID_MARCA,
+      tipoProducto: product.TIPO_PRODUCTO,
+      codigoBarra: product.CODIGO_BARRAS,
+      sku: product.SKU,
+      categoriaId: product.ID_CATEGORIA,
+      unidadMedidaId: product.ID_UNIDAD,
+      description: product.DESCRIPCION,
+      monedaId: product.ID_MONEDA,
+      precioCompra: product.PRECIO_COMPRA,
+      precioVenta: product.PRECIO_VENTA,
+      precioMinimoVenta: product.PRECIO_MINIMO_VENTA,
+      afectacionIgvId: product.CODIGO_AFECTACION_IGV,
+      controlStock: product.CONTROLAR_STOCK,
+      minStock: product.STOCK_MINIMO,
+      maxStock: product.STOCK_MAXIMO,
+      active: product.ACTIVO,
+      activeOnlineStore: product.ACTIVO_TIENDA_ONLINE,
+      tipoControlStock: product.TIPO_CONTROL_STOCK,
+      stockInicial: product.STOCK_APERTURA?.CANTIDAD || 0,
+      codigoLote: product.STOCK_APERTURA?.LOTE || '',
+      fechaVencimiento: product.STOCK_APERTURA?.FECHA_VENCIMIENTO ? new Date(product.STOCK_APERTURA.FECHA_VENCIMIENTO) : null,
 
-    //         afectacionIgvId: product.CODIGO_AFECTACION_IGV,
-    //         controlStock: product.CONTROLAR_STOCK,
-    //         minStock: product.STOCK_MINIMO,
-    //         maxStock: product.STOCK_MAXIMO,
-    //         negativeStock: product.PERMITIR_VENTA_SIN_STOCK || false,
+      // Mapeo de campos adicionales
+      complementaryTax: product.IMPUESTO_ICBPER,
+      negativeStock: product.PERMITIR_VENTA_SIN_STOCK,
+    });
 
-    //         tipoControlStock: product.TIPO_CONTROL_STOCK,
-    //         activeOnlineStore: product.ACTIVO_TIENDA_ONLINE,
-    //         active: product.ACTIVO
-    //       });
+    this.updateTraceabilityState(product.TIPO_CONTROL_STOCK || 'NORMAL');
 
-    //       this.updatePriceFieldsState(product.TIPO_PRODUCTO);
+    if (product.PRESENTACIONES && product.PRESENTACIONES.length > 0) {
+      const presentations: PresentacionRowView[] = product.PRESENTACIONES.map(p => {
+        const unit = this.unidadMedida().find(u => u.ID_UNIDAD_MEDIDA === p.ID_UNIDAD);
+        return {
+          ID_UNIDAD: p.ID_UNIDAD,
+          unitName: unit?.DESCRIPCION_SUNAT || 'N/A',
+          FACTOR_CONVERSION_BASE: p.FACTOR_CONVERSION_BASE,
+          CODIGO_BARRAS: p.CODIGO_BARRAS,
+          PRECIO_VENTA: p.PRECIO_VENTA,
+          ES_PRINCIPAL: p.ES_PRINCIPAL
+        };
+      });
+      this.presentationsData.set(presentations);
+    }
 
-    //       if (product.PRESENTACIONES && product.PRESENTACIONES.length > 0) {
-    //         const presentations: PresentationRowView[] = product.PRESENTACIONES.map(p => ({
-    //           unitId: p.ID_UNIDAD,
-    //           unitName: p.UNIDAD_NOMBRE,
-    //           factor: p.FACTOR_CONVERSION_BASE,
-    //           barcode: p.CODIGO_BARRAS,
-    //           salePrice: p.PRECIO_VENTA,
-    //           isPrimary: p.ES_PRINCIPAL
-    //         }));
+    if (product.STOCK_APERTURA?.SERIES) {
+      this.seriales.set(product.STOCK_APERTURA.SERIES);
+    }
 
-    //         this.presentationsData.set(presentations);
-    //         const primaryIndex = presentations.findIndex(p => p.isPrimary);
-    //         this.primaryPresentationIndex.set(primaryIndex !== -1 ? primaryIndex : null);
-    //       }
-
-    //       if (product.IMAGEN_URL) {
-    //         this.imagePreviewUrl.set(product.IMAGEN_URL);
-    //       }
-    //     }
-    //     this.loading.set(false);
-    //   },
-    //   error: (err) => {
-    //     console.error('Error loading product', err);
-    //     this.messageService.add({
-    //       severity: 'error',
-    //       summary: 'Error',
-    //       detail: 'No se pudo cargar el producto. Verifique el código de barras.'
-    //     });
-    //     this.loading.set(false);
-    //     this.router.navigate(['/inventario/productos']);
-    //   }
-    // });
+    if (product.IMAGEN_URL) {
+      this.imagePreviewUrl.set(product.IMAGEN_URL);
+    }
   }
 
   updatePriceFieldsState(type: string, reset: boolean = false) {
@@ -690,11 +761,16 @@ export default class NewProductoPage implements OnInit {
     const ignoreDraft = presentaciones.length > 0;
 
     if (this.isProductFormInvalid(ignoreDraft)) {
+      const controls = this.productForm.controls as Record<string, AbstractControl>;
+      const invalidFields = Object.entries(controls)
+        .filter(([name, control]) => control.invalid && !(ignoreDraft && name === 'presentaciones'))
+        .map(([name]) => name);
+
       this.markProductFormAsTouched(ignoreDraft);
       this.messageService.add({
         severity: 'warn',
-        summary: 'Formulario Inválido',
-        detail: 'Por favor, complete todos los campos obligatorios marcados en rojo.'
+        summary: 'Formulario Incompleto',
+        detail: 'Faltan campos obligatorios: ' + invalidFields.join(', ')
       });
       return false;
     }
@@ -723,7 +799,7 @@ export default class NewProductoPage implements OnInit {
 
     // ! VALIDACIONES CONDICIONALES (LOTE / SERIE)
     const stockInicial = this.productForm.get('stockInicial')?.value || 0;
-    const trazabilidad = this.productForm.get('tipoTrazabilidad')?.value;
+    const trazabilidad = this.productForm.get('tipoControlStock')?.value;
 
     if (stockInicial > 0) {
       if (trazabilidad === 'LOTE') {
@@ -794,31 +870,6 @@ export default class NewProductoPage implements OnInit {
 
   openMarcaDialog() {
     this.showMarcaDialog.set(true);
-  }
-
-  // ! PRIVADO
-  private loadDependencies() {
-    this.loading.set(true);
-    forkJoin({
-      marcas: this.marcaService.getAll(),
-      categories: this.categoriaService.getAll(),
-      unidadMedida: this.unidadMedidaService.getAll(),
-      moneda: this.generalService.getAllMonedas(),
-      afectacionIgv: this.generalService.getAllAfectacionesIgv(),
-    }).subscribe({
-      next: (data) => {
-        if (data.categories.success) this.categories.set(data.categories.data);
-        if (data.marcas.success) this.marcas.set(data.marcas.data);
-        if (data.unidadMedida.success) this.unidadMedida.set(data.unidadMedida.data);
-        if (data.moneda.success) this.monedas.set(data.moneda.data);
-        if (data.afectacionIgv.success) this.afectacionIgv.set(data.afectacionIgv.data);
-        this.loading.set(false);
-      },
-      error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al cargar dependencias' });
-        this.loading.set(false);
-      }
-    });
   }
 
   private handleImageFiles(files: FileList) {

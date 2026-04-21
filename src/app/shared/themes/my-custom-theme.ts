@@ -4,6 +4,7 @@ import { AutocompletePreset } from "./presets/autocomplete.preset";
 import { SelectPreset } from "./presets/select.preset";
 import { FloatLabelPreset } from "./presets/floatlabel.preset";
 import { InputTextPreset } from "./presets/inputtext.preset";
+import { InputNumberPreset } from "./presets/inputnumber.preset";
 
 
 export const MyPreset = definePreset(Aura, {
@@ -47,6 +48,7 @@ export const MyPreset = definePreset(Aura, {
         floatlabel: FloatLabelPreset,
         inputtext: InputTextPreset,
         textarea: InputTextPreset,
+        inputnumber: InputNumberPreset,
 
         table: {
             header: {

@@ -15,24 +15,19 @@
         <div class="table-section__header-actions--left">
           <span class="p-input-icon-left search-wrapper">
             <i class="pi pi-search" aria-hidden="true"></i>
-            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)"
-              placeholder="Buscar por nombre, código o código de barras..." class="search-input"
-              aria-label="Buscar por nombre, código o código de barras" />
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por nombre, código o código de barras..." class="search-input" aria-label="Buscar por nombre, código o código de barras" />
           </span>
         </div>
 
         <div class="table-section__header-actions--right">
           <label>Estado:</label>
-          <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()"
-            (ngModelChange)="onStatusChange($event)">
+          <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()" (ngModelChange)="onStatusChange($event)">
           </p-select>
         </div>
       </div>
 
       <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-        <p-table [value]="productos()" [loading]="loading()" [(selection)]="selectedProductos" dataKey="ID_PRODUCTO"
-          [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-          class="p-datatable-sm custom-table">
+        <p-table [value]="productos()" [loading]="loading()" [(selection)]="selectedProductos" dataKey="ID_PRODUCTO" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 4rem">#</th>
@@ -67,21 +62,17 @@
                 </div>
               </td>
               <td>
-                <p-tag [value]="producto.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(producto.ACTIVO)"
-                  [rounded]="true"></p-tag>
+                <p-tag [value]="producto.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(producto.ACTIVO)" [rounded]="true"></p-tag>
               </td>
               <td class="text-center">
                 <div class="action-buttons">
-                  <button class="action-buttons--view" (click)="onViewProducto(producto)" pTooltip="Ver Detalle"
-                    tooltipPosition="top">
+                  <button class="action-buttons--view" (click)="onViewProducto(producto)" pTooltip="Ver Detalle" tooltipPosition="top">
                     <i class="pi pi-eye"></i>
                   </button>
-                  <button class="action-buttons--edit" (click)="editProducto(producto)" pTooltip="Editar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--edit" (click)="editProducto(producto)" pTooltip="Editar" tooltipPosition="top">
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button class="action-buttons--delete" (click)="deleteProducto(producto)" pTooltip="Eliminar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--delete" (click)="deleteProducto(producto)" pTooltip="Eliminar" tooltipPosition="top">
                     <i class="pi pi-trash"></i>
                   </button>
                 </div>
@@ -133,17 +124,14 @@
 
               <div class="mobile-card__info">
                 <div class="mobile-card__status-badge">
-                  <p-tag [value]="producto.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(producto.ACTIVO)"
-                    [rounded]="true"></p-tag>
+                  <p-tag [value]="producto.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(producto.ACTIVO)" [rounded]="true"></p-tag>
                 </div>
                 <span class="mobile-card__name">{{ producto.NOMBRE }}</span>
                 <span class="mobile-card__dni">{{ producto.SKU || producto.CODIGO_BARRAS || 'Sin código' }}</span>
               </div>
 
               <div class="mobile-card__actions">
-                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded"
-                  (click)="selectedProductoForMenu.set(producto); menu.toggle($event)"
-                  [ariaLabel]="'Acciones para producto ' + producto.NOMBRE"></button>
+                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded" (click)="selectedProductoForMenu.set(producto); menu.toggle($event)" [ariaLabel]="'Acciones para producto ' + producto.NOMBRE"></button>
               </div>
             </div>
           </div>
@@ -166,9 +154,7 @@
       </div>
 
       <div class="table-section__footer-paginated">
-        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-          [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
         </p-paginator>
       </div>
 

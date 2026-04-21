@@ -60,6 +60,7 @@ export class ProductoAdapter {
       } : undefined as any,
 
       EDITABLE: Boolean(p.editable),
+      ACTIVO: Boolean(p.activo),
 
       PRESENTACIONES: p.presentaciones?.map(pres => ({
         ID_UNIDAD: pres.unidadId,
@@ -119,9 +120,9 @@ export class ProductoAdapter {
     const stockApertura = formValue.stockInicial > 0 ? {
       ID_ALMACEN: 1, // Assuming default value based on example
       CANTIDAD: formValue.stockInicial,
-      LOTE: formValue.tipoTrazabilidad === 'LOTE' ? formValue.codigoLote : undefined,
-      FECHA_VENCIMIENTO: formValue.tipoTrazabilidad === 'LOTE' ? formValue.fechaVencimiento : undefined,
-      SERIES: formValue.tipoTrazabilidad === 'SERIE' ? (seriales && seriales.length > 0 ? seriales : (formValue.numeroSerie ? [formValue.numeroSerie] : undefined)) : undefined
+      LOTE: formValue.tipoControlStock === 'LOTE' ? formValue.codigoLote : undefined,
+      FECHA_VENCIMIENTO: formValue.tipoControlStock === 'LOTE' ? formValue.fechaVencimiento : undefined,
+      SERIES: formValue.tipoControlStock === 'SERIE' ? (seriales && seriales.length > 0 ? seriales : (formValue.numeroSerie ? [formValue.numeroSerie] : undefined)) : undefined
     } : undefined;
 
     return {
@@ -147,8 +148,9 @@ export class ProductoAdapter {
       CONTROLAR_STOCK: formValue.controlStock,
       STOCK_MINIMO: formValue.minStock,
       STOCK_MAXIMO: formValue.maxStock,
-      TIPO_CONTROL_STOCK: formValue.tipoTrazabilidad,
+      TIPO_CONTROL_STOCK: formValue.tipoControlStock,
       ACTIVO_TIENDA_ONLINE: formValue.activeOnlineStore,
+      // PERMITIR_VENTA_SIN_STOCK: formValue.negativeStock,
 
       STOCK_APERTURA: stockApertura
     };

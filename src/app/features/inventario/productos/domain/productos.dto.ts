@@ -95,6 +95,7 @@ export interface ProductoViewDTO {
   imagenUrl: string;
   stockApertura: StockAperturaUpSertDTO;
   editable: boolean;
+  activo: boolean;
 
   presentaciones: PresentacionesUpSertDTO[];
 }
