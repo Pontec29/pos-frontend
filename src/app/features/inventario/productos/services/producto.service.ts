@@ -66,6 +66,10 @@ export class ProductoService {
     );
   }
 
+  buscar(term: string): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiUrl}/buscar?term=${term}`);
+  }
+
   private notifyChange() {
     this.getAll().subscribe({
       next: (res) => {

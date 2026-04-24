@@ -6,7 +6,7 @@ export class ComprasAdapter {
     return {
       ID_COMPRA: dto.id,
       PROVEEDOR: dto.proveedorRazonSocial,
-      EMPRESA: dto.empresaRazonSocial,
+      EMPRESA: dto.proveedorRazonSocial, // Usando proveedor o podrías añadir empresa real si existe
       ID_TIPO_COMPROBANTE: dto.tipoComprobanteId,
       SERIE: dto.serie,
       NUMERO: dto.numero,
@@ -21,6 +21,7 @@ export class ComprasAdapter {
     return {
       almacenId: form.ID_ALMACEN,
       proveedorId: form.ID_PROVEEDOR,
+      tipoOperacionId: form.ID_TIPO_OPERACION,
       tipoComprobanteId: form.ID_TIPO_COMPROBANTE,
       serie: form.SERIE,
       numero: form.NUMERO,
@@ -31,6 +32,7 @@ export class ComprasAdapter {
       observaciones: form.OBSERVACIONES,
       detalles: form.DETALLES.map(d => ({
         productoId: d.ID_PRODUCTO,
+        afectacionIgvId: d.ID_AFECTACION_IGV,
         cantidad: d.CANTIDAD,
         unidadId: d.ID_UNIDAD,
         valorUnitario: d.VALOR_UNITARIO,

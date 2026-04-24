@@ -3,7 +3,7 @@ import { Component, effect, inject, input, output, signal } from '@angular/core'
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Proveedor, ProveedorCrear } from '@proveedores/domain/proveedor.interface';
 import { ProveedorService } from '@proveedores/services/proveedor.service';
-import { ResponseUbigeoDto } from '@shared/domains/general.dto';
+import { ResponseUbigeoDto, ResponseTipoDocumentoDto } from '@shared/domains/general.dto';
 import { GeneralService } from '@shared/services/general.service';
 import { PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
 import { MessageService } from 'primeng/api';
@@ -28,6 +28,7 @@ export class FormProveedor {
   isSubmitting = signal(false);
   isSearching = signal(false);
   ubigeoResults = signal<ResponseUbigeoDto[]>([]);
+  tipoDocumentoOptions = signal<ResponseTipoDocumentoDto[]>([]);
 
   statusOptions = [
     { label: 'Activo', value: 'Activo' },
@@ -45,6 +46,7 @@ export class FormProveedor {
     email: FormControl<string>;
     address: FormControl<string>;
     ubigeo: FormControl<ResponseUbigeoDto | null>;
+    tipoDocumento: FormControl<ResponseTipoDocumentoDto | null>;
     status: FormControl<'Activo' | 'Inactivo'>;
   }> = this.fb.group({
     id: this.fb.control<number | null>(null),
@@ -67,16 +69,15 @@ export class FormProveedor {
       updateOn: 'blur',
     }),
     address: this.fb.control<string>('', { nonNullable: true, validators: [requiredTrim()] }),
-    ubigeo: this.fb.control<ResponseUbigeoDto | null>(null, {
-      validators: [Validators.required],
-      asyncValidators: [ubigeoExisteAsyncValidator(this.generalService)],
-    }),
+    ubigeo: this.fb.control<ResponseUbigeoDto | null>(null),
+    tipoDocumento: this.fb.control<ResponseTipoDocumentoDto | null>(null, { validators: [Validators.required] }),
     status: this.fb.control<'Activo' | 'Inactivo'>('Activo', { nonNullable: true, validators: [Validators.required] }),
   });
 
   data = input<Proveedor | null>(null);
 
   constructor() {
+    this.loadTipoDocumentos();
     effect(() => {
       const item = this.data();
 
@@ -117,13 +118,30 @@ export class FormProveedor {
     return this.form.dirty && !this.isSubmitting();
   }
 
+  loadTipoDocumentos() {
+    this.generalService.getAllTiposDocumentos().subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          this.tipoDocumentoOptions.set(res.data);
+          // Set RUC as default if exists (can be '6' or '06')
+          const ruc = res.data.find((t) => t.codigoSunat === '6' || t.codigoSunat === '06');
+          if (ruc) this.form.controls.tipoDocumento.setValue(ruc);
+        }
+      },
+    });
+  }
+
   searchUbigeo(event: any) {
     const searchTerm = event.query?.trim() || undefined;
 
     this.generalService.getAllUbigeos(searchTerm).subscribe({
       next: (res) => {
         if (res.success && res.data) {
-          this.ubigeoResults.set(res.data);
+          const dataWithFullLabel = res.data.map(u => ({
+            ...u,
+            fullName: `${u.departamento} - ${u.provincia} - ${u.distrito}`
+          }));
+          this.ubigeoResults.set(dataWithFullLabel);
         }
       },
       error: () => {
@@ -206,6 +224,7 @@ export class FormProveedor {
       APELLIDOS: String(fv.contactLastName).trim(),
       DIRECCION: String(fv.address).trim(),
       ID_UBIGEO: String(fv.ubigeo?.id ?? '').trim(),
+      tipoDocCodigo: fv.tipoDocumento?.codigoSunat ?? '06',
       EMAIL: String(fv.email).trim(),
       TELEFONO_PRINCIPAL: String(fv.phone).trim(),
       TELEFONO_SECUNDARIO: '',
@@ -260,6 +279,7 @@ export class FormProveedor {
       email: '',
       address: '',
       ubigeo: null,
+      tipoDocumento: this.tipoDocumentoOptions().find(t => t.codigoSunat === '06') || null,
       status: 'Activo',
     });
     this.form.markAsPristine();
@@ -270,7 +290,11 @@ export class FormProveedor {
       next: (res) => {
         const match = res.success && res.data ? res.data.find((u) => u.id === ubigeoId) || res.data[0] : null;
         if (match) {
-          this.form.patchValue({ ubigeo: match });
+          const matchWithFullLabel = {
+            ...match,
+            fullName: `${match.departamento} - ${match.provincia} - ${match.distrito}`
+          };
+          this.form.patchValue({ ubigeo: matchWithFullLabel });
           this.form.controls.ubigeo.markAsPristine();
         }
       },
@@ -301,17 +325,3 @@ function documentoValidator(): ValidatorFn {
   };
 }
 
-function ubigeoExisteAsyncValidator(generalService: GeneralService) {
-  return (control: AbstractControl) => {
-    const value = control.value as ResponseUbigeoDto | null;
-    const ubigeoId = value?.id;
-    if (!ubigeoId) return Promise.resolve({ ubigeoInvalid: true });
-
-    return firstValueFrom(generalService.getAllUbigeos(ubigeoId))
-      .then((res) => {
-        const ok = Boolean(res?.success && res?.data?.some((u) => u.id === ubigeoId));
-        return ok ? null : { ubigeoInvalid: true };
-      })
-      .catch(() => null);
-  };
-}

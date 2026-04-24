@@ -26,6 +26,7 @@ export interface ProveedorCrear {
   RAZON_SOCIAL?: string;
   TELEFONO_PRINCIPAL: string;
   NOMBRE_COMERCIAL?: string;
+  tipoDocCodigo: string;
 }
 
 // ! CAMBIAR ESTADO

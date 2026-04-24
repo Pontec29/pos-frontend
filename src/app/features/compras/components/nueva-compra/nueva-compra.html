@@ -56,7 +56,7 @@
                                 [suggestions]="filteredSuppliers()" 
                                 (completeMethod)="filterSuppliers($event)" 
                                 field="businessName" 
-                                (onSelect)="onSupplierSelect($event)"
+                                (onSelect)="onSupplierSelect($event.value)"
                                 placeholder="Buscar proveedor por nombre o RUC..." 
                                 [forceSelection]="true"
                                 fluid>
@@ -65,7 +65,12 @@
 
                         <div class="col-12 col-md-3 form-field">
                             <label><i class="pi pi-money-bill mr-1"></i> Moneda</label>
-                            <p-select formControlName="ID_MONEDA" [options]="currencies" optionLabel="label" optionValue="value" fluid></p-select>
+                            <p-select formControlName="ID_MONEDA" [options]="currencies" optionLabel="label" optionValue="value" placeholder="Moneda" fluid></p-select>
+                        </div>
+
+                        <div class="col-12 col-md-6 form-field">
+                            <label><i class="pi pi-briefcase mr-1"></i> Tipo de Operación (SUNAT)</label>
+                            <p-select formControlName="ID_TIPO_OPERACION" [options]="tiposOperacion()" optionLabel="descripcion" optionValue="id" placeholder="Seleccione Op." fluid></p-select>
                         </div>
                     </div>
 
@@ -105,6 +110,14 @@
                                 fluid>
                             </p-autoComplete>
                         </div>
+                        
+                        <div class="col-12 col-md-3 form-field">
+                            <label><i class="pi pi-info-circle mr-1"></i> Afectación IGV</label>
+                            <p-select [ngModel]="newAfectacion()" (ngModelChange)="newAfectacion.set($event)" [ngModelOptions]="{standalone: true}" [options]="afectacionesIgv()" optionLabel="descripcion" placeholder="Afectación" fluid></p-select>
+                        </div>
+                    </div>
+
+                    <div class="form-grid items-end mb-2">
 
                         <div class="col-6 col-md-2 form-field">
                             <label><i class="pi pi-tag mr-1"></i> Cantidad</label>
@@ -150,6 +163,7 @@
                                 <th class="text-center" style="width: 100px;">Cant.</th>
                                 <th class="text-right" style="width: 120px;">Costo Unit.</th>
                                 <th class="text-right" style="width: 120px;">Subtotal</th>
+                                <th class="text-center" style="width: 150px;">Operación</th>
                                 <th class="text-right" style="width: 100px;">I.G.V.</th>
                                 <th class="text-right" style="width: 120px;">Total</th>
                                 <th class="action-col" style="width: 60px;"></th>
@@ -172,6 +186,9 @@
                                     {{ item.get('VALOR_UNITARIO')?.value | number:'1.2-2' }}
                                 </td>
                                 <td class="text-right">{{ item.get('SUBTOTAL')?.value | number:'1.2-2' }}</td>
+                                <td class="text-center">
+                                    <span class="text-xs px-2 py-1 bg-gray-100 rounded border">{{ item.get('AFECTACION_NOMBRE')?.value }}</span>
+                                </td>
                                 <td class="text-right text-muted">{{ item.get('IGV')?.value | number:'1.2-2' }}</td>
                                 <td class="text-right font-bold">{{ item.get('TOTAL')?.value | number:'1.2-2' }}</td>
                                 <td class="text-center">
@@ -202,6 +219,14 @@
                         <div class="summary-row">
                             <span>I.G.V. (18%):</span>
                             <span class="amount">{{ igvTotal() | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="summary-row" *ngIf="opGratuita() > 0">
+                            <span>Op. Gratuita:</span>
+                            <span class="amount text-info">{{ opGratuita() | number:'1.2-2' }}</span>
+                        </div>
+                        <div class="summary-row" *ngIf="noGravado() > 0">
+                            <span>No Gravado:</span>
+                            <span class="amount">{{ noGravado() | number:'1.2-2' }}</span>
                         </div>
                         <div class="summary-divider"></div>
                         <div class="total-display">

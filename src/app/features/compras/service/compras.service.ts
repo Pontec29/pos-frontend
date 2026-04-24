@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { environment } from '@environments/environment';
 import { catchError, map, Observable, Subject, throwError } from 'rxjs';
-import { Compra, CompraCrear } from '../domain/compras.interface';
+import { Compra, CompraCrear, TipoOperacion, SunatAfectacionIgv } from '../domain/compras.interface';
 import { ApiResponse, ApiResponseSuccess } from '@shared/domains/api-response.model';
 import { CompraDto } from '../domain/compras.dto';
 import { ComprasAdapter } from '../domain/compras.adapter';
@@ -26,6 +26,14 @@ export class ComprasService {
         data: res.data.map(dto => ComprasAdapter.adapt(dto))
       }))
     );
+  }
+
+  getTiposOperacion(): Observable<ApiResponse<TipoOperacion[]>> {
+    return this.http.get<ApiResponse<TipoOperacion[]>>(`${this.apiUrl}/catalogos/tipos-operacion`);
+  }
+
+  getAfectacionesIgv(): Observable<ApiResponse<SunatAfectacionIgv[]>> {
+    return this.http.get<ApiResponse<SunatAfectacionIgv[]>>(`${this.apiUrl}/catalogos/afectaciones-igv`);
   }
 
   create(request: CompraCrear): Observable<ApiResponseSuccess> {

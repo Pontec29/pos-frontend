@@ -15,6 +15,7 @@ export interface CompraCrear {
   ID_COMPRA?: number;
   ID_ALMACEN: number;
   ID_PROVEEDOR: number;
+  ID_TIPO_OPERACION: number;
   ID_TIPO_COMPROBANTE: string;
   SERIE: string;
   NUMERO: string;
@@ -28,6 +29,7 @@ export interface CompraCrear {
 
 export interface Detalle {
   ID_PRODUCTO: number;
+  ID_AFECTACION_IGV: number;
   CANTIDAD: number;
   ID_UNIDAD: number;
   VALOR_UNITARIO: number;
@@ -36,4 +38,21 @@ export interface Detalle {
   CODIGO_LOTE: string;
   FECHA_VENCIMIENTO: string;
 }
+
+export interface TipoOperacion {
+  id: number;
+  codigoSunat: string;
+  descripcion: string;
+  estado: boolean;
+}
+
+export interface SunatAfectacionIgv {
+  id: number;
+  codigoSunat: string;
+  descripcion: string;
+  aplicaIgv: boolean;
+  esBonificacion: boolean;
+}
+
+
 
