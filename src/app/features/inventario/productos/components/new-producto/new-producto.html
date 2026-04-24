@@ -1,4 +1,5 @@
 <app-modal-confirmacion></app-modal-confirmacion>
+<p-toast></p-toast>
 
 <div class="erp-page-container">
   <div class="erp-page-header">
@@ -73,7 +74,7 @@
 
             <div class="erp-col-3 erp-col-md-6 erp-col-sm-12">
               <p-floatlabel variant="in">
-                <p-select [options]="unidadesMedidaBase()" formControlName="unidadMedidaId" optionLabel="DESCRIPCION_SUNAT" optionValue="ID_UNIDAD_MEDIDA" [filter]="true" filterBy="DESCRIPCION_SUNAT" inputId="unidadMedida" appendTo="body"></p-select>
+                <p-select [options]="unidadesMedidaBase()" formControlName="unidadMedidaId" optionLabel="DESCRIPCION_SUNAT" optionValue="ID_UNIDAD_MEDIDA" [filter]="true" filterBy="DESCRIPCION_SUNAT" inputId="unidadMedida" appendTo="body" (onChange)="onBaseUnitChange($event.value)"></p-select>
                 <label for="unidadMedida">Medida Base <span class="required-star">*</span></label>
               </p-floatlabel>
             </div>
@@ -205,9 +206,22 @@
                 </div>
                 <div class="erp-col-3 erp-col-md-4 erp-col-sm-6">
                   <p-floatlabel variant="in">
-                    <p-inputNumber formControlName="precioMinimoVenta" mode="currency" [currency]="currencyCode()" locale="es-PE"></p-inputNumber>
+                    <p-inputNumber formControlName="precioMinimoVenta" mode="currency" [currency]="currencyCode()" locale="es-PE" styleClass="w-full"></p-inputNumber>
                     <label>Precio Mínimo</label>
                   </p-floatlabel>
+                </div>
+                <!-- Indicador de Margen de Ganancia (ERP Pro Feature) -->
+                <div class="erp-col-3 erp-col-md-4 erp-col-sm-6 flex items-center justify-start pb-2">
+                  <div class="p-3 border-round w-full flex items-center gap-3 transition-all transition-duration-300" 
+                       [ngClass]="profitMargin() > 0 ? 'bg-green-50 border-1 border-green-100' : 'bg-yellow-50 border-1 border-yellow-100'">
+                    <i class="pi text-xl" [ngClass]="profitMargin() > 0 ? 'pi-trending-up text-green-500' : 'pi-trending-down text-yellow-500'"></i>
+                    <div>
+                      <span class="block text-xs font-bold uppercase" [ngClass]="profitMargin() > 0 ? 'text-green-600' : 'text-yellow-600'">Margen Estimado</span>
+                      <span class="text-xl font-bold" [ngClass]="profitMargin() > 0 ? 'text-green-700' : 'text-yellow-700'">
+                        {{ profitMargin() }}%
+                      </span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </p-tabpanel>

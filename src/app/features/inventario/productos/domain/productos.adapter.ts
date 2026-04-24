@@ -152,6 +152,8 @@ export class ProductoAdapter {
       ACTIVO_TIENDA_ONLINE: formValue.activeOnlineStore,
       // PERMITIR_VENTA_SIN_STOCK: formValue.negativeStock,
 
+      IMAGEN_URL: formValue.image,
+
       STOCK_APERTURA: stockApertura
     };
   }

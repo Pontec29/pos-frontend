@@ -128,6 +128,17 @@ export default class NewProductoPage implements OnInit {
   imageError = signal<string | null>(null);
   imageDragActive = signal(false);
 
+  // ! PROFIT MARGIN SIGNAL (ERP PRO FEATURE)
+  profitMargin = computed(() => {
+    const data = this.productFormValue();
+    const compra = data.precioCompra || 0;
+    const venta = data.precioVenta || 0;
+
+    if (compra <= 0 || venta <= 0) return 0;
+    const margin = ((venta - compra) / venta) * 100;
+    return Math.round(margin * 100) / 100;
+  });
+
   newUnitForm = this.fb.group({
     commercialName: ['', [Validators.required]],
     sunatCode: ['', [Validators.required]]
@@ -277,6 +288,21 @@ export default class NewProductoPage implements OnInit {
 
     const tipoControlStock = this.productForm.get('tipoControlStock')?.value || 'NORMAL';
     this.updateTraceabilityState(tipoControlStock);
+
+    const controlStockCtrl = this.productForm.get('controlStock');
+    controlStockCtrl?.valueChanges.subscribe(value => {
+      const minCtrl = this.productForm.get('minStock');
+      const maxCtrl = this.productForm.get('maxStock');
+      if (value) {
+        minCtrl?.enable();
+        maxCtrl?.enable();
+      } else {
+        minCtrl?.disable();
+        minCtrl?.setValue(null);
+        maxCtrl?.disable();
+        maxCtrl?.setValue(null);
+      }
+    });
   }
 
   presentationsData = signal<PresentacionRowView[]>([]);
@@ -411,48 +437,69 @@ export default class NewProductoPage implements OnInit {
   }
 
   updateTraceabilityState(type: string) {
+    const isService = this.productForm.get('tipoProducto')?.value === 'S';
+    const isEdit = this.isEditMode();
+    
     const stockInicialControl = this.productForm.get('stockInicial');
     const codigoLoteControl = this.productForm.get('codigoLote');
     const fechaVencimientoControl = this.productForm.get('fechaVencimiento');
     const numeroSerieControl = this.productForm.get('numeroSerie');
+    const tipoControlStockControl = this.productForm.get('tipoControlStock');
 
     // Reset validations
     codigoLoteControl?.clearValidators();
     fechaVencimientoControl?.clearValidators();
     numeroSerieControl?.clearValidators();
 
-    // Enable/Disable logic
-    stockInicialControl?.enable();
+    // ERP Rule: Stock inicial only on creation
+    if (isEdit || isService) {
+      stockInicialControl?.disable();
+      stockInicialControl?.setValue(isService ? 0 : stockInicialControl.value);
+    } else {
+      stockInicialControl?.enable();
+    }
+
+    // ERP Rule: Traceability locked on edit to preserve movement history
+    if (isEdit) {
+      tipoControlStockControl?.disable();
+    } else {
+      tipoControlStockControl?.enable();
+    }
+
+    if (isService) {
+      this.disableInventoryFields([codigoLoteControl, fechaVencimientoControl, numeroSerieControl]);
+      return;
+    }
 
     if (type === 'LOTE') {
       codigoLoteControl?.setValidators([Validators.required]);
       fechaVencimientoControl?.setValidators([Validators.required]);
-      codigoLoteControl?.enable();
-      fechaVencimientoControl?.enable();
-
+      if (!isEdit) {
+        codigoLoteControl?.enable();
+        fechaVencimientoControl?.enable();
+      }
       numeroSerieControl?.disable();
       numeroSerieControl?.setValue('');
     } else if (type === 'SERIE') {
-      // numeroSerieControl?.setValidators([Validators.required]);
-      numeroSerieControl?.enable();
-
+      if (!isEdit) numeroSerieControl?.enable();
       codigoLoteControl?.disable();
       codigoLoteControl?.setValue('');
       fechaVencimientoControl?.disable();
       fechaVencimientoControl?.setValue(null);
     } else {
-      // ESTANDAR
-      codigoLoteControl?.disable();
-      codigoLoteControl?.setValue('');
-      fechaVencimientoControl?.disable();
-      fechaVencimientoControl?.setValue(null);
-      numeroSerieControl?.disable();
-      numeroSerieControl?.setValue('');
+      this.disableInventoryFields([codigoLoteControl, fechaVencimientoControl, numeroSerieControl]);
     }
 
     codigoLoteControl?.updateValueAndValidity();
     fechaVencimientoControl?.updateValueAndValidity();
     numeroSerieControl?.updateValueAndValidity();
+  }
+
+  private disableInventoryFields(controls: (AbstractControl | null)[]) {
+    controls.forEach(c => {
+      c?.disable();
+      c?.setValue(c.value instanceof Date ? null : '');
+    });
   }
 
   onTipoTrazabilidadSelect(type: string) {
@@ -462,6 +509,7 @@ export default class NewProductoPage implements OnInit {
 
   onTipoProductoChange(event: any) {
     this.updatePriceFieldsState(event.value, true);
+    this.updateTraceabilityState(this.productForm.get('tipoControlStock')?.value || 'NORMAL');
   }
 
   onImageDragOver(event: DragEvent) {
@@ -511,6 +559,38 @@ export default class NewProductoPage implements OnInit {
   generateEan13() {
     const ean = '775' + Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
     this.productForm.patchValue({ codigoBarra: ean });
+  }
+
+  onBaseUnitChange(unitId: number) {
+    if (!unitId) return;
+
+    // Autoseleccionar la misma unidad en el borrador de presentaciones para ahorrar tiempo
+    this.presentaciones.get('unidadId')?.setValue(unitId);
+
+    // Regla ERP: Si no hay presentaciones, agregar la base automáticamente
+    if (this.presentationsData().length === 0) {
+      const unit = this.unidadMedida().find(u => u.ID_UNIDAD_MEDIDA === unitId);
+      if (!unit) return;
+
+      const precioVenta = this.productForm.get('precioVenta')?.value || 0;
+      const barcode = this.productForm.get('codigoBarra')?.value || '';
+
+      const basePresentation: PresentacionRowView = {
+        ID_UNIDAD: unitId,
+        unitName: unit.DESCRIPCION_SUNAT || 'N/A',
+        FACTOR_CONVERSION_BASE: 1,
+        PRECIO_VENTA: precioVenta,
+        CODIGO_BARRAS: barcode,
+        ES_PRINCIPAL: true
+      };
+
+      this.presentationsData.set([basePresentation]);
+      this.messageService.add({
+        severity: 'info',
+        summary: 'Presentación Automática',
+        detail: `Se ha agregado ${unit.DESCRIPCION_SUNAT} como presentación principal base.`
+      });
+    }
   }
 
   generatePresentationEan13() {
@@ -585,6 +665,19 @@ export default class NewProductoPage implements OnInit {
       });
       this.formularioValido = false;
       return;
+    }
+
+    // ERP Rule: There can only be ONE base presentation (Factor 1)
+    if (value.factor === 1) {
+      const hasFactor1 = this.presentationsData().some(p => p.FACTOR_CONVERSION_BASE === 1);
+      if (hasFactor1) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Operación denegada',
+          detail: 'Ya existe una presentación principal con Factor 1. Las cajas o fardos adicionales deben tener un factor mayor a 1.'
+        });
+        return;
+      }
     }
 
     const unit = this.unidadMedida().find(
@@ -703,12 +796,27 @@ export default class NewProductoPage implements OnInit {
       return;
     }
 
+    const presentacion = current[index];
+
+    // ERP Rule: Prevent deleting the Base Presentation (Factor 1) or leaving the product empty
+    if (presentacion.FACTOR_CONVERSION_BASE === 1) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Acción Bloqueada',
+        detail: 'No se puede eliminar la presentación primaria (Factor 1). Todo producto necesita una presentación base.'
+      });
+      return;
+    }
+
     this.confirmationService.confirm({
-      message: '¿Desea eliminar esta presentación?',
+      message: '¿Desea eliminar esta presentación secundaria?',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Sí, eliminar',
       rejectLabel: 'Cancelar',
-      accept: () => this.removePresentation(index)
+      acceptButtonStyleClass: 'p-button-danger',
+      accept: () => {
+        this.removePresentation(index);
+      }
     });
   }
 
@@ -797,6 +905,37 @@ export default class NewProductoPage implements OnInit {
       }
     }
 
+    // ! VALIDACIONES DE STOCK CONSISTENTES
+    const controlStock = this.productForm.get('controlStock')?.value;
+    const minStock = this.productForm.get('minStock')?.value || 0;
+    const maxStock = this.productForm.get('maxStock')?.value || 0;
+    const pCompra = this.productForm.get('precioCompra')?.value || 0;
+    const pVenta = this.productForm.get('precioVenta')?.value || 0;
+    const pVentaMin = this.productForm.get('precioMinimoVenta')?.value || 0;
+
+    // ! VALIDACIONES DE PRECIOS GLOBALES
+    if (this.productForm.get('tipoProducto')?.value === 'B' && pCompra >= 0) {
+      if (pVenta < pCompra || pVentaMin < pCompra) {
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Inconsistencia de Precios',
+          detail: 'El Precio de Venta o el Precio Mínimo no pueden ser menores al Precio de Compra. Revise sus costos para evitar pérdidas.'
+        });
+        return false;
+      }
+    }
+
+    if (controlStock) {
+      if (maxStock > 0 && minStock > maxStock) {
+        this.messageService.add({
+          severity: 'warn',
+          summary: 'Inconsistencia de Stock',
+          detail: 'El stock mínimo no puede ser mayor al stock máximo.'
+        });
+        return false;
+      }
+    }
+
     // ! VALIDACIONES CONDICIONALES (LOTE / SERIE)
     const stockInicial = this.productForm.get('stockInicial')?.value || 0;
     const trazabilidad = this.productForm.get('tipoControlStock')?.value;
@@ -817,6 +956,19 @@ export default class NewProductoPage implements OnInit {
           });
           return false;
         }
+
+        // ERP Rule: Prevent receiving initial stock that is already expired
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (new Date(fechaVencimiento.value) < today) {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Fecha Inválida',
+            detail: 'La fecha de vencimiento del lote inicial no puede ser una fecha pasada.'
+          });
+          return false;
+        }
+
       } else if (trazabilidad === 'SERIE') {
         if (this.seriales().length === 0) {
           this.messageService.add({

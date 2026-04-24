@@ -43,6 +43,8 @@ export interface ProductoUpSert {
 
   // ! STOCK DE APERTURA
   STOCK_APERTURA?: StockAperturaUpSert;
+  
+  IMAGEN_URL?: string;
 }
 
 export interface PresentacionUpSert {
