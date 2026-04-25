@@ -2,33 +2,14 @@
     <div class="row">
         <div class="form-row">
             <p-floatlabel>
-                <input pInputText id="username" formControlName="username" placeholder=" "
-                    [class.p-invalid]="form.get('username')?.invalid && form.get('username')?.touched" />
-                <label for="username">Usuario <span style="color: red;">*</span></label>
+                <input pInputText id="username" formControlName="username" placeholder=" " [class.p-invalid]="form.get('username')?.invalid && form.get('username')?.touched" />
+                <label for="username">Usuario <span class="required">*</span></label>
             </p-floatlabel>
         </div>
         <div class="form-row">
             <p-floatlabel>
-                <input pInputText id="email" formControlName="email" type="email" placeholder=" "
-                    [class.p-invalid]="form.get('email')?.invalid && form.get('email')?.touched" />
-                <label for="email">Correo Electrónico <span style="color: red;">*</span></label>
-            </p-floatlabel>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="form-row">
-            <p-floatlabel>
-                <input pInputText id="firstName" formControlName="firstName" placeholder=" "
-                    [class.p-invalid]="form.get('firstName')?.invalid && form.get('firstName')?.touched" />
-                <label for="firstName">Nombres <span style="color: red;">*</span></label>
-            </p-floatlabel>
-        </div>
-        <div class="form-row">
-            <p-floatlabel>
-                <input pInputText id="lastName" formControlName="lastName" placeholder=" "
-                    [class.p-invalid]="form.get('lastName')?.invalid && form.get('lastName')?.touched" />
-                <label for="lastName">Apellidos <span style="color: red;">*</span></label>
+                <input pInputText id="email" formControlName="email" type="email" placeholder=" " [class.p-invalid]="form.get('email')?.invalid && form.get('email')?.touched" />
+                <label for="email">Correo Electrónico <span class="required">*</span></label>
             </p-floatlabel>
         </div>
     </div>
@@ -36,17 +17,14 @@
     <div class="row">
         <div class="form-row">
             <p-floatlabel>
-                <p-select [options]="documentTypes()" formControlName="documentType" optionLabel="name"
-                    optionValue="code" placeholder=" " styleClass="w-full"
-                    (onChange)="onDocumentTypeChange($event.value)"></p-select>
-                <label for="documentType">Tipo Doc. <span style="color: red;">*</span></label>
+                <input pInputText id="nombres" formControlName="nombres" placeholder=" " [class.p-invalid]="form.get('nombres')?.invalid && form.get('nombres')?.touched" />
+                <label for="nombres">Nombres <span class="required">*</span></label>
             </p-floatlabel>
         </div>
         <div class="form-row">
             <p-floatlabel>
-                <input pInputText id="documentNumber" formControlName="documentNumber" placeholder=" "
-                    [class.p-invalid]="form.get('documentNumber')?.invalid && form.get('documentNumber')?.touched" />
-                <label for="documentNumber">Núm. Doc. <span style="color: red;">*</span></label>
+                <input pInputText id="apellidos" formControlName="apellidos" placeholder=" " [class.p-invalid]="form.get('apellidos')?.invalid && form.get('apellidos')?.touched" />
+                <label for="apellidos">Apellidos <span class="required">*</span></label>
             </p-floatlabel>
         </div>
     </div>
@@ -54,16 +32,28 @@
     <div class="row">
         <div class="form-row">
             <p-floatlabel>
-                <p-inputMask mask="(999) 999-999" formControlName="phone" placeholder=" "
-                    styleClass="w-full"></p-inputMask>
-                <label for="phone">Teléfono</label>
+                <p-select [options]="documentTypes()" formControlName="tipoDocumento" optionLabel="name" optionValue="code" placeholder=" " styleClass="w-full" (onChange)="onDocumentTypeChange($event.value)"></p-select>
+                <label for="tipoDocumento">Tipo Doc. <span class="required">*</span></label>
             </p-floatlabel>
         </div>
         <div class="form-row">
             <p-floatlabel>
-                <p-password formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="w-full"
-                    inputStyleClass="w-full" placeholder=" "
-                    [class.p-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
+                <input pInputText id="nroDocumento" formControlName="nroDocumento" placeholder=" " [class.p-invalid]="form.get('nroDocumento')?.invalid && form.get('nroDocumento')?.touched" />
+                <label for="nroDocumento">Núm. Doc. <span class="required">*</span></label>
+            </p-floatlabel>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-row">
+            <p-floatlabel>
+                <input pInputText id="telefono" formControlName="telefono" placeholder=" " [class.p-invalid]="form.get('telefono')?.invalid && form.get('telefono')?.touched" />
+                <label for="telefono">Teléfono</label>
+            </p-floatlabel>
+        </div>
+        <div class="form-row">
+            <p-floatlabel>
+                <p-password formControlName="password" [toggleMask]="true" [feedback]="false" styleClass="w-full" inputStyleClass="w-full" placeholder=" " [class.p-invalid]="form.get('password')?.invalid && form.get('password')?.touched">
                 </p-password>
                 <label for="password">Contraseña {{ !isEditMode() ? '*' : '' }}</label>
             </p-floatlabel>
@@ -79,9 +69,9 @@
             <div class="status-container">
                 <div class="status-info">
                     <span class="status-label">Estado</span>
-                    <span class="status-text">{{ form.get('active')?.value ? 'Activo' : 'Inactivo' }}</span>
+                    <span class="status-text">{{ form.get('activo')?.value ? 'Activo' : 'Inactivo' }}</span>
                 </div>
-                <p-toggleswitch formControlName="active"></p-toggleswitch>
+                <p-toggleswitch formControlName="activo"></p-toggleswitch>
             </div>
         </div>
     </div>

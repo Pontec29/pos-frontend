@@ -8,11 +8,28 @@ import { TooltipModule } from 'primeng/tooltip';
 import { ButtonModule } from 'primeng/button';
 import { AppButton } from '../../../../../shared/ui/button';
 import { UserAssignmentService } from '../../services/user-assignment.service';
-import { UserAssignment } from '../../../../../core/models/user-assignment.models';
 import { User } from '../../models/user.models';
 import { GeneralService } from '../../../../../shared/services/general.service';
 import { RolesEmpresaService } from '../../../permisos/services/roles-empresa.service';
 import { Observable } from 'rxjs';
+import { AlertService } from '../../../../../shared/services/alert.service';
+
+export interface UserAssignment {
+  id?: number;
+  usuarioId: number;
+  tenantId: number;
+  rolId: number;
+  nombreEmpresa: string;
+  nombreRol: string;
+  predeterminado?: boolean;
+  activo: boolean;
+}
+
+export interface CreateAssignmentRequest {
+  usuarioId: number;
+  tenantId: number;
+  rolId: number;
+}
 
 
 @Component({
@@ -35,6 +52,7 @@ export class UserAssignmentsComponent implements OnInit, OnChanges {
   private readonly userAssignmentService = inject(UserAssignmentService);
   private readonly generalService = inject(GeneralService);
   private readonly rolesEmpresaService = inject(RolesEmpresaService);
+  private readonly alertService = inject(AlertService);
   private readonly fb = inject(FormBuilder);
 
   @Input() visible = false;
@@ -54,23 +72,23 @@ export class UserAssignmentsComponent implements OnInit, OnChanges {
   editingAssignment: UserAssignment | null = null;
 
   assignmentForm = this.fb.group({
-    companyId: [null as number | null, Validators.required],
-    roleId: [null as number | null, Validators.required]
+    tenantId: [null as number | null, Validators.required],
+    rolId: [null as number | null, Validators.required]
   });
 
   ngOnInit(): void {
     this.loadCompanies();
 
     // Subscribe to company changes to load roles dynamically
-    this.assignmentForm.get('companyId')?.valueChanges.subscribe(companyId => {
-      console.log('Selected Company ID:', companyId);
-      if (companyId) {
-        this.loadRolesByCompany(companyId);
-        this.assignmentForm.get('roleId')?.enable();
+    this.assignmentForm.get('tenantId')?.valueChanges.subscribe(tenantId => {
+      console.log('Selected Tenant ID:', tenantId);
+      if (tenantId) {
+        this.loadRolesByCompany(tenantId);
+        this.assignmentForm.get('rolId')?.enable();
       } else {
         this.roles.set([]);
-        this.assignmentForm.get('roleId')?.disable();
-        this.assignmentForm.get('roleId')?.reset();
+        this.assignmentForm.get('rolId')?.disable();
+        this.assignmentForm.get('rolId')?.reset();
       }
     });
 
@@ -184,72 +202,48 @@ export class UserAssignmentsComponent implements OnInit, OnChanges {
   editAssignment(assignment: UserAssignment): void {
     this.editingAssignment = assignment;
     this.assignmentForm.patchValue({
-      companyId: assignment.companyId
+      tenantId: assignment.tenantId
     });
 
     // Manually trigger role load for edit
-    if (assignment.companyId) {
-      this.loadRolesByCompany(assignment.companyId);
-      this.assignmentForm.patchValue({ roleId: assignment.roleId });
-      this.assignmentForm.get('roleId')?.enable();
+    if (assignment.tenantId) {
+      this.loadRolesByCompany(assignment.tenantId);
+      this.assignmentForm.patchValue({ rolId: assignment.rolId });
+      this.assignmentForm.get('rolId')?.enable();
     }
-    this.showAssignmentForm.set(true);
   }
 
   saveAssignment(): void {
     if (this.assignmentForm.invalid || !this.selectedUser?.id) return;
 
     const formValue = this.assignmentForm.value;
-    const assignmentData = {
-      userId: this.selectedUser.id,
-      companyId: formValue.companyId!,
-      roleId: formValue.roleId!
-    };
-
-    if (this.editingAssignment) {
-      // Update existing assignment
-      this.userAssignmentService.updateAssignment(this.editingAssignment.id!, assignmentData).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loadAssignments();
-            this.showAssignmentForm.set(false);
-            this.assignmentForm.reset();
-            this.editingAssignment = null;
-          }
-        },
-        error: (error) => {
-          console.error('Error updating assignment:', error);
+    
+    // Always use assignUserToCompany for both create and update
+    this.userAssignmentService.assignUserToCompany(
+      this.selectedUser.id,
+      formValue.tenantId!,
+      formValue.rolId!,
+      false
+    ).subscribe({
+      next: (response) => {
+        if (response.success) {
+          this.alertService.success(this.editingAssignment ? 'Asignación actualizada' : 'Usuario asignado correctamente');
+          this.toggleAssignmentForm();
+          this.loadAssignments();
         }
-      });
-    } else {
-      // Create new assignment
-      this.userAssignmentService.assignUserToCompany(
-        this.selectedUser.id,
-        formValue.companyId!,
-        formValue.roleId!,
-        false // Default company flag - could be added to form if needed
-      ).subscribe({
-        next: (response) => {
-          if (response.success) {
-            this.loadAssignments();
-            this.showAssignmentForm.set(false);
-            this.assignmentForm.reset();
-            this.editingAssignment = null;
-          }
-        },
-        error: (error) => {
-          console.error('Error creating assignment:', error);
-        }
-      });
-    }
+      },
+      error: (error) => {
+        this.alertService.error('No se pudo procesar la asignación');
+      }
+    });
   }
 
   deleteAssignment(assignment: UserAssignment): Observable<void> {
-    if (!this.selectedUser?.id || !assignment.companyId) return new Observable();
+    if (!this.selectedUser?.id || !assignment.tenantId) return new Observable();
 
     if (!confirm('¿Está seguro de eliminar esta asignación?')) return new Observable();
 
-    this.userAssignmentService.removeUserCompany(this.selectedUser.id, assignment.companyId).subscribe({
+    this.userAssignmentService.removeUserCompany(this.selectedUser.id, assignment.tenantId).subscribe({
       next: (response) => {
         if (response.success) {
           this.loadAssignments();

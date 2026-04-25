@@ -53,10 +53,11 @@ export default class UsuariosPage implements OnInit {
   cols = [
     { field: 'id', header: '#' },
     { field: 'username', header: 'Usuario' },
-    { field: 'firstName', header: 'Nombre' },
-    { field: 'lastName', header: 'Apellido' },
+    { field: 'nombres', header: 'Nombre' },
+    { field: 'apellidos', header: 'Apellido' },
     { field: 'email', header: 'Correo' },
-    { field: 'active', header: 'Estado' },
+    { field: 'empresas', header: 'Empresas' },
+    { field: 'activo', header: 'Estado' },
     { field: 'actions', header: 'Acciones' }
   ];
   selectedColumns = this.cols.slice();
@@ -140,17 +141,17 @@ export default class UsuariosPage implements OnInit {
   modalData = signal<ModalData<User> | null>(null);
   selectedUserForAssignments: User | null = null;
 
-  // Formulario para crear/editar usuario (sin rol y empresa)
+  // Formulario para crear/editar usuario
   form = this.fb.group({
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
-    password: [''], // Opcional en edición, requerido si es nuevo (validacion manual o separada)
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
-    documentType: ['dni'],
-    documentNumber: ['', Validators.required],
-    phone: [''],
-    active: [true],
+    password: [''],
+    nombres: ['', Validators.required],
+    apellidos: ['', Validators.required],
+    tipoDocumento: ['dni'],
+    nroDocumento: ['', Validators.required],
+    telefono: [''],
+    activo: [true],
     id: [null as number | null]
   });
 

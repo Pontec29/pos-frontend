@@ -1,61 +1,30 @@
 @use 'mixins' as *;
 
 .container {
-  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow-y: auto;
+  overflow: hidden;
 
   // !RESOLUCIONES
-  @include phone-x1 {
-    padding: var(--space-1) var(--space-3);
-  }
-
-  @include phone-x2 {
-    padding: var(--space-2) var(--space-4);
-  }
-
-  @include phone-medium {
-    padding: var(--space-3) var(--space-5);
-  }
-
-  @include phone-large {
-    padding: var(--space-4) var(--space-6);
-  }
-
-  @include tablet-small {
-    padding: var(--space-5) var(--space-7);
-  }
-
-  @include tablet {
-    padding: var(--space-6) var(--space-8);
-  }
-
-  @include tablet-large {
-    padding: var(--space-7) var(--space-9);
-  }
-
-  @include desktop-small {
-    padding: var(--space-8) var(--space-10);;
-  }
-
-  @include desktop-medium {
-    padding: var(--space-9) var(--space-11);
-  }
-
-  @include desktop-full {
-    padding: var(--space-10) var(--space-12);
-  }
-
-  @include desktop-ultra-hd {
-    padding: var(--space-11) var(--space-13);
-  }
+  @include phone-x1 { padding: 0.5rem 0.75rem; }
+  @include phone-x2 { padding: 0.75rem 1rem; }
+  @include phone-medium { padding: 1rem 1.25rem; }
+  @include phone-large { padding: 1.25rem 1.5rem; }
+  @include tablet-small { padding: 1.25rem 1.5rem; }
+  @include tablet { padding: 1.25rem 1.5rem; }
+  @include tablet-large { padding: 1.5rem 2rem; }
+  @include desktop-small { padding: 1.5rem 2rem; }
+  @include desktop-medium { padding: 1.5rem 2.5rem; }
+  @include desktop-full { padding: 1rem 2.5rem; }
+  @include desktop-ultra-hd { padding: 2rem 3rem; }
 
   .header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
 
     &--title {
       display: flex;
@@ -64,8 +33,9 @@
 
       h6 {
         color: var(--color-primary);
-        font-size: var(--font-size-6);
-        font-weight: bold;
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0;
       }
 
       p {
@@ -79,6 +49,13 @@
       display: flex;
       gap: var(--space-2);
     }
+  }
+
+  .main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
   }
 }
 

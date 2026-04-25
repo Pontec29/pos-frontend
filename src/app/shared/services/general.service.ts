@@ -3,7 +3,8 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '@environments/environment';
 import { ApiResponse } from '@shared/domains/api-response.model';
 import { ResponseAfectacionIgvDto, ResponseBancosDto, ResponseBuscarDniOrucDto, ResponseContactoDto, ResponseEmpresaAsignadaDto, ResponseMetodoPagoDto, ResponseMonedaDto, ResponseTipoDocumentoDto, ResponseUbigeoDto } from '@shared/domains/general.dto';
-import { Observable } from 'rxjs';
+import { from, map, Observable, of, shareReplay, switchMap, tap } from 'rxjs';
+import { IndexedDbService } from './indexed-db.service';
 
 
 @Injectable({
@@ -13,6 +14,10 @@ export class GeneralService {
 
   private apiUrl = `${environment.apiUrl}/api/v1`;
   private http = inject(HttpClient);
+  private dbService = inject(IndexedDbService);
+
+  private readonly EMPRESAS_ASIGNADAS_KEY = 'empresas_asignadas';
+  private cacheEmpresasAsignadas$?: Observable<ApiResponse<ResponseEmpresaAsignadaDto[]>>;
 
   // ! BUSCAR POR DNI O RUC 1:DNI 6:RUC
   public buscarPorDniOruc(tipoDoc: string, numeroDocumento: string): Observable<ApiResponse<ResponseBuscarDniOrucDto>> {
@@ -59,10 +64,39 @@ export class GeneralService {
 
   // ! LISTAR EMPRESAS ASIGNADAS AL USUARIO ACTUAL- p-select
   public getEmpresasAsignadas(): Observable<ApiResponse<ResponseEmpresaAsignadaDto[]>> {
-    return this.http.get<ApiResponse<ResponseEmpresaAsignadaDto[]>>(`${this.apiUrl.replace('/mto', '')}/companies/asignadas`);
+    if (this.cacheEmpresasAsignadas$) {
+      return this.cacheEmpresasAsignadas$;
+    }
+
+    // 1. Intentar cargar de IndexedDB
+    this.cacheEmpresasAsignadas$ = from(this.dbService.get<ResponseEmpresaAsignadaDto[]>(this.EMPRESAS_ASIGNADAS_KEY)).pipe(
+      switchMap(cachedData => {
+        if (cachedData) {
+          // Si hay en cache, lo devolvemos envuelto en ApiResponse
+          return of({ success: true, message: 'Cargado de cache', data: cachedData });
+        }
+        // 2. Si no hay, ir al API
+        return this.http.get<ApiResponse<ResponseEmpresaAsignadaDto[]>>(`${this.apiUrl}/companies/asignadas`).pipe(
+          tap(res => {
+            if (res.success && res.data) {
+              this.dbService.set(this.EMPRESAS_ASIGNADAS_KEY, res.data);
+            }
+          })
+        );
+      }),
+      shareReplay(1)
+    );
+
+    return this.cacheEmpresasAsignadas$;
   }
+
+  public clearCache(): void {
+    this.cacheEmpresasAsignadas$ = undefined;
+    this.dbService.remove(this.EMPRESAS_ASIGNADAS_KEY);
+  }
+
   // ! LISTAR TODAS LAS EMPRESAS BÁSICAS (Para selects o listados simplificados)
   public getEmpresasBasicas(): Observable<ApiResponse<{ tenantId: number; razonSocial: string; ruc: string; direccion: string }[]>> {
-    return this.http.get<ApiResponse<{ tenantId: number; razonSocial: string; ruc: string; direccion: string }[]>>(`${this.apiUrl.replace('/mto', '')}/companies/basicas`);
+    return this.http.get<ApiResponse<{ tenantId: number; razonSocial: string; ruc: string; direccion: string }[]>>(`${this.apiUrl}/companies/basicas`);
   }
 }

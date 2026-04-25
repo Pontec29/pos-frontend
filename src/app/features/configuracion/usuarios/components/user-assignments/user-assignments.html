@@ -1,4 +1,4 @@
-<p-dialog [visible]="visible" [modal]="true" [style]="{width:'1200px'}" [draggable]="false" [closable]="false">
+<p-dialog [visible]="visible" [modal]="true" [style]="{width:'900px'}" [draggable]="false" [closable]="false">
 
   <ng-template #header>
     <div class="dialog-header">
@@ -6,118 +6,84 @@
         <i class="pi pi-users"></i>
       </div>
       <div class="header-content">
-        <h3 class="title">Asignaciones de Usuario</h3>
-        <span class="subtitle">{{ selectedUser?.email }}</span>
+        <h3 class="title">Gestión de Asignaciones</h3>
+        <div class="user-meta">
+          <span class="user-name">{{ selectedUser?.nombres }} {{ selectedUser?.apellidos }}</span>
+          <span class="separator">•</span>
+          <span class="user-email">{{ selectedUser?.email }}</span>
+        </div>
       </div>
     </div>
   </ng-template>
 
   <div class="assignments-layout">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <!-- Search -->
-      <div class="search-section">
-        <input type="text" placeholder="Buscar usuario..." class="search-input" />
-      </div>
-
-      <!-- User Card -->
-      <div class="user-card selected">
-        <div class="user-info">
-          <h4 class="user-name">{{ selectedUser?.firstName }} {{ selectedUser?.lastName }}</h4>
-          <p class="user-email">{{ selectedUser?.email }}</p>
-          <div class="user-stats">
-            <span class="company-count">{{ assignments().length }} empresas</span>
-            <span class="status-badge" [ngClass]="selectedUser?.active ? 'active' : 'inactive'">
-              {{ selectedUser?.active ? 'ACTIVO' : 'INACTIVO' }}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
     <div class="main-content">
-      <!-- Tabs -->
-      <div class="tabs-header">
-        <button class="tab-btn active">
-          Información General
-        </button>
-        <button class="tab-btn">
-          Empresas y Roles
-        </button>
-        <button class="tab-btn">
-          Permisos
-        </button>
-        <div class="tab-actions">
-          <button class="edit-btn">
-            <i class="pi pi-pencil"></i> Editar
-          </button>
-          <button class="delete-btn">
-            <i class="pi pi-trash"></i> Eliminar
-          </button>
-        </div>
+
+      <!-- HEADER SELECTS (Direct Assignment) -->
+      <div class="direct-assignment-bar">
+        <form [formGroup]="assignmentForm" class="assignment-inline-form">
+          <div class="form-field">
+            <label>Empresa</label>
+            <p-select [options]="companies()" formControlName="tenantId" [appendTo]="'body'" [disabled]="loadingCompanies() || editingAssignment !== null" [placeholder]="loadingCompanies() ? 'Cargando...' : 'Seleccione Empresa'">
+            </p-select>
+          </div>
+
+          <div class="form-field">
+            <label>Rol</label>
+            <p-select [options]="roles()" formControlName="rolId" [appendTo]="'body'" [disabled]="loadingRoles()" [placeholder]="loadingRoles() ? 'Cargando...' : 'Seleccione Rol'">
+            </p-select>
+          </div>
+
+          <div class="form-actions">
+            @if (editingAssignment) {
+            <app-button preset="cancel" (clicked)="toggleAssignmentForm()" pTooltip="Cancelar edición"></app-button>
+            <app-button preset="save" label="Actualizar" [disabled]="assignmentForm.invalid" (clicked)="saveAssignment()"></app-button>
+            } @else {
+            <app-button preset="save" label="Agregar Asignación" [disabled]="assignmentForm.invalid" (clicked)="saveAssignment()" icon="pi pi-plus"></app-button>
+            }
+          </div>
+        </form>
       </div>
 
-      <div class="tab-content">
-        <!-- Assignments Header -->
-        <div class="assignments-header">
-          <div class="header-info">
-            <h5>Asignaciones Activas</h5>
-            <span class="assignments-count">{{ assignments().length }} empresa(s) asignada(s)</span>
-          </div>
-          <button class="add-assignment-btn" (click)="showAssignmentForm.set(true)">
-            <i class="pi pi-plus"></i> Agregar Asignación
-          </button>
+      <div class="assignments-section">
+        <div class="section-title">
+          <h5>Asignaciones Activas</h5>
+          <span class="badge">{{ assignments().length }}</span>
         </div>
 
-        <!-- Loading State -->
         @if (loading()) {
         <div class="loading-container">
           <div class="loading-spinner"></div>
           <p>Cargando asignaciones...</p>
         </div>
         }
-
-        <!-- Empty State -->
         @else if (assignments().length === 0) {
         <div class="empty-state">
           <div class="empty-icon">
             <i class="pi pi-building"></i>
           </div>
-          <h4>Sin asignaciones</h4>
-          <p>Este usuario no tiene empresas asignadas aún</p>
-          <button class="add-first-assignment-btn" (click)="showAssignmentForm.set(true)">
-            <i class="pi pi-plus"></i> Agregar Primera Asignación
-          </button>
+          <p>Este usuario no tiene empresas asignadas aún.</p>
         </div>
         }
-
-        <!-- Assignments List -->
         @else {
-        <div class="assignments-list">
+        <div class="assignments-grid">
           @for (assignment of assignments(); track assignment.id) {
-          <div class="assignment-card">
-            <div class="assignment-icon">
+          <div class="assignment-card" [class.editing]="editingAssignment?.id === assignment.id">
+            <div class="card-icon">
               <i class="pi pi-building"></i>
             </div>
-            <div class="assignment-info">
-              <h5 class="company-name">{{ assignment.companyName }}</h5>
-              <div class="assignment-details">
-                <span class="role-badge">
-                  <i class="pi pi-user"></i>
-                  {{ assignment.roleName }}
-                </span>
-                <!-- <span class="assignment-date">
-                  <i class="pi pi-calendar"></i>
-                  Asignado el {{ assignment.assignedDate | date:'dd/MM/yyyy' }}
-                </span> -->
+            <div class="card-content">
+              <div class="company-name">{{ assignment.nombreEmpresa }}</div>
+              <div class="role-tag">
+                <i class="pi pi-user-edit"></i>
+                {{ assignment.nombreRol }}
               </div>
             </div>
-            <div class="assignment-actions">
-              <button class="action-btn edit-btn" (click)="editAssignment(assignment)" title="Editar asignación">
+            <div class="card-actions">
+              <button class="btn-icon edit" (click)="editAssignment(assignment)" pTooltip="Editar rol">
                 <i class="pi pi-pencil"></i>
               </button>
-              <button class="action-btn delete-btn" (click)="deleteAssignment(assignment)" title="Eliminar asignación">
+              <button class="btn-icon delete" (click)="deleteAssignment(assignment)" pTooltip="Eliminar asignación">
                 <i class="pi pi-trash"></i>
               </button>
             </div>
@@ -130,64 +96,6 @@
   </div>
 
   <ng-template #footer>
-    <button class="close-btn" (click)="onHide()">Cerrar</button>
-  </ng-template>
-</p-dialog>
-
-<!-- Assignment Dialog -->
-<p-dialog [visible]="showAssignmentForm()" [modal]="true" [style]="{width:'500px'}" [draggable]="false" [closable]="false">
-
-  <ng-template #header>
-    <div class="dialog-header">
-      <div class="header-icon">
-        <i class="pi pi-plus"></i>
-      </div>
-      <div class="header-content">
-        <h3 class="title">{{ editingAssignment ? 'Editar' : 'Nueva' }} Asignación</h3>
-        <span class="subtitle">{{ editingAssignment ? 'Actualiza la' : 'Crea una nueva' }} asignación de empresa y rol</span>
-      </div>
-    </div>
-  </ng-template>
-
-  <form [formGroup]="assignmentForm" class="assignment-form">
-    <div class="form-row">
-      <label for="companyId">Empresa *</label>
-      <p-select id="companyId" [options]="companies()" formControlName="companyId" [appendTo]="'body'" [disabled]="loadingCompanies()" [placeholder]="loadingCompanies() ? 'Cargando empresas...' : 'Seleccione una empresa'">
-
-        <ng-template #selectedItem let-selectedOption>
-          @if (loadingCompanies()) {
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-spinner pi-spin"></i>
-            <span>Cargando...</span>
-          </div>
-          } @else {
-          <span>{{ selectedOption?.label }}</span>
-          }
-        </ng-template>
-      </p-select>
-    </div>
-
-    <div class="form-row">
-      <label for="roleId">Rol *</label>
-      <p-select id="roleId" [options]="roles()" formControlName="roleId" [appendTo]="'body'" [disabled]="loadingRoles()" [placeholder]="loadingRoles() ? 'Cargando roles...' : 'Seleccione un rol'">
-
-        <ng-template #selectedItem let-selectedOption>
-          @if (loadingRoles()) {
-          <div class="flex align-items-center gap-2">
-            <i class="pi pi-spinner pi-spin"></i>
-            <span>Cargando...</span>
-          </div>
-          } @else {
-          <span>{{ selectedOption?.label }}</span>
-          }
-        </ng-template>
-      </p-select>
-    </div>
-  </form>
-
-  <ng-template #footer>
-    <app-button preset="cancel" label="Cancelar" (clicked)="showAssignmentForm.set(false)"></app-button>
-    <app-button preset="save" label="{{ editingAssignment ? 'Actualizar' : 'Crear' }}" [disabled]="assignmentForm.invalid" (clicked)="saveAssignment()">
-    </app-button>
+    <button class="close-btn" (click)="onHide()">Cerrar Gestión</button>
   </ng-template>
 </p-dialog>

@@ -4,6 +4,7 @@ import { Observable, from, switchMap, tap, map, EMPTY } from 'rxjs';
 import { ApiResponse } from '@shared/domains/api-response.model';
 import { IndexedDbService } from '@shared/services/indexed-db.service';
 import { SidebarService } from '../../../layout/sidebar/services/sidebar.service';
+import { GeneralService } from '@shared/services/general.service';
 import { environment } from '@environments/environment';
 import { LoginRequest, LoginResponse, UserCompany } from '@core/models/auth.models';
 
@@ -15,6 +16,7 @@ export class AuthService {
   private readonly http          = inject(HttpClient);
   private readonly dbService     = inject(IndexedDbService);
   private readonly sidebarService = inject(SidebarService);
+  private readonly generalService = inject(GeneralService);
   private readonly apiUrl        = `${environment.apiUrl}/api/v1/auth`;
   private readonly AUTH_KEY      = 'auth_session';
 
@@ -88,7 +90,10 @@ export class AuthService {
 
   logout(): Observable<void> {
     return from(this.sidebarService.clearCache()).pipe(
-      switchMap(() => from(this.dbService.remove(this.AUTH_KEY))),
+      switchMap(() => {
+        this.generalService.clearCache();
+        return from(this.dbService.clear());
+      }),
       tap(() => this._session.set(null))
     );
   }

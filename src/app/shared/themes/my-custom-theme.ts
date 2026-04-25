@@ -5,6 +5,8 @@ import { SelectPreset } from "./presets/select.preset";
 import { FloatLabelPreset } from "./presets/floatlabel.preset";
 import { InputTextPreset } from "./presets/inputtext.preset";
 import { InputNumberPreset } from "./presets/inputnumber.preset";
+import { DatatablePreset } from "./presets/datatable.preset";
+import { PaginatorPreset } from "./presets/paginator.preset";
 
 
 export const MyPreset = definePreset(Aura, {
@@ -49,24 +51,8 @@ export const MyPreset = definePreset(Aura, {
         inputtext: InputTextPreset,
         textarea: InputTextPreset,
         inputnumber: InputNumberPreset,
-
-        table: {
-            header: {
-                background: '{surface.50}',
-                borderColor: '{surface.200}',
-                color: '{surface.700}',
-                padding: '0.75rem 1rem'
-            },
-            body: {
-                padding: '0.75rem 1rem'
-            },
-            row: {
-                hoverBackground: '{primary.50}',
-                color: '{surface.700}'
-            }
-        },
+        datatable: DatatablePreset,
+        paginator: PaginatorPreset,
         card: {},
-
-
     }
 });

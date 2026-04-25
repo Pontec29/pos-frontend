@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Usuarios</h6>
-            <p class="subtitle">Administre las cuentas de usuario y sus niveles de acceso al sistema.</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nuevo Usuario" (clicked)="openNew()"></app-button>
@@ -26,8 +25,8 @@
                 </div>
             </div>
 
-            <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="id">
+            <div class="table-section__main-table" [class.table-loading]="loading()">
+                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [stripedRows]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="id">
                     <ng-template pTemplate="header">
                         <tr>
                             @if (isSelected('id')) {
@@ -36,16 +35,19 @@
                             @if (isSelected('username')) {
                             <th pSortableColumn="username">Usuario <p-sortIcon field="username"></p-sortIcon></th>
                             }
-                            @if (isSelected('firstName')) {
+                            @if (isSelected('nombres')) {
                             <th pSortableColumn="nombres">Nombre <p-sortIcon field="nombres"></p-sortIcon></th>
                             }
-                            @if (isSelected('lastName')) {
+                            @if (isSelected('apellidos')) {
                             <th pSortableColumn="apellidos">Apellido <p-sortIcon field="apellidos"></p-sortIcon></th>
                             }
                             @if (isSelected('email')) {
                             <th>Correo</th>
                             }
-                            @if (isSelected('active')) {
+                            @if (isSelected('empresas')) {
+                            <th>Empresas</th>
+                            }
+                            @if (isSelected('activo')) {
                             <th style="width: 8rem" class="text-center">Estado</th>
                             }
                             @if (isSelected('actions')) {
@@ -53,7 +55,7 @@
                             }
                         </tr>
                     </ng-template>
- 
+
                     <ng-template pTemplate="body" let-u let-rowIndex="rowIndex">
                         <tr>
                             @if (isSelected('id')) {
@@ -72,16 +74,27 @@
                                 </div>
                             </td>
                             }
-                            @if (isSelected('firstName')) {
+                            @if (isSelected('nombres')) {
                             <td>{{ u.nombres }}</td>
                             }
-                            @if (isSelected('lastName')) {
+                            @if (isSelected('apellidos')) {
                             <td>{{ u.apellidos }}</td>
                             }
                             @if (isSelected('email')) {
                             <td>{{ u.email }}</td>
                             }
-                            @if (isSelected('active')) {
+                            @if (isSelected('empresas')) {
+                            <td>
+                                <div class="flex flex-wrap gap-1">
+                                    @for (emp of u.empresas; track emp) {
+                                    <p-tag [value]="emp" [rounded]="true" severity="secondary" class="company-tag"></p-tag>
+                                    } @empty {
+                                    <span class="text-sm text-gray-400">Sin empresas</span>
+                                    }
+                                </div>
+                            </td>
+                            }
+                            @if (isSelected('activo')) {
                             <td class="text-center">
                                 <p-tag [value]="u.activo ? 'Activo' : 'Inactivo'" [severity]="u.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>
@@ -95,8 +108,8 @@
                                     <button class="action-buttons--edit" (click)="editUser(u)" pTooltip="Editar" tooltipPosition="top">
                                         <i class="pi pi-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--delete" (click)="toggleUserStatus(u)" [pTooltip]="u.active ? 'Desactivar' : 'Activar'" tooltipPosition="top">
-                                        <i [class]="u.active ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i>
+                                    <button class="action-buttons--delete" (click)="toggleUserStatus(u)" [pTooltip]="u.activo ? 'Desactivar' : 'Activar'" tooltipPosition="top">
+                                        <i [class]="u.activo ? 'pi pi-eye-slash' : 'pi pi-eye'" aria-hidden="true"></i>
                                     </button>
                                     <button class="action-buttons--delete" (click)="remove(u)" pTooltip="Eliminar" tooltipPosition="top">
                                         <i class="pi pi-trash" aria-hidden="true"></i>
@@ -140,21 +153,17 @@
                 </p-table>
             </div>
 
-            <div class="table-section__footer-paginated">
-                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows2()" [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
-                </p-paginator>
-            </div>
+            <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows2()" [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [appendTo]="'body'" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+            </p-paginator>
         </div>
     </section>
 </div>
 
 @if (showDialog()) {
-    @if (modalData()) {
-        <app-modal-form 
-            [data]="modalData()!" 
-            (closed)="onModalClosed($event)">
-        </app-modal-form>
-    }
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)">
+</app-modal-form>
+}
 }
 
 <app-user-assignments [visible]="showAssignmentsDialog()" [selectedUser]="selectedUserForAssignments" (visibleChange)="showAssignmentsDialog.set($event)">

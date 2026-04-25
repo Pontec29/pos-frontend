@@ -28,40 +28,19 @@ export class UserService {
     }
 
     createUser(user: Partial<User>): Observable<ApiResponse<User>> {
-        // Prepare user data for API
-        const createData = {
-            username: user.username,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            documentType: user.documentType,
-            documentNumber: user.documentNumber,
-            phone: user.phone,
-            password: user.password,
-            active: user.active
-        };
-        return this.http.post<ApiResponse<User>>(this.apiUrl, createData, { headers: this.getHeaders() });
+        // Enviar directamente el objeto con llaves en español
+        return this.http.post<ApiResponse<User>>(this.apiUrl, user, { headers: this.getHeaders() });
     }
 
     updateUser(id: number, user: Partial<User>): Observable<ApiResponse<User>> {
-        // Prepare user data for API
-        const updateData: any = {
-            username: user.username,
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            documentType: user.documentType,
-            documentNumber: user.documentNumber,
-            phone: user.phone,
-            active: user.active
-        };
-
-        // Only include password if it's provided and not empty
-        if (user.password) {
-            updateData.password = user.password;
+        // Enviar directamente el objeto con llaves en español
+        // Solo nos aseguramos de no enviar password vacío si no se cambió
+        const payload = { ...user };
+        if (payload.password === '') {
+            delete payload.password;
         }
 
-        return this.http.put<ApiResponse<User>>(`${this.apiUrl}/${id}`, updateData, { headers: this.getHeaders() });
+        return this.http.put<ApiResponse<User>>(`${this.apiUrl}/${id}`, payload, { headers: this.getHeaders() });
     }
 
     activateUser(id: number): Observable<ApiResponse<null>> {

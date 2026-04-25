@@ -49,12 +49,12 @@ export class FormUsuarioComponent implements OnInit {
     username: ['', Validators.required],
     email: ['', [Validators.required, Validators.email]],
     password: [''],
-    firstName: ['', Validators.required],
-    lastName: ['', Validators.required],
-    documentType: ['dni', Validators.required],
-    documentNumber: ['', Validators.required],
-    phone: [''],
-    active: [true]
+    nombres: ['', Validators.required],
+    apellidos: ['', Validators.required],
+    tipoDocumento: ['dni', Validators.required],
+    nroDocumento: ['', Validators.required],
+    telefono: [''],
+    activo: [true]
   });
 
   constructor() {
@@ -65,12 +65,12 @@ export class FormUsuarioComponent implements OnInit {
           id: selectedUser.id,
           username: selectedUser.username,
           email: selectedUser.email,
-          firstName: selectedUser.firstName || selectedUser.nombres,
-          lastName: selectedUser.lastName || selectedUser.apellidos,
-          documentType: selectedUser.documentType || selectedUser.tipoDocumento || 'dni',
-          documentNumber: selectedUser.documentNumber || selectedUser.nroDocumento,
-          phone: selectedUser.phone || selectedUser.telefono,
-          active: selectedUser.active ?? selectedUser.activo ?? true,
+          nombres: selectedUser.nombres,
+          apellidos: selectedUser.apellidos,
+          tipoDocumento: selectedUser.tipoDocumento,
+          nroDocumento: selectedUser.nroDocumento,
+          telefono: selectedUser.telefono,
+          activo: selectedUser.activo,
           password: ''
         });
 
@@ -102,7 +102,7 @@ export class FormUsuarioComponent implements OnInit {
 
   onDocumentTypeChange(code: string): void {
     const documentType = this.documentTypes().find(t => t.code === code);
-    const documentNumberControl = this.form.get('documentNumber');
+    const documentNumberControl = this.form.get('nroDocumento');
 
     if (documentNumberControl && documentType) {
       const validators = [Validators.required];
@@ -161,12 +161,12 @@ export class FormUsuarioComponent implements OnInit {
       username: '',
       email: '',
       password: '',
-      firstName: '',
-      lastName: '',
-      documentType: 'dni',
-      documentNumber: '',
-      phone: '',
-      active: true
+      nombres: '',
+      apellidos: '',
+      tipoDocumento: 'dni',
+      nroDocumento: '',
+      telefono: '',
+      activo: true
     });
     this.form.markAsPristine();
   }

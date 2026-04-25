@@ -12,13 +12,8 @@ export interface User {
     activo: boolean;
     fechaCreacion?: string;
 
-    // Campos utilizados en el frontend / lógica previa
-    firstName?: string | null;
-    lastName?: string | null;
-    active?: boolean;
-    documentType?: string;
-    documentNumber?: string;
-    phone?: string;
+    // Campos adicionales
     companyId?: number;
     companyName?: string | null;
+    empresas?: string[];
 }

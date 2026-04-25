@@ -6,7 +6,7 @@ import { ApiResponse } from '@shared/domains/api-response.model';
 import {
   UserAssignment,
   CreateAssignmentRequest
-} from '../../../../core/models/user-assignment.models';
+} from '../components/user-assignments/user-assignments';
 
 @Injectable({
   providedIn: 'root'
