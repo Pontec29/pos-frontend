@@ -17,7 +17,7 @@ export class ComprasAdapter {
     };
   }
 
-  static adaptToCreate(form: CompraCrear): CompraUpsertDto {
+  static adaptToCreate(form: CompraCrear | any): CompraUpsertDto {
     return {
       almacenId: form.ID_ALMACEN,
       proveedorId: form.ID_PROVEEDOR,
@@ -30,7 +30,8 @@ export class ComprasAdapter {
       monedaId: form.ID_MONEDA,
       tipoCambio: form.TIPO_CAMBIO,
       observaciones: form.OBSERVACIONES,
-      detalles: form.DETALLES.map(d => ({
+      generaIngreso: form.GENERA_INGRESO,
+      detalles: form.DETALLES.map((d: any) => ({
         productoId: d.ID_PRODUCTO,
         afectacionIgvId: d.ID_AFECTACION_IGV,
         cantidad: d.CANTIDAD,

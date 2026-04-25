@@ -7,7 +7,6 @@
                 <div class="erp-card erp-header-card">
                     <div class="header-info">
                         <h1 class="header-title">Registro de Compra</h1>
-                        <p class="text-sm text-muted">Ingreso de mercadería por compra a proveedor</p>
                     </div>
 
                     <div class="header-actions">
@@ -20,191 +19,171 @@
                                 <input type="radio" value="03" formControlName="ID_TIPO_COMPROBANTE">
                                 <span>Boleta</span>
                             </label>
-                            <label class="radio-option">
+                            <label hidden class="radio-option">
                                 <input type="radio" value="07" formControlName="ID_TIPO_COMPROBANTE">
                                 <span>N. Crédito</span>
                             </label>
                         </div>
 
-                        <div class="correlative-inputs">
-                            <div class="input-group">
-                                <span class="box-label">Serie</span>
-                                <input pInputText formControlName="SERIE" placeholder="F001" maxlength="4" class="header-input serie">
+                        <div class="document-id-container">
+                            <div class="document-icon">
+                                <i class="pi pi-hashtag"></i>
                             </div>
-                            <div class="input-divider">-</div>
-                            <div class="input-group">
-                                <span class="box-label">Número</span>
-                                <input pInputText formControlName="NUMERO" placeholder="000123" maxlength="10" class="header-input correlative">
+                            <div class="document-inputs">
+                                <div class="input-field serie-field">
+                                    <span class="field-label">Serie</span>
+                                    <input pInputText formControlName="SERIE" placeholder="F001" maxlength="4" class="document-input">
+                                </div>
+                                <div class="field-separator"></div>
+                                <div class="input-field number-field">
+                                    <span class="field-label">Número</span>
+                                    <input pInputText formControlName="NUMERO" placeholder="00000000" maxlength="10" class="document-input">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="erp-card">
-                    <div class="section-header">
-                        <i class="pi pi-truck"></i>
-                        <h2 class="section-title">Datos del Proveedor</h2>
-                    </div>
 
                     <div class="row items-end">
-                        <div class="col-12 col-md-9 form-field">
-                            <label><i class="pi pi-briefcase mr-1"></i> Proveedor (Razón Social o RUC)</label>
-                            <p-autoComplete 
-                                [ngModel]="selectedSupplier()" 
-                                (ngModelChange)="selectedSupplier.set($event)"
-                                [ngModelOptions]="{standalone: true}"
-                                [suggestions]="filteredSuppliers()" 
-                                (completeMethod)="filterSuppliers($event)" 
-                                field="businessName" 
-                                (onSelect)="onSupplierSelect($event.value)"
-                                placeholder="Buscar proveedor por nombre o RUC..." 
-                                [forceSelection]="true"
-                                fluid>
+                        <div class="col-6 col-md-6 form-field">
+                            <label>Proveedor (Razón Social o RUC)</label>
+                            <p-autoComplete [ngModel]="selectedSupplier()" (ngModelChange)="selectedSupplier.set($event)" [ngModelOptions]="{standalone: true}" [suggestions]="filteredSuppliers()" (completeMethod)="filterSuppliers($event)" optionLabel="businessName" (onSelect)="onSupplierSelect($event)" placeholder="Buscar proveedor por nombre o RUC..." [forceSelection]="true" fluid>
                             </p-autoComplete>
                         </div>
 
-                        <div class="col-12 col-md-3 form-field">
-                            <label><i class="pi pi-money-bill mr-1"></i> Moneda</label>
+                        <div class="col-6 col-md-3 form-field">
+                            <label>Moneda</label>
                             <p-select formControlName="ID_MONEDA" [options]="currencies" optionLabel="label" optionValue="value" placeholder="Moneda" fluid></p-select>
                         </div>
 
-                        <div class="col-12 col-md-6 form-field">
-                            <label><i class="pi pi-briefcase mr-1"></i> Tipo de Operación (SUNAT)</label>
+                        <div class="col-6 col-md-3 form-field">
+                            <label>Tipo de Operación (SUNAT)</label>
                             <p-select formControlName="ID_TIPO_OPERACION" [options]="tiposOperacion()" optionLabel="descripcion" optionValue="id" placeholder="Seleccione Op." fluid></p-select>
                         </div>
-                    </div>
 
-                    <div class="row mt-3 items-end">
-                        <div class="col-12 col-md-3 form-field">
-                            <label><i class="pi pi-calendar mr-1"></i> Fecha Emisión</label>
+                        <div class="col-6 col-md-2 form-field">
+                            <label>Tipo de Cambio</label>
+                            <p-inputnumber formControlName="TIPO_CAMBIO" mode="decimal" [minFractionDigits]="3" fluid></p-inputnumber>
+                        </div>
+                        <div class="col-6 col-md-2 form-field">
+                            <label>Fecha Emisión</label>
                             <p-datepicker formControlName="FECHA_EMISION" [showIcon]="true" dateFormat="dd/mm/yy" fluid></p-datepicker>
                         </div>
-                        <div class="col-12 col-md-3 form-field">
-                            <label><i class="pi pi-calendar-times mr-1"></i> Fecha Vencimiento</label>
+                        <div class="col-6 col-md-2 form-field">
+                            <label>Fecha Vencimiento</label>
                             <p-datepicker formControlName="FECHA_VENCIMIENTO" [showIcon]="true" dateFormat="dd/mm/yy" fluid></p-datepicker>
                         </div>
                         <div class="col-12 col-md-6 form-field">
-                            <label><i class="pi pi-pencil mr-1"></i> Observaciones</label>
+                            <label>Observaciones</label>
                             <input pInputText formControlName="OBSERVACIONES" placeholder="Notas adicionales sobre la compra..." class="w-full">
                         </div>
                     </div>
                 </div>
 
-                <div class="erp-card">
-                    <div class="section-header">
-                        <i class="pi pi-plus-circle"></i>
-                        <h3 class="section-title">Detalle de Productos</h3>
-                    </div>
-
-                    <div class="form-grid items-end mb-2">
-                        <div class="col-12 col-md-4 form-field">
-                            <label><i class="pi pi-box mr-1"></i> Producto</label>
-                            <p-autoComplete 
-                                [ngModel]="newProduct()" 
-                                (ngModelChange)="newProduct.set($event)"
-                                [ngModelOptions]="{standalone: true}"
-                                [suggestions]="filteredProducts()" 
-                                (completeMethod)="filterProducts($event)" 
-                                field="name" 
-                                placeholder="Nombre o código del producto" 
-                                fluid>
+                <div class="erp-card product-selector-card">
+                    <div class="selector-grid">
+                        <div class="field-group product-field">
+                            <label>Producto</label>
+                            <p-autoComplete formControlName="TEMP_PRODUCTO" [suggestions]="filteredProducts()" (completeMethod)="filterProducts($event)" optionLabel="name" placeholder="Buscar producto..." [forceSelection]="true" fluid>
                             </p-autoComplete>
                         </div>
-                        
-                        <div class="col-12 col-md-3 form-field">
-                            <label><i class="pi pi-info-circle mr-1"></i> Afectación IGV</label>
-                            <p-select [ngModel]="newAfectacion()" (ngModelChange)="newAfectacion.set($event)" [ngModelOptions]="{standalone: true}" [options]="afectacionesIgv()" optionLabel="descripcion" placeholder="Afectación" fluid></p-select>
+
+                        <div class="field-group afectacion-field">
+                            <label>Afectación IGV</label>
+                            <p-select formControlName="TEMP_AFECTACION" [options]="afectacionesIgv()" optionLabel="descripcion" placeholder="Seleccionar..." fluid>
+                            </p-select>
                         </div>
-                    </div>
 
-                    <div class="form-grid items-end mb-2">
-
-                        <div class="col-6 col-md-2 form-field">
-                            <label><i class="pi pi-tag mr-1"></i> Cantidad</label>
-                            <p-inputNumber 
-                                [ngModel]="newQuantity()" 
-                                (ngModelChange)="newQuantity.set($event)"
-                                [ngModelOptions]="{standalone: true}" 
-                                [min]="0.01" placeholder="0.00" fluid>
+                        <div class="field-group quantity-field">
+                            <label>Cantidad</label>
+                            <p-inputNumber formControlName="TEMP_CANTIDAD" [min]="0.01" placeholder="0.00" fluid>
                             </p-inputNumber>
                         </div>
 
-                        <div class="col-6 col-md-2 form-field">
-                            <label><i class="pi pi-money-bill mr-1"></i> Costo Unit.</label>
-                            <p-inputNumber 
-                                [ngModel]="newUnitCost()" 
-                                (ngModelChange)="newUnitCost.set($event)"
-                                [ngModelOptions]="{standalone: true}" 
-                                [min]="0" mode="decimal" [minFractionDigits]="2" placeholder="0.00" fluid>
+                        <div class="field-group cost-field">
+                            <label>Costo Unitario</label>
+                            <p-inputNumber formControlName="TEMP_COSTO" [min]="0.001" placeholder="0.00" mode="decimal" [minFractionDigits]="2" fluid>
                             </p-inputNumber>
                         </div>
 
-                        <div class="col-6 col-md-2 form-field">
-                            <label><i class="pi pi-info-circle mr-1"></i> Lote</label>
-                            <input pInputText 
-                                [ngModel]="newLotCode()" 
-                                (ngModelChange)="newLotCode.set($event)"
-                                [ngModelOptions]="{standalone: true}" 
-                                placeholder="ABC-123" class="w-full">
-                        </div>
-
-                        <div class="col-6 col-md-2 form-field">
-                            <button pButton type="button" icon="pi pi-plus" label="Agregar" (click)="addLine()" [disabled]="!newProduct() || !newQuantity() || !newUnitCost()" class="btn-add-item w-full"></button>
+                        <div class="field-group action-field">
+                            <button pButton type="button" icon="pi pi-plus" label="Agregar" (click)="addLine()" [disabled]="!form.get('TEMP_PRODUCTO')?.value || !form.get('TEMP_CANTIDAD')?.value || !form.get('TEMP_COSTO')?.value" class="btn-add-item w-full">
+                            </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="erp-card erp-table-container">
-                    <table class="erp-table">
-                        <thead>
+                <div class="erp-card erp-table-card">
+                    <p-table [value]="detailsControls" [formGroup]="form" responsiveLayout="scroll" [scrollable]="true" scrollHeight="400px" styleClass="p-datatable-sm erp-prime-table">
+
+                        <ng-template pTemplate="header">
                             <tr>
-                                <th class="text-center" style="width: 50px;">#</th>
+                                <th class="text-center" style="width: 40px;">#</th>
                                 <th>Producto</th>
                                 <th class="text-center" style="width: 100px;">Cant.</th>
                                 <th class="text-right" style="width: 120px;">Costo Unit.</th>
-                                <th class="text-right" style="width: 120px;">Subtotal</th>
-                                <th class="text-center" style="width: 150px;">Operación</th>
+                                <th class="text-right" style="width: 120px;">Subtotal (s/ IGV)</th>
                                 <th class="text-right" style="width: 100px;">I.G.V.</th>
                                 <th class="text-right" style="width: 120px;">Total</th>
-                                <th class="action-col" style="width: 60px;"></th>
+                                <th class="text-center" style="width: 120px;">Operación</th>
+                                <th class="text-center" style="width: 50px;"></th>
                             </tr>
-                        </thead>
-                        <tbody>
-                            <tr *ngFor="let item of detailsControls; let i = index">
-                                <td class="text-center text-muted">{{ i + 1 }}</td>
-                                <td>
-                                    <span class="product-name font-medium">{{ item.get('PRODUCTO_NOMBRE')?.value }}</span>
-                                    <div class="flex gap-2 mt-1">
-                                        <small class="text-muted" *ngIf="item.get('CODIGO_LOTE')?.value">Lote: {{ item.get('CODIGO_LOTE')?.value }}</small>
-                                        <small class="text-muted" *ngIf="item.get('FECHA_VENCIMIENTO')?.value">Venc: {{ item.get('FECHA_VENCIMIENTO')?.value | date: 'dd/MM/yy' }}</small>
+                        </ng-template>
+
+                        <ng-template pTemplate="body" let-item let-ri="rowIndex">
+                            <ng-container formArrayName="DETALLES">
+                                <tr [formGroupName]="ri">
+                                    <td class="text-center text-muted text-xs">{{ ri + 1 }}</td>
+                                    <td>
+                                        <div class="product-info">
+                                            <span class="product-name font-bold">{{ item.get('PRODUCTO_NOMBRE')?.value }}</span>
+                                            <small class="text-muted block" *ngIf="item.get('CODIGO_LOTE')?.value">
+                                                Lote: {{ item.get('CODIGO_LOTE')?.value }}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <p-inputNumber formControlName="CANTIDAD" (onInput)="updateRowTotals(ri)" [min]="0.01" [showButtons]="false" class="table-input" fluid>
+                                        </p-inputNumber>
+                                    </td>
+                                    <td>
+                                        <p-inputNumber formControlName="VALOR_UNITARIO" (onInput)="updateRowTotals(ri)" [min]="0" mode="decimal" [minFractionDigits]="2" [maxFractionDigits]="4" class="table-input" fluid>
+                                        </p-inputNumber>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="font-medium">{{ item.get('SUBTOTAL')?.value | number:'1.2-2' }}</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="text-muted">{{ item.get('IGV')?.value | number:'1.2-2' }}</span>
+                                    </td>
+                                    <td class="text-right">
+                                        <span class="font-bold text-primary">{{ item.get('TOTAL')?.value | number:'1.2-2' }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="op-badge">{{ item.get('AFECTACION_NOMBRE')?.value }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn-delete-row" type="button" (click)="removeLine(ri)" title="Eliminar línea">
+                                            <i class="pi pi-times"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            </ng-container>
+                        </ng-template>
+
+                        <ng-template pTemplate="emptymessage">
+                            <tr>
+                                <td colspan="9" class="text-center py-8 text-muted">
+                                    <div class="empty-state">
+                                        <i class="pi pi-shopping-cart text-4xl mb-3 opacity-20"></i>
+                                        <p>No hay productos en esta compra</p>
                                     </div>
                                 </td>
-                                <td class="text-center">
-                                    <span class="font-medium">{{ item.get('CANTIDAD')?.value | number:'1.2-2' }}</span>
-                                </td>
-                                <td class="text-right">
-                                    {{ item.get('VALOR_UNITARIO')?.value | number:'1.2-2' }}
-                                </td>
-                                <td class="text-right">{{ item.get('SUBTOTAL')?.value | number:'1.2-2' }}</td>
-                                <td class="text-center">
-                                    <span class="text-xs px-2 py-1 bg-gray-100 rounded border">{{ item.get('AFECTACION_NOMBRE')?.value }}</span>
-                                </td>
-                                <td class="text-right text-muted">{{ item.get('IGV')?.value | number:'1.2-2' }}</td>
-                                <td class="text-right font-bold">{{ item.get('TOTAL')?.value | number:'1.2-2' }}</td>
-                                <td class="text-center">
-                                    <button class="btn-delete" type="button" (click)="removeLine(i)">
-                                        <i class="pi pi-trash"></i>
-                                    </button>
-                                </td>
                             </tr>
-                            <tr *ngIf="detalles.length === 0">
-                                <td colspan="8" class="text-center py-5 text-muted">
-                                    <i class="pi pi-shopping-cart text-3xl block mb-2 opacity-20"></i>
-                                    No hay productos agregados a la compra
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        </ng-template>
+                    </p-table>
                 </div>
             </div>
 
@@ -246,29 +225,30 @@
                     </div>
                 </div>
 
-                <div class="erp-card">
-                    <div class="section-header mb-3">
-                        <h3 class="section-title">Información Adicional</h3>
+                <div class="erp-card warehouse-config-card">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex flex-col">
+                            <span class="font-bold text-sm">Generar Nota de Entrada</span>
+                            <small class="text-muted">Afectar stock automáticamente</small>
+                        </div>
+                        <p-toggleSwitch formControlName="GENERA_INGRESO"></p-toggleSwitch>
                     </div>
-                    <div class="form-grid">
-                        <div class="col-12 form-field">
+
+                    <div class="form-grid" *ngIf="form.get('GENERA_INGRESO')?.value">
+                        <div class="col-12 form-field mb-2">
                             <label>Almacén de Destino</label>
                             <p-select [options]="[{label: 'Almacén Principal', value: 1}]" formControlName="ID_ALMACEN" fluid></p-select>
                         </div>
-                        <div class="col-12 form-field mt-3">
-                            <label>Tipo de Cambio</label>
-                            <p-inputnumber formControlName="TIPO_CAMBIO" mode="decimal" [minFractionDigits]="3" fluid></p-inputnumber>
+                        
+                        <div class="col-12 mt-2">
+                            <div class="info-badge">
+                                <i class="pi pi-info-circle"></i>
+                                <span>La serie y número correlativo se generarán automáticamente por el sistema.</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="sunat-alert">
-                    <i class="pi pi-info-circle"></i>
-                    <div>
-                        <strong>Validación</strong>
-                        <p class="mt-1">Asegúrese de que los datos del comprobante coincidan con el documento físico o XML del proveedor.</p>
-                    </div>
-                </div>
             </div>
         </div>
     </form>

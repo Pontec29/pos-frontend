@@ -1,6 +1,6 @@
 import { Component, inject, input, signal, computed, OnInit } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { PRIMENG_FILTER_MODULES, PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
-import { AppButton } from "@shared/ui/button";
 import { CompraUpsertDto } from '@compras/domain/compras.dto';
 import { CompraCrear, TipoOperacion, SunatAfectacionIgv } from '@compras/domain/compras.interface';
 import { ComprasService } from '@compras/service/compras.service';
@@ -62,14 +62,6 @@ export default class NuevaCompra implements OnInit {
   filteredProducts = signal<any[]>([]);
   selectedSupplier = signal<any | null>(null);
 
-  // ! VARIABLES PARA AGREGAR PRODUCTO (NO SON PARTE DEL FORM GROUP PRINCIPAL)
-  newProduct = signal<any | null>(null);
-  newQuantity = signal<number | null>(null);
-  newUnitCost = signal<number | null>(null);
-  newAfectacion = signal<SunatAfectacionIgv | null>(null);
-  newLotCode = signal<string>('');
-  newExpirationDate = signal<Date | null>(null);
-
   // ! FORMULARIO REACTIVO
   form = this.fb.group({
     ID_ALMACEN: [1, [Validators.required]], // Default almacén 1
@@ -83,6 +75,18 @@ export default class NuevaCompra implements OnInit {
     ID_MONEDA: ['PEN', [Validators.required]],
     TIPO_CAMBIO: [1, [Validators.required, Validators.min(0.001)]],
     OBSERVACIONES: [''],
+    
+    // CONFIGURACIÓN DE INGRESO A ALMACÉN
+    GENERA_INGRESO: [true],
+
+    // CAMPOS TEMPORALES PARA AGREGAR PRODUCTO
+    TEMP_PRODUCTO: [null as any | null],
+    TEMP_CANTIDAD: [null as number | null],
+    TEMP_COSTO: [null as number | null],
+    TEMP_AFECTACION: [null as SunatAfectacionIgv | null],
+    TEMP_LOTE: [''],
+    TEMP_VENCIMIENTO: [null as Date | null],
+
     DETALLES: this.fb.array([], [Validators.required, Validators.minLength(1)])
   });
 
@@ -95,7 +99,6 @@ export default class NuevaCompra implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.tiposOperacion.set(res.data);
-          // Set default if available
           if (res.data.length > 0) {
             this.form.patchValue({ ID_TIPO_OPERACION: res.data[0].id });
           }
@@ -107,10 +110,9 @@ export default class NuevaCompra implements OnInit {
       next: (res) => {
         if (res.success && res.data) {
           this.afectacionesIgv.set(res.data);
-          // Set default for new product
           if (res.data.length > 0) {
             const defaultAfectacion = res.data.find(a => a.codigoSunat === '10') || res.data[0];
-            this.newAfectacion.set(defaultAfectacion);
+            this.form.patchValue({ TEMP_AFECTACION: defaultAfectacion });
           }
         }
       }
@@ -126,24 +128,25 @@ export default class NuevaCompra implements OnInit {
     return this.detalles.controls as FormGroup[];
   }
 
+  // ! REATIVIDAD PARA TOTALES
+  private formValue = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+
   // ! CALCULOS COMPUTADOS
   subtotalGeneral = computed(() => {
-    // Implementar lógica si es necesario, o usar valores del form
-    const detalles = this.form.value.DETALLES as any[];
+    const detalles = this.formValue()?.DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => acc + (curr.SUBTOTAL || 0), 0);
   });
 
   igvTotal = computed(() => {
-    const detalles = this.form.value.DETALLES as any[];
+    const detalles = this.formValue()?.DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => acc + (curr.IGV || 0), 0);
   });
 
   totalGeneral = computed(() => {
-    const detalles = this.form.value.DETALLES as any[];
+    const detalles = this.formValue()?.DETALLES as any[];
     if (!detalles) return 0;
-    // El total general solo suma lo que NO es gratuito
     return detalles.reduce((acc, curr) => {
       const isGratuito = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV)?.esBonificacion;
       return acc + (isGratuito ? 0 : (curr.TOTAL || 0));
@@ -151,7 +154,7 @@ export default class NuevaCompra implements OnInit {
   });
 
   opGratuita = computed(() => {
-    const detalles = this.form.value.DETALLES as any[];
+    const detalles = this.formValue()?.DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => {
       const isGratuito = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV)?.esBonificacion;
@@ -160,7 +163,7 @@ export default class NuevaCompra implements OnInit {
   });
 
   noGravado = computed(() => {
-    const detalles = this.form.value.DETALLES as any[];
+    const detalles = this.formValue()?.DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => {
       const afectacion = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV);
@@ -216,30 +219,20 @@ export default class NuevaCompra implements OnInit {
 
   // ! AGREGAR Y ELIMINAR LINEAS
   addLine() {
-    const product = this.newProduct();
-    const quantity = this.newQuantity();
-    const cost = this.newUnitCost();
+    const values = this.form.value;
+    const product = values.TEMP_PRODUCTO;
+    const quantity = values.TEMP_CANTIDAD;
+    const cost = values.TEMP_COSTO;
+    const afectacion = values.TEMP_AFECTACION;
 
-    if (!product || !quantity || !cost) {
+    if (!product || !quantity || !cost || !afectacion) {
       this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Complete los datos del producto' });
       return;
     }
 
-    const afectacion = this.newAfectacion();
-
-    if (!afectacion) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Seleccione una afectación de IGV' });
-      return;
-    }
-
-    // Cálculos basados en afectación
-    const igvPercent = product.igv || 18;
+    const igvPercent = 18;
     const aplicaIgv = afectacion.aplicaIgv;
-
-    // Si aplica IGV, el costo es el valor unitario (base)
-    // Si no aplica, el costo es el precio total de línea dividido por cantidad? 
-    // Usualmente el usuario ingresa el Valor Unitario (sin IGV)
-    const subtotal = quantity * cost;
+    const subtotal = (quantity || 0) * (cost || 0);
     const igv = aplicaIgv ? (subtotal * (igvPercent / 100)) : 0;
     const total = subtotal + igv;
 
@@ -251,10 +244,10 @@ export default class NuevaCompra implements OnInit {
       CANTIDAD: [quantity, [Validators.required, Validators.min(0.01)]],
       ID_UNIDAD: [product.unitId || 1, [Validators.required]],
       VALOR_UNITARIO: [cost, [Validators.required]],
-      PRECIO_UNITARIO: [cost * (aplicaIgv ? (1 + igvPercent / 100) : 1)],
+      PRECIO_UNITARIO: [(cost || 0) * (aplicaIgv ? (1 + igvPercent / 100) : 1)],
       PORCENTAJE_IGV: [igvPercent, [Validators.required]],
-      CODIGO_LOTE: [this.newLotCode()],
-      FECHA_VENCIMIENTO: [this.newExpirationDate()],
+      CODIGO_LOTE: [values.TEMP_LOTE || ''],
+      FECHA_VENCIMIENTO: [values.TEMP_VENCIMIENTO],
       SUBTOTAL: [subtotal],
       IGV: [igv],
       TOTAL: [total]
@@ -262,16 +255,45 @@ export default class NuevaCompra implements OnInit {
 
     this.detalles.push(detalleGroup);
 
-    // Reset fields
-    this.newProduct.set(null);
-    this.newQuantity.set(null);
-    this.newUnitCost.set(null);
-    this.newLotCode.set('');
-    this.newExpirationDate.set(null);
+    // Reset fields en el form
+    this.form.patchValue({
+      TEMP_PRODUCTO: null,
+      TEMP_CANTIDAD: null,
+      TEMP_COSTO: null,
+      TEMP_LOTE: '',
+      TEMP_VENCIMIENTO: null
+    });
+
+    this.form.get('DETALLES')?.updateValueAndValidity({ emitEvent: true });
   }
 
   removeLine(index: number) {
     this.detalles.removeAt(index);
+  }
+
+  updateRowTotals(index: number) {
+    const row = this.detalles.at(index) as FormGroup;
+    const quantity = row.get('CANTIDAD')?.value || 0;
+    const cost = row.get('VALOR_UNITARIO')?.value || 0;
+    const afectacionId = row.get('ID_AFECTACION_IGV')?.value;
+    const afectacion = this.afectacionesIgv().find(a => a.id === afectacionId);
+
+    const igvPercent = row.get('PORCENTAJE_IGV')?.value || 18;
+    const aplicaIgv = afectacion?.aplicaIgv ?? true;
+
+    const subtotal = quantity * cost;
+    const igv = aplicaIgv ? (subtotal * (igvPercent / 100)) : 0;
+    const total = subtotal + igv;
+
+    row.patchValue({
+      SUBTOTAL: subtotal,
+      IGV: igv,
+      TOTAL: total,
+      PRECIO_UNITARIO: cost * (aplicaIgv ? (1 + igvPercent / 100) : 1)
+    }, { emitEvent: false });
+
+    // Forzar actualización de señales computadas
+    this.form.get('DETALLES')?.updateValueAndValidity();
   }
 
   cancel() {

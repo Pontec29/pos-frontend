@@ -32,6 +32,10 @@ export interface CompraUpsertDto {
   monedaId: string;
   tipoCambio: number;
   observaciones: string;
+
+  // Opciones de Ingreso Almacén
+  generaIngreso?: boolean;
+
   detalles: DetalleDto[];
 }
 
