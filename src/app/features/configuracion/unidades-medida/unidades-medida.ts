@@ -4,14 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { MessageService, ConfirmationService } from 'primeng/api';
 import { PRIMENG_TABLE_MODULES, PRIMENG_FILTER_MODULES } from '@shared/ui/prime-imports';
 import { AppButton } from '@shared/ui/button';
-import { LoadingSpinner } from '@shared/ui/loading-spinner/loading-spinner';
-import { ErrorState } from '@shared/ui/error-state/error-state';
 import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
 import { ModalForm } from '@shared/components/modal-form/modal-form';
 import { ModalData } from '@shared/domains/apartadoType.model';
 import { UnidadMedidaService } from './services/unidad-medida.service';
 import { UnidadMedidaListar } from './domain/unidad-medida.interface';
 import { Tag } from "primeng/tag";
+import { AlertService } from '@shared/services/alert.service';
 
 @Component({
     selector: 'app-unidades-medida',
@@ -31,9 +30,9 @@ import { Tag } from "primeng/tag";
     styleUrl: './unidades-medida.scss'
 })
 export default class UnidadesMedida implements OnInit {
-    private messageService = inject(MessageService);
     private confirmationService = inject(ConfirmationService);
     private unidadMedidaService = inject(UnidadMedidaService);
+    private alertService = inject(AlertService);
 
     // Signals
     unidades = signal<UnidadMedidaListar[]>([]);
@@ -99,12 +98,7 @@ export default class UnidadesMedida implements OnInit {
                 console.error('Error al cargar unidades de medida:', err);
                 this.error.set('Error al conectar con el servidor');
                 this.loading.set(false);
-                this.messageService.add({
-                    severity: 'error',
-                    summary: 'Error',
-                    detail: 'No se pudieron cargar las unidades de medida',
-                    life: 3000
-                });
+                this.alertService.error('No se pudieron cargar las unidades de medida');
             }
         });
     }
@@ -120,52 +114,39 @@ export default class UnidadesMedida implements OnInit {
     }
 
     deleteUnidad(unidad: UnidadMedidaListar) {
-        // this.confirmationService.confirm({
-        //     message: `¿Está seguro de eliminar la unidad de medida "${unidad.name}"?`,
-        //     header: 'Confirmar Eliminación',
-        //     icon: 'pi pi-exclamation-triangle',
-        //     acceptLabel: 'Eliminar',
-        //     rejectLabel: 'Cancelar',
-        //     acceptButtonStyleClass: 'danger',
-        //     accept: () => {
-        //         this.unidadMedidaService.delete(unidad.id).subscribe({
-        //             next: (response) => {
-        //                 if (response.success) {
-        //                     this.unidades.update(values => values.filter(val => val.id !== unidad.id));
-        //                     this.messageService.add({
-        //                         severity: 'success',
-        //                         summary: 'Exitoso',
-        //                         detail: 'Unidad de medida eliminada correctamente',
-        //                         life: 3000
-        //                     });
-        //                 } else {
-        //                     this.messageService.add({
-        //                         severity: 'error',
-        //                         summary: 'Error',
-        //                         detail: response.message || 'No se pudo eliminar la unidad de medida',
-        //                         life: 3000
-        //                     });
-        //                 }
-        //             },
-        //             error: (err) => {
-        //                 console.error('Error al eliminar unidad de medida:', err);
-        //                 this.messageService.add({
-        //                     severity: 'error',
-        //                     summary: 'Error',
-        //                     detail: 'No se pudo eliminar la unidad de medida',
-        //                     life: 3000
-        //                 });
-        //             }
-        //         });
-        //     }
-        // });
+        this.confirmationService.confirm({
+            message: `¿Está seguro de eliminar la unidad de medida "${unidad.NOMBRE_COMERCIAL}"?`,
+            header: 'Confirmar Eliminación',
+            icon: 'pi pi-exclamation-triangle',
+            acceptLabel: 'Eliminar',
+            rejectLabel: 'Cancelar',
+            acceptButtonStyleClass: 'danger',
+            accept: () => {
+                this.unidadMedidaService.delete(unidad.ID_UNIDAD_MEDIDA).subscribe({
+                    next: (response) => {
+                        if (response.success) {
+                            this.unidades.update(values => values.filter(val => val.ID_UNIDAD_MEDIDA !== unidad.ID_UNIDAD_MEDIDA));
+                            this.alertService.success('Unidad de medida eliminada correctamente');
+                        } else {
+                            this.alertService.error(response.message || 'No se pudo eliminar la unidad de medida');
+                        }
+                    },
+                    error: (err) => {
+                        console.error('Error al eliminar unidad de medida:', err);
+                        this.alertService.error('No se pudo eliminar la unidad de medida');
+                    }
+                });
+            }
+        });
     }
 
-    onModalClosed(event: { saved: boolean; result?: unknown }) {
+    onModalClosed(event: { saved: boolean; result?: any }) {
         this.visible.set(false);
         this.modalData.set(null);
         if (event.saved) {
             this.loadUnidades();
+            const msg = event.result?.message || 'Operación realizada correctamente';
+            this.alertService.success(msg);
         }
     }
 

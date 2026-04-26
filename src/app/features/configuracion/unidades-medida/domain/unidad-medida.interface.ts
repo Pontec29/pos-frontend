@@ -4,6 +4,5 @@ export interface UnidadMedidaListar {
   DESCRIPCION_SUNAT: string;
   Abreviatura: string;
   NOMBRE_COMERCIAL: string;
-  ES_BASE: boolean;
   ACTIVO: boolean;
 }

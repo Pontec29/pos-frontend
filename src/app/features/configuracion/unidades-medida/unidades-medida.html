@@ -34,7 +34,6 @@
                             <th>Descripción</th>
                             <th>Abreviación</th>
                             <th>Nombre Comercial</th>
-                            <th class="text-center">Base</th>
                             <th style="width: 8rem" class="text-center">Estado</th>
                             <th style="width: 9rem" class="text-center">Acciones</th>
                         </tr>
@@ -56,9 +55,6 @@
                             <td>{{ unidad.DESCRIPCION_SUNAT }}</td>
                             <td>{{ unidad.Abreviatura }}</td>
                             <td>{{ unidad.NOMBRE_COMERCIAL }}</td>
-                            <td class="text-center">
-                                <i [class]="unidad.ES_BASE ? 'pi pi-check-circle text-green-500' : 'pi pi-times-circle text-red-400'" style="font-size: 1.2rem"></i>
-                            </td>
                             <td class="text-center">
                                 <p-tag [value]="unidad.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="unidad.ACTIVO ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>

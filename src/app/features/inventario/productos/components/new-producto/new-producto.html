@@ -115,7 +115,7 @@
                   <div class="erp-col-3 erp-col-md-6">
                     <p-floatlabel variant="in">
                       <p-inputNumber formControlName="stockInicial" [min]="0" inputId="stockInicial"></p-inputNumber>
-                      <label for="stockInicial">Stock Inicial</label>
+                      <label for="stockInicial">Stock Inicial {{ selectedUnitName() ? '(' + selectedUnitName() + ')' : '' }}</label>
                     </p-floatlabel>
                   </div>
 

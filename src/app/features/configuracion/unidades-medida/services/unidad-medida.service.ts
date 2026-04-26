@@ -50,7 +50,7 @@ export class UnidadMedidaService {
   }
 
   delete(id: number): Observable<ApiResponse<void>> {
-    return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}`, {});
+    return this.http.patch<ApiResponse<void>>(`${this.apiUrl}/${id}/eliminar`, {});
   }
 
   private handleHttpError(error: any): Observable<never> {

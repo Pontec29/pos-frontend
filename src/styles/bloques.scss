@@ -61,10 +61,20 @@
 
 // !SCROLL
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 3px;
+  height: 3px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary);
-  border-radius: 6px;
+  background: var(--color-gray-300, #e2e8f0);
+  border-radius: 10px;
+  transition: background 0.3s;
+
+  &:hover {
+    background: var(--primary);
+  }
 }

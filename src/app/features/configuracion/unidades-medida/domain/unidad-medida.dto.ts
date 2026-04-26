@@ -4,6 +4,6 @@ export interface UnidadMedidaDTO {
   abreviatura: string;
   codigoSunat: string;
   descripcionSunat: string;
-  esBase: boolean;
+
   activo: boolean;
 }

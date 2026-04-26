@@ -42,8 +42,7 @@ export class FormUnidadMedidaComponent implements OnInit {
     id: [null as number | null], // Internal use for knowing edit vs create
     codigoSunat: ['', Validators.required],
     nombreComercial: ['', [Validators.required, Validators.maxLength(50)]],
-    abreviatura: ['', [Validators.maxLength(10)]],
-    esBase: [false]
+    abreviatura: ['', [Validators.maxLength(10)]]
   });
 
   constructor() {
@@ -54,8 +53,7 @@ export class FormUnidadMedidaComponent implements OnInit {
           id: selectedUnidad.ID_UNIDAD_MEDIDA,
           codigoSunat: selectedUnidad.CODIGO_SUNAT,
           nombreComercial: selectedUnidad.NOMBRE_COMERCIAL,
-          abreviatura: selectedUnidad.Abreviatura,
-          esBase: selectedUnidad.ES_BASE
+          abreviatura: selectedUnidad.Abreviatura
         });
       } else {
         this.resetForm();
@@ -65,6 +63,15 @@ export class FormUnidadMedidaComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadCatalogoSunat();
+    this.setupAutoSuggest();
+  }
+
+  setupAutoSuggest() {
+    this.form.controls.codigoSunat.valueChanges.subscribe(value => {
+      if (value && !this.form.controls.abreviatura.value) {
+        this.form.patchValue({ abreviatura: value });
+      }
+    });
   }
 
   loadCatalogoSunat() {
@@ -93,13 +100,12 @@ export class FormUnidadMedidaComponent implements OnInit {
     }
 
     const value = this.form.value;
-    
+
     // Only send what Java expects: UnidadMedidaRequest
     const payload = {
       nombreComercial: value.nombreComercial,
       abreviatura: value.abreviatura,
       codigoSunat: value.codigoSunat,
-      esBase: value.esBase
     };
 
     this.isSubmitting.set(true);
@@ -121,7 +127,8 @@ export class FormUnidadMedidaComponent implements OnInit {
       },
       error: (err: any) => {
         console.error('Error saving unidad-medida:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error al guardar' });
+        const errorMsg = err.error?.message || 'Ocurrió un error al guardar';
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: errorMsg });
       }
     });
   }
@@ -132,7 +139,6 @@ export class FormUnidadMedidaComponent implements OnInit {
       codigoSunat: '',
       nombreComercial: '',
       abreviatura: '',
-      esBase: false
     });
     this.form.markAsPristine();
   }

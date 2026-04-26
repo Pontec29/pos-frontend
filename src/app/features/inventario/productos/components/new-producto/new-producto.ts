@@ -101,12 +101,15 @@ export default class NewProductoPage implements OnInit {
   marcas = signal<MarcaListar[]>([]);
   categories = signal<Categoria[]>([]);
   unidadMedida = signal<UnidadMedidaListar[]>([]);
-  unidadesMedidaBase = computed(() => {
-    const unidades = this.unidadMedida();
-    return unidades.filter(u => u && u.ES_BASE === true);
-  });
+  unidadesMedidaBase = computed(() => this.unidadMedida());
   monedas = signal<ResponseMonedaDto[]>([]);
   afectacionIgv = signal<ResponseAfectacionIgvDto[]>([]);
+
+  selectedUnitName = computed(() => {
+    const id = this.productFormValue().unidadMedidaId;
+    const unit = this.unidadMedida().find(u => u.ID_UNIDAD_MEDIDA === id);
+    return unit ? unit.DESCRIPCION_SUNAT : '';
+  });
 
   tiposProducto = [
     { label: 'Bien (Físico)', value: 'B' },
@@ -439,7 +442,7 @@ export default class NewProductoPage implements OnInit {
   updateTraceabilityState(type: string) {
     const isService = this.productForm.get('tipoProducto')?.value === 'S';
     const isEdit = this.isEditMode();
-    
+
     const stockInicialControl = this.productForm.get('stockInicial');
     const codigoLoteControl = this.productForm.get('codigoLote');
     const fechaVencimientoControl = this.productForm.get('fechaVencimiento');
@@ -890,19 +893,6 @@ export default class NewProductoPage implements OnInit {
         detail: 'Debe existir al menos una presentación principal.'
       });
       return false;
-    }
-
-    const unidadId = this.productForm.get('unidadMedidaId')?.value;
-    if (unidadId) {
-      const selectedUnit = this.unidadMedida().find(u => u.ID_UNIDAD_MEDIDA === unidadId);
-      if (selectedUnit && !selectedUnit.ES_BASE) {
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Unidad Inválida',
-          detail: 'La unidad de medida seleccionada debe ser una unidad base.'
-        });
-        return false;
-      }
     }
 
     // ! VALIDACIONES DE STOCK CONSISTENTES

@@ -9,7 +9,6 @@ export class UnidadMedidaAdapter {
       DESCRIPCION_SUNAT: dto.descripcionSunat,
       Abreviatura: dto.abreviatura,
       NOMBRE_COMERCIAL: dto.nombreComercial,
-      ES_BASE: dto.esBase,
       ACTIVO: dto.activo
     };
   }

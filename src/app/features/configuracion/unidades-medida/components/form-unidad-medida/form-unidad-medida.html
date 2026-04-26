@@ -2,9 +2,7 @@
     <div class="row">
         <div class="form-row">
             <p-floatlabel>
-                <p-select [options]="catalogoSunat()" formControlName="codigoSunat" optionLabel="descripcion"
-                    optionValue="codigoSunat" [filter]="true" filterBy="codigoSunat,descripcion"
-                    placeholder=" " styleClass="w-full">
+                <p-select [options]="catalogoSunat()" formControlName="codigoSunat" optionLabel="descripcion" optionValue="codigoSunat" [filter]="true" filterBy="codigoSunat,descripcion" placeholder=" " styleClass="w-full" appendTo="body">
                     <ng-template let-option pTemplate="item">
                         <div class="flex flex-column gap-1">
                             <span class="font-bold">{{ option.codigoSunat }}</span>
@@ -12,7 +10,7 @@
                         </div>
                     </ng-template>
                 </p-select>
-                <label for="codigoSunat">Código SUNAT <span style="color: red;">*</span></label>
+                <label for="codigoSunat">Código SUNAT <span class="required">*</span></label>
             </p-floatlabel>
         </div>
     </div>
@@ -20,29 +18,15 @@
     <div class="row">
         <div class="form-row">
             <p-floatlabel>
-                <input pInputText id="nombreComercial" formControlName="nombreComercial" placeholder=" "
-                    [class.p-invalid]="form.get('nombreComercial')?.invalid && form.get('nombreComercial')?.touched" />
-                <label for="nombreComercial">Nombre Comercial <span style="color: red;">*</span></label>
+                <input pInputText id="nombreComercial" formControlName="nombreComercial" placeholder=" " [class.p-invalid]="form.get('nombreComercial')?.invalid && form.get('nombreComercial')?.touched" />
+                <label for="nombreComercial">Nombre Comercial <span class="required">*</span></label>
             </p-floatlabel>
         </div>
         <div class="form-row">
             <p-floatlabel>
-                <input pInputText id="abreviatura" formControlName="abreviatura" placeholder=" "
-                    [class.p-invalid]="form.get('abreviatura')?.invalid && form.get('abreviatura')?.touched" />
+                <input pInputText id="abreviatura" formControlName="abreviatura" placeholder=" " [class.p-invalid]="form.get('abreviatura')?.invalid && form.get('abreviatura')?.touched" />
                 <label for="abreviatura">Abreviatura</label>
             </p-floatlabel>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="form-row">
-            <div class="status-container">
-                <div class="status-info">
-                    <span class="status-label">Unidad Base</span>
-                    <span class="status-text">{{ form.get('esBase')?.value ? 'Sí' : 'No' }}</span>
-                </div>
-                <p-toggleswitch formControlName="esBase"></p-toggleswitch>
-            </div>
         </div>
     </div>
 </form>
