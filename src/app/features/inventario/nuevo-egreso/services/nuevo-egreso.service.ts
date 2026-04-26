@@ -28,4 +28,32 @@ export class NuevoEgresoService {
     registrarSalida(payload: MovimientoSalidaPayload): Observable<ApiResponse<any>> {
         return this.http.post<ApiResponse<any>>(`${this.apiUrl}/salida`, payload);
     }
+
+    /**
+     * Registra una salida y la procesa directamente (stock + kardex)
+     */
+    registrarSalidaDirecta(payload: MovimientoSalidaPayload): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/salida/directa`, payload);
+    }
+
+    /**
+     * Obtiene una nota por ID
+     */
+    getById(id: number): Observable<ApiResponse<any>> {
+        return this.http.get<ApiResponse<any>>(`${this.apiUrl}/${id}`);
+    }
+
+    /**
+     * Anula una nota
+     */
+    anular(id: number, motivo: string): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/anular`, { motivo });
+    }
+
+    /**
+     * Procesa una nota (actualiza stock)
+     */
+    procesar(id: number): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/procesar`, {});
+    }
 }

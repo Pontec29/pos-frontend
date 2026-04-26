@@ -43,6 +43,7 @@ import { PresentacionUpSert, ProductoView } from '@inventario/productos/domain/p
 import { LoaderService } from '@shared/services/loader.service';
 import { UnidadMedidaService } from '../../../../configuracion/unidades-medida/services/unidad-medida.service';
 import { ModalConfirmacionComponent } from '@shared/ui/modal-confirmacion/modal-confirmacion.component';
+import { ModalConfirmacionService } from '@shared/ui/modal-confirmacion/modal-confirmacion.service';
 import type { UnidadMedidaListar } from '../../../../configuracion/unidades-medida/domain/unidad-medida.interface';
 
 export interface PresentacionRowView extends PresentacionUpSert {
@@ -91,6 +92,7 @@ export default class NewProductoPage implements OnInit {
   private unidadMedidaService = inject(UnidadMedidaService);
   private generalService = inject(GeneralService);
   private alertService = inject(AlertService);
+  private modalConfirmacionService = inject(ModalConfirmacionService);
 
   productId = signal<number | null>(null);
   isEditMode = signal<boolean>(false);
@@ -98,6 +100,7 @@ export default class NewProductoPage implements OnInit {
   showUnitDialog = signal<boolean>(false);
   showCategoryDialog = signal<boolean>(false);
   showMarcaDialog = signal<boolean>(false);
+  showInactivePresentations = signal<boolean>(false);
 
   // ! DATA MAESTRA
   marcas = signal<MarcaListar[]>([]);
@@ -142,6 +145,12 @@ export default class NewProductoPage implements OnInit {
     if (compra <= 0 || venta <= 0) return 0;
     const margin = ((venta - compra) / venta) * 100;
     return Math.round(margin * 100) / 100;
+  });
+
+  filteredPresentations = computed(() => {
+    const all = this.presentationsData();
+    if (this.showInactivePresentations()) return all;
+    return all.filter(p => p.ACTIVO !== false);
   });
 
   newUnitForm = this.fb.group({
@@ -277,6 +286,7 @@ export default class NewProductoPage implements OnInit {
     precioVentaCtrl?.valueChanges.subscribe(() => {
       this.calcularMargenes();
       this.validarRelacionesDePrecios();
+      this.sincronizarPrecioPresentacionBase();
       this.autosave();
     });
 
@@ -409,7 +419,8 @@ export default class NewProductoPage implements OnInit {
           FACTOR_CONVERSION_BASE: p.FACTOR_CONVERSION_BASE,
           CODIGO_BARRAS: p.CODIGO_BARRAS,
           PRECIO_VENTA: p.PRECIO_VENTA,
-          ES_PRINCIPAL: p.ES_PRINCIPAL
+          ES_PRINCIPAL: p.ES_PRINCIPAL,
+          ACTIVO: p.ACTIVO ?? true
         };
       });
       this.presentationsData.set(presentations);
@@ -428,6 +439,7 @@ export default class NewProductoPage implements OnInit {
   updatePriceFieldsState(type: string, reset: boolean = false) {
     const precioCompraControl = this.productForm.get('precioCompra');
     const precioMinimoVentaControl = this.productForm.get('precioMinimoVenta');
+    const precioVentaControl = this.productForm.get('precioVenta');
 
     if (type === 'S') {
       precioCompraControl?.disable();
@@ -465,11 +477,13 @@ export default class NewProductoPage implements OnInit {
       stockInicialControl?.enable();
     }
 
-    // ERP Rule: Traceability locked on edit to preserve movement history
+    // ERP Rule: Traceability and Type locked on edit to preserve data integrity
     if (isEdit) {
       tipoControlStockControl?.disable();
+      this.productForm.get('tipoProducto')?.disable();
     } else {
       tipoControlStockControl?.enable();
+      this.productForm.get('tipoProducto')?.enable();
     }
 
     if (isService) {
@@ -699,7 +713,8 @@ export default class NewProductoPage implements OnInit {
       CODIGO_BARRAS: barcode,
       PRECIO_VENTA: Number(value.priceBase),
       ES_PRINCIPAL: isFirst,
-      unitName: unit.DESCRIPCION_SUNAT || (unit as any).name || 'N/A'
+      unitName: unit.DESCRIPCION_SUNAT || (unit as any).name || 'N/A',
+      ACTIVO: true
     };
 
     const next = [...this.presentationsData(), row];
@@ -803,15 +818,35 @@ export default class NewProductoPage implements OnInit {
       return;
     }
 
-    this.confirmationService.confirm({
-      message: '¿Desea eliminar esta presentación secundaria?',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí, eliminar',
-      rejectLabel: 'Cancelar',
-      acceptButtonStyleClass: 'p-button-danger',
-      accept: () => {
-        this.removePresentation(index);
+    this.modalConfirmacionService.confirm(
+      'deactivate',
+      `Presentación: ${presentacion.unitName}`,
+      () => {
+        this.togglePresentationActive(index);
       }
+    );
+  }
+
+  togglePresentationActive(index: number) {
+    const rows = [...this.presentationsData()];
+    const row = rows[index];
+
+    if (row.FACTOR_CONVERSION_BASE === 1 && row.ACTIVO) {
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Acción Bloqueada',
+        detail: 'La presentación base (Factor 1) no puede ser desactivada.'
+      });
+      return;
+    }
+
+    row.ACTIVO = !row.ACTIVO;
+    this.presentationsData.set(rows);
+
+    this.messageService.add({
+      severity: 'info',
+      summary: 'Estado Actualizado',
+      detail: `Presentación ${row.unitName} ha sido ${row.ACTIVO ? 'reactivada' : 'desactivada'}.`
     });
   }
 
@@ -870,10 +905,15 @@ export default class NewProductoPage implements OnInit {
         .map(([name]) => name);
 
       this.markProductFormAsTouched(ignoreDraft);
+      const hasRequiredErrors = Object.values(controls).some(c => c.hasError('required'));
+      const detail = hasRequiredErrors 
+        ? 'Faltan campos obligatorios: ' + invalidFields.join(', ')
+        : 'Existen inconsistencias en los datos. Revise los campos marcados en rojo.';
+
       this.messageService.add({
         severity: 'warn',
-        summary: 'Formulario Incompleto',
-        detail: 'Faltan campos obligatorios: ' + invalidFields.join(', ')
+        summary: 'Formulario Inválido',
+        detail: detail
       });
       return false;
     }
@@ -1080,6 +1120,19 @@ export default class NewProductoPage implements OnInit {
     this.formularioValido = !duplicado;
   }
 
+  private sincronizarPrecioPresentacionBase(): void {
+    const mainPrice = this.productForm.get('precioVenta')?.value || 0;
+    const presentations = [...this.presentationsData()];
+    const baseIndex = presentations.findIndex(p => p.FACTOR_CONVERSION_BASE === 1);
+
+    if (baseIndex !== -1) {
+      if (presentations[baseIndex].PRECIO_VENTA !== mainPrice) {
+        presentations[baseIndex].PRECIO_VENTA = mainPrice;
+        this.presentationsData.set(presentations);
+      }
+    }
+  }
+
   private calcularMargenes(): void {
     const precioCompra = this.productForm.get('precioCompra')?.value ?? 0;
     const precioVenta = this.productForm.get('precioVenta')?.value ?? 0;
@@ -1104,7 +1157,7 @@ export default class NewProductoPage implements OnInit {
     if (!control || !control.errors) {
       return;
     }
-    const { relation, ...rest } = control.errors;
+    const { relation, higherThanSale, lowerThanCost, ...rest } = control.errors;
     control.setErrors(Object.keys(rest).length ? rest : null);
   }
 
@@ -1112,6 +1165,7 @@ export default class NewProductoPage implements OnInit {
     const precioCompra = this.productForm.get('precioCompra')?.value ?? 0;
     const precioMinimoVenta = this.productForm.get('precioMinimoVenta')?.value ?? 0;
     const precioVenta = this.productForm.get('precioVenta')?.value ?? 0;
+    const tipoProducto = this.productForm.get('tipoProducto')?.value;
 
     const precioCompraCtrl = this.productForm.get('precioCompra');
     const precioMinimoCtrl = this.productForm.get('precioMinimoVenta');
@@ -1121,18 +1175,22 @@ export default class NewProductoPage implements OnInit {
     this.limpiarErroresRelacion(precioMinimoCtrl);
     this.limpiarErroresRelacion(precioVentaCtrl);
 
-    if (precioVenta > 0 && precioMinimoVenta > 0) {
-      if (precioVenta <= precioMinimoVenta && precioVentaCtrl) {
-        const errors = precioVentaCtrl.errors || {};
-        precioVentaCtrl.setErrors({ ...errors, relation: true });
-      }
+    // Validación 1: Venta < Compra (Solo Bienes)
+    if (tipoProducto === 'B' && precioVenta > 0 && precioVenta < precioCompra) {
+      const errors = precioVentaCtrl?.errors || {};
+      precioVentaCtrl?.setErrors({ ...errors, lowerThanCost: true });
     }
 
-    if (precioMinimoVenta > 0 && precioCompra > 0) {
-      if (precioMinimoVenta <= precioCompra && precioMinimoCtrl) {
-        const errors = precioMinimoCtrl.errors || {};
-        precioMinimoCtrl.setErrors({ ...errors, relation: true });
-      }
+    // Validación 2: Mínimo > Venta
+    if (precioVenta > 0 && precioMinimoVenta > precioVenta) {
+      const errors = precioMinimoCtrl?.errors || {};
+      precioMinimoCtrl?.setErrors({ ...errors, higherThanSale: true });
+    }
+    
+    // Validación 3: Mínimo <= Compra (Advertencia adicional)
+    if (tipoProducto === 'B' && precioMinimoVenta > 0 && precioMinimoVenta <= precioCompra) {
+       const errors = precioMinimoCtrl?.errors || {};
+       precioMinimoCtrl?.setErrors({ ...errors, relation: true });
     }
   }
 

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 import { ApiResponse } from '@shared/domains/api-response.model';
-import { MovimientoEntradaPayload, MovimientoResumenIngreso } from '../modelo/nuevo-ingreso.model';
+import { MovimientoEntradaPayload, MovimientoResumenIngreso, MovimientoResponse } from '../modelo/nuevo-ingreso.model';
 
 @Injectable({
     providedIn: 'root'
@@ -17,6 +17,13 @@ export class NuevoIngresoService {
      */
     listarEntradas(): Observable<ApiResponse<MovimientoResumenIngreso[]>> {
         return this.http.get<ApiResponse<MovimientoResumenIngreso[]>>(`${this.apiUrl}/tipo/ENTRADA`);
+    }
+
+    /**
+     * Obtiene el detalle de un movimiento por su ID
+     */
+    getById(id: number): Observable<ApiResponse<MovimientoResponse>> {
+        return this.http.get<ApiResponse<MovimientoResponse>>(`${this.apiUrl}/${id}`);
     }
 
     /**
@@ -43,7 +50,7 @@ export class NuevoIngresoService {
     /**
      * Anula un movimiento (reversa stock si estaba procesado)
      */
-    anular(id: number): Observable<ApiResponse<any>> {
-        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/anular`, {});
+    anular(id: number, motivo: string): Observable<ApiResponse<any>> {
+        return this.http.post<ApiResponse<any>>(`${this.apiUrl}/${id}/anular`, { motivo });
     }
 }

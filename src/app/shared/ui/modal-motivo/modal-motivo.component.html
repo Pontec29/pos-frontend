@@ -1,0 +1,29 @@
+<p-dialog [header]="title()" [(visible)]="visible" [modal]="true" [style]="{ width: '450px' }" [draggable]="false"
+    [resizable]="false" class="modal-motivo-dialog">
+
+    <div class="modal-body">
+        <p class="modal-message">{{ message() }}</p>
+
+        @if (warning()) {
+        <div class="warning-box">
+            <i class="pi pi-exclamation-triangle"></i>
+            <span>{{ warning() }}</span>
+        </div>
+        }
+
+        <div class="field-container">
+            <label for="motivo-input" class="field-label">Motivo de Anulación</label>
+            <textarea id="motivo-input" pTextarea [rows]="3" [autoResize]="true" [ngModel]="motivo()"
+                (ngModelChange)="motivo.set($event)" [placeholder]="placeholder()" class="pos-textarea"></textarea>
+        </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+        <div class="modal-footer">
+            <button pButton label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary"
+                (click)="cancelar()"></button>
+            <button pButton [label]="confirmLabel()" [icon]="confirmIcon()" [class]="confirmClass()"
+                (click)="confirmar()" [disabled]="!motivo().trim()"></button>
+        </div>
+    </ng-template>
+</p-dialog>

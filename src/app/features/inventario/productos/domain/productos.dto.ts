@@ -52,6 +52,7 @@ interface PresentacionesUpSertDTO {
   factorConversionBase: number;
   codigoBarras: string;
   esPrincipal: boolean;
+  activo?: boolean;
 }
 
 interface StockAperturaUpSertDTO {

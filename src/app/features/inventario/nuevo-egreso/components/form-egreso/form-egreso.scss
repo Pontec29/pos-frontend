@@ -56,14 +56,67 @@
 }
 
 .status-badge {
-    background-color: #fef08a;
-    color: #854d0e;
-    padding: 0.2rem 0.6rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
+
+.status-badge--view {
+  background-color: #fef08a;
+  color: #854d0e;
+}
+
+.status-badge--anulado {
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.annulment-reason-banner {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  margin-left: 3.25rem;
+  font-size: 0.95rem;
+
+  i {
+    font-size: 1.25rem;
+  }
+
+  .reason-content {
+    display: flex;
+    gap: 0.5rem;
+
+    strong {
+      white-space: nowrap;
+    }
+  }
+}
+
+.lote-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: white;
+  user-select: none;
+}
+
+.lote-box--lote { background-color: #f59e0b; }
+.lote-box--serie { background-color: #3b82f6; }
+.lote-box--normal { background-color: #94a3b8; }
 
 .doc-context {
     display: flex;
@@ -352,8 +405,25 @@
 }
 
 .actions {
-    display: flex;
-    gap: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.borrador-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-right: 1.5rem;
+  border-right: 1px solid #fda4af;
+
+  label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #9f1239;
+    white-space: nowrap;
+    cursor: pointer;
+  }
 }
 
 ::ng-deep .btn-clean.p-button {

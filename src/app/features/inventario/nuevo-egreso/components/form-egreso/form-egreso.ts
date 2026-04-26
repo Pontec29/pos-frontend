@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, Validators, FormControl, FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { AlertService } from '@shared/services/alert.service';
 import { PRIMENG_TABLE_MODULES, PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { DividerModule } from 'primeng/divider';
@@ -17,7 +18,7 @@ import { CorrelativoService, CorrelativoPreview } from '../../../../../core/serv
 import { ProductoService } from '../../../../../core/services/producto.service';
 import { ProductoBusqueda, ProductoPresentacion } from '../../../../../core/models/producto.model';
 import { NuevoEgresoService } from '../../services/nuevo-egreso.service';
-import { CodigoSunatSalida, MovimientoSalidaPayload } from '../../modelo/nuevo-egreso.model';
+import { CodigoSunatSalida, MovimientoSalidaPayload, MovimientoResponse, DetalleMovimientoResponse } from '../../modelo/nuevo-egreso.model';
 
 @Component({
     selector: 'app-form-egreso',
@@ -47,11 +48,17 @@ export default class FormEgreso implements OnInit {
     private readonly correlativoService = inject(CorrelativoService);
     private readonly productoService = inject(ProductoService);
     private readonly egresoService = inject(NuevoEgresoService);
-    private readonly messageService = inject(MessageService);
+    private readonly alertService = inject(AlertService);
     private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
 
     // Estado
+    readonly isViewMode = signal(false);
+    readonly cargandoDatos = signal(false);
+    readonly estadoMovimiento = signal<string>('');
+    readonly motivoAnulacion = signal<string | null>(null);
     readonly correlativoPreview = signal<CorrelativoPreview | null>(null);
+    readonly soloBorrador = signal(false);
     guardando = signal(false);
     totalGeneral = signal(0);
     productosSugeridos: ProductoBusqueda[] = [];
@@ -94,6 +101,61 @@ export default class FormEgreso implements OnInit {
         this.detallesFormArray.valueChanges.subscribe(() => {
             this.actualizarTotalGeneral();
         });
+
+        const id = this.route.snapshot.params['id'];
+        if (id) {
+            this.isViewMode.set(true);
+            this.cargarMovimiento(Number(id));
+        }
+    }
+
+    private cargarMovimiento(id: number) {
+        this.cargandoDatos.set(true);
+        this.egresoService.getById(id).subscribe({
+            next: (res) => {
+                if (res.success && res.data) {
+                    const m = res.data as MovimientoResponse;
+                    this.formulario.patchValue({
+                        fechaEmision: new Date(m.fechaEmision + 'T00:00:00'),
+                        codigoOperacionSunat: m.codigoOperacionSunat,
+                        documentoReferencia: m.documentoReferencia,
+                        observacion: m.observacion
+                    });
+
+                    this.estadoMovimiento.set(m.estado);
+                    this.motivoAnulacion.set(m.motivoAnulacion);
+
+                    // Cargar detalles
+                    this.detallesFormArray.clear();
+                    m.detalles.forEach((d: DetalleMovimientoResponse) => {
+                        const filaGroup = this.fb.group({
+                            productoId: [d.productoId],
+                            productoNombre: [d.productoNombre],
+                            unidadesList: [[]],
+                            unidadSeleccionada: [{ unidadNombre: d.unidadAbreviatura }],
+                            cantidad: [d.cantidad],
+                            cantidadBase: [d.cantidadBase],
+                            tipoControlStock: [d.tipoControlStock],
+                            loteId: [d.loteId],
+                            codigoLote: [d.codigoLote],
+                            stockDisponible: [0],
+                            costoPromedio: [d.costoUnitario]
+                        });
+                        this.detallesFormArray.push(filaGroup);
+                    });
+
+                    if (this.isViewMode()) {
+                        this.formulario.disable();
+                        this.buscadorControl.disable();
+                    }
+                }
+                this.cargandoDatos.set(false);
+            },
+            error: () => {
+                this.alertService.error('No se pudo cargar el movimiento');
+                this.cargandoDatos.set(false);
+            }
+        });
     }
 
     private cargarCorrelativo(almacenId: number) {
@@ -133,6 +195,18 @@ export default class FormEgreso implements OnInit {
         });
 
         this.detallesFormArray.push(filaGroup);
+        const index = this.detallesFormArray.length - 1;
+
+        // Cargar stock disponible
+        const almacenId = this.contexto.almacenId();
+        if (almacenId) {
+            this.productoService.getStock(p.id, almacenId).subscribe(res => {
+                if (res.success) {
+                    this.detallesFormArray.at(index).patchValue({ stockDisponible: res.data });
+                }
+            });
+        }
+
         this.buscadorControl.setValue(null);
     }
 
@@ -161,17 +235,29 @@ export default class FormEgreso implements OnInit {
         this.totalGeneral.set(total);
     }
 
+    private formatearFecha(date: Date | string): string {
+        return (date instanceof Date ? date : new Date(date)).toISOString().split('T')[0];
+    }
+
     confirmarSalida() {
         const almacenId = this.contexto.almacenId();
         if (!almacenId) return;
 
         if (this.formulario.invalid || this.detallesFormArray.length === 0) {
-            this.messageService.add({
-                severity: 'warn',
-                summary: 'Atención',
-                detail: 'Complete los campos obligatorios y agregue al menos un producto.'
-            });
+            this.alertService.warn('Complete los campos obligatorios y agregue al menos un producto.');
             this.formulario.markAllAsTouched();
+            return;
+        }
+
+        // Validación de Stock Negativo
+        const itemsSinStock = this.detallesFormArray.controls.filter(ctrl => {
+            const cantBase = ctrl.get('cantidadBase')?.value || 0;
+            const stockDisp = ctrl.get('stockDisponible')?.value || 0;
+            return cantBase > stockDisp;
+        });
+
+        if (itemsSinStock.length > 0) {
+            this.alertService.error('Hay productos cuya cantidad a retirar supera el stock disponible.', 'Stock Insuficiente');
             return;
         }
 
@@ -180,10 +266,10 @@ export default class FormEgreso implements OnInit {
 
         const payload: MovimientoSalidaPayload = {
             tipoMovimiento: 'SALIDA',
-            almacenOrigenId: almacenId,
+            almacenOrigenId: this.contexto.almacenId()!,
             codigoOperacionSunat: formData.codigoOperacionSunat as string,
             documentoReferencia: formData.documentoReferencia as string,
-            fechaEmision: (formData.fechaEmision as Date).toISOString().split('T')[0],
+            fechaEmision: this.formatearFecha(formData.fechaEmision as Date),
             observacion: formData.observacion as string,
             detalles: formData.detalles.map((d: any) => ({
                 productoId: d.productoId,
@@ -195,23 +281,23 @@ export default class FormEgreso implements OnInit {
             }))
         };
 
-        this.egresoService.registrarSalida(payload).subscribe({
+        const request$ = this.soloBorrador() 
+            ? this.egresoService.registrarSalida(payload)
+            : this.egresoService.registrarSalidaDirecta(payload);
+
+        request$.subscribe({
             next: (res) => {
                 this.guardando.set(false);
                 if (res.success) {
-                    this.messageService.add({
-                        severity: 'success',
-                        summary: 'Éxito',
-                        detail: `Salida ${res.data?.serie}-${res.data?.numero} registrada.`
-                    });
-                    this.router.navigate(['/inventario/notas-salida']);
+                    this.alertService.success(`Salida ${res.data?.serie}-${res.data?.numero} registrada ${this.soloBorrador() ? 'como borrador' : 'y procesada'}.`);
+                    this.router.navigate(['/inventario/nuevo-egreso']);
                 } else {
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message });
+                    this.alertService.error(res.message);
                 }
             },
-            error: () => {
+            error: (err) => {
                 this.guardando.set(false);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Fallo al registrar salida.' });
+                this.alertService.error(err.error?.message || 'Fallo al registrar salida.');
             }
         });
     }
@@ -231,6 +317,6 @@ export default class FormEgreso implements OnInit {
     }
 
     volver() {
-        this.router.navigate(['/inventario/notas-salida']);
+        this.router.navigate(['/inventario/nuevo-egreso']);
     }
 }

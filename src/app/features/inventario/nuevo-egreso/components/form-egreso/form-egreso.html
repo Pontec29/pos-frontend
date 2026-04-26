@@ -8,14 +8,30 @@
                 (click)="volver()"></button>
             <h1 class="doc-title">
                 Nota de Salida
-                @if (correlativoPreview()) {
+                @if (isViewMode()) {
+                <span class="doc-serie">{{ correlativoPreview()?.documentoFormateado }}</span>
+                } @else if (correlativoPreview()) {
                 <span class="doc-serie">{{ correlativoPreview()!.documentoFormateado }}</span>
                 } @else {
                 <span class="doc-serie doc-serie--pending">(Sin serie)</span>
                 }
             </h1>
-            <span class="status-badge">NUEVO</span>
+            <span class="status-badge" 
+                [class.status-badge--view]="isViewMode() && estadoMovimiento() !== 'ANULADO'"
+                [class.status-badge--anulado]="estadoMovimiento() === 'ANULADO'">
+                {{ estadoMovimiento() === 'ANULADO' ? 'ANULADO' : (isViewMode() ? 'VISTA' : 'NUEVO') }}
+            </span>
         </div>
+
+        @if (estadoMovimiento() === 'ANULADO' && motivoAnulacion()) {
+        <div class="annulment-reason-banner">
+            <i class="pi pi-info-circle"></i>
+            <div class="reason-content">
+                <strong>Motivo de Anulación:</strong>
+                <span>{{ motivoAnulacion() }}</span>
+            </div>
+        </div>
+        }
 
         <div class="doc-context">
             <div class="context-badge context-badge--danger">
@@ -56,6 +72,7 @@
                 <div class="toolbar-title">
                     <h3>Detalle de mercadería a retirar</h3>
                 </div>
+                @if (!isViewMode()) {
                 <div class="search-exterior">
                     <p-inputgroup>
                         <p-autoComplete [formControl]="buscadorControl" [suggestions]="productosSugeridos"
@@ -68,6 +85,7 @@
                         </p-inputgroup-addon>
                     </p-inputgroup>
                 </div>
+                }
             </div>
 
             <!-- Tabla de detalle -->
@@ -76,6 +94,7 @@
                     <thead>
                         <tr>
                             <th style="width: 30px">#</th>
+                            <th style="width: 50px; text-align: center;">CTRL</th>
                             <th>PRODUCTO</th>
                             <th style="width: 90px; text-align: center; color: #e11d48;">CANT. A SACAR</th>
                             <th style="width: 140px; color: #1d4ed8;">UNIDAD / EMPAQUE</th>
@@ -83,26 +102,43 @@
                             <th style="width: 120px; text-align: center; color: #d97706;">LOTE</th>
                             <th style="width: 100px; text-align: right; color: #16a34a;">STOCK DISP.</th>
                             <th style="width: 100px; text-align: right;">COSTO PROM.</th>
+                            @if (!isViewMode()) {
                             <th style="width: 40px"></th>
+                            }
                         </tr>
                     </thead>
                     <tbody formArrayName="detalles">
                         @for (item of detallesFormArray.controls; track $index) {
                         <tr [formGroupName]="$index">
                             <td class="text-center text-gray">{{ $index + 1 }}</td>
+                            <td class="text-center">
+                                @switch (item.get('tipoControlStock')?.value) {
+                                    @case ('LOTE') { <span class="lote-box lote-box--lote" pTooltip="Control por Lote">L</span> }
+                                    @case ('SERIE') { <span class="lote-box lote-box--serie" pTooltip="Control por Serie">S</span> }
+                                    @default { <span class="lote-box lote-box--normal" pTooltip="Producto Normal">N</span> }
+                                }
+                            </td>
                             <td>
                                 <div class="product-name-display">{{ item.get('productoNombre')?.value }}</div>
                             </td>
                             <td>
+                                @if (!isViewMode()) {
                                 <input type="number" class="pos-input-num bold-num center-text input-danger"
                                     formControlName="cantidad" (input)="recalcularFila($index)" min="0.0001">
+                                } @else {
+                                <div class="read-only-cell text-center bold-num">{{ item.get('cantidad')?.value | number:'1.2-2' }}</div>
+                                }
                             </td>
                             <td>
+                                @if (!isViewMode()) {
                                 <p-select [options]="item.get('unidadesList')?.value"
                                     formControlName="unidadSeleccionada" (onChange)="recalcularFila($index)"
                                     optionLabel="unidadNombre" appendTo="body" styleClass="w-full table-select"
                                     placeholder="Seleccionar"
                                     [disabled]="item.get('unidadesList')?.value?.length === 0"></p-select>
+                                } @else {
+                                <div class="read-only-cell">{{ item.get('unidadSeleccionada')?.value?.unidadNombre }}</div>
+                                }
                             </td>
                             <td class="text-center">
                                 <div class="read-only-cell">- {{ item.get('cantidadBase')?.value | number:'1.2-2' }}
@@ -110,11 +146,11 @@
                             </td>
                             <td class="text-center">
                                 @if(item.get('tipoControlStock')?.value !== 'NORMAL') {
-                                <div class="lote-badge lote-badge--active">
-                                    <i class="pi pi-box"></i> Requiere
-                                </div>
+                                    <div class="read-only-cell text-center" style="color: #d97706; font-weight: 700;">
+                                        {{ item.get('codigoLote')?.value || 'SIN SELECCIONAR' }}
+                                    </div>
                                 } @else {
-                                <div class="lote-badge lote-badge--none">SIN LOTE</div>
+                                    <div class="na-cell">N/A</div>
                                 }
                             </td>
                             <td class="text-right">
@@ -124,16 +160,18 @@
                             <td class="text-right text-gray">
                                 {{ item.get('costoPromedio')?.value | number:'1.2-2' }}
                             </td>
+                            @if (!isViewMode()) {
                             <td class="text-center">
                                 <i class="pi pi-times action-icon text-gray hover-red"
                                     (click)="eliminarFila($index)"></i>
                             </td>
+                            }
                         </tr>
                         }
                         @if(detallesFormArray.length === 0) {
                         <tr>
-                            <td colspan="9" class="text-center text-gray py-4">
-                                No hay productos agregados. Utilice el buscador para agregar productos a retirar.
+                            <td [attr.colspan]="isViewMode() ? 8 : 9" class="text-center text-gray py-4">
+                                {{ isViewMode() ? 'Esta nota no tiene productos registrados.' : 'No hay productos agregados. Utilice el buscador para agregar productos a retirar.' }}
                             </td>
                         </tr>
                         }
@@ -147,13 +185,22 @@
                     VALOR TOTAL (PÉRDIDA/SALIDA): <span class="total-amount">S/ {{ totalGeneral() | number:'1.2-2'
                         }}</span>
                 </div>
+                @if (!isViewMode()) {
                 <div class="actions">
+                    <div class="borrador-toggle">
+                        <p-toggleswitch [ngModel]="soloBorrador()" (ngModelChange)="soloBorrador.set($event)"></p-toggleswitch>
+                        <label>Guardar como Borrador</label>
+                    </div>
+
                     <button pButton label="Limpiar" icon="pi pi-refresh"
                         class="btn-clean p-button-outlined p-button-secondary" (click)="limpiar()"
                         [disabled]="guardando()"></button>
-                    <button pButton label="Confirmar Salida" icon="pi pi-sign-out" class="btn-confirm"
+                    <button pButton [label]="soloBorrador() ? 'Guardar Borrador' : 'Procesar Salida'" 
+                        [icon]="soloBorrador() ? 'pi pi-save' : 'pi pi-check-circle'" 
+                        class="btn-confirm"
                         (click)="confirmarSalida()" [loading]="guardando()"></button>
                 </div>
+                }
             </div>
         </div>
     </div>

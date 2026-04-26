@@ -78,11 +78,21 @@ export const routes: Routes = [
               import('./features/inventario/nuevo-ingreso/components/form-ingreso/form-ingreso'),
           },
           {
+            path: 'nuevo-ingreso/ver/:id',
+            loadComponent: () =>
+              import('./features/inventario/nuevo-ingreso/components/form-ingreso/form-ingreso'),
+          },
+          {
             path: 'nuevo-egreso',
             loadComponent: () => import('./features/inventario/nuevo-egreso/nuevo-egreso'),
           },
           {
             path: 'nuevo-egreso/nuevo',
+            loadComponent: () =>
+              import('./features/inventario/nuevo-egreso/components/form-egreso/form-egreso'),
+          },
+          {
+            path: 'nuevo-egreso/ver/:id',
             loadComponent: () =>
               import('./features/inventario/nuevo-egreso/components/form-egreso/form-egreso'),
           },

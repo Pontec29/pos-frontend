@@ -37,4 +37,11 @@ export class ProductoService {
             responseType: 'blob'
         });
     }
+
+    /**
+     * Obtiene el stock de un producto en un almacén específico.
+     */
+    getStock(productoId: number, almacenId: number): Observable<ApiResponse<number>> {
+        return this.http.get<ApiResponse<number>>(`${environment.apiUrl}/api/v1/inv/stock/producto/${productoId}/almacen/${almacenId}`);
+    }
 }

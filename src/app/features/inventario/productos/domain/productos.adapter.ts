@@ -67,7 +67,8 @@ export class ProductoAdapter {
         PRECIO_VENTA: Number(pres.precioVenta),
         FACTOR_CONVERSION_BASE: Number(pres.factorConversionBase),
         CODIGO_BARRAS: pres.codigoBarras,
-        ES_PRINCIPAL: Boolean(pres.esPrincipal)
+        ES_PRINCIPAL: Boolean(pres.esPrincipal),
+        ACTIVO: Boolean(pres.activo)
       })) || []
     };
   }
@@ -95,6 +96,7 @@ export class ProductoAdapter {
         factorConversionBase: p.FACTOR_CONVERSION_BASE,
         codigoBarras: p.CODIGO_BARRAS,
         esPrincipal: p.ES_PRINCIPAL,
+        activo: p.ACTIVO,
       })),
 
       codigoAfectacionIgv: form.CODIGO_AFECTACION_IGV,

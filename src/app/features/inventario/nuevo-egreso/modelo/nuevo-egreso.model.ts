@@ -1,7 +1,3 @@
-/**
- * Modelos para el módulo de Notas de Salida
- */
-
 export interface CodigoSunatSalida {
     codigo: string;
     nombre: string;
@@ -22,6 +18,43 @@ export interface MovimientoSalidaPayload {
         factorConversion: number;
         costoUnitario: number;
     }>;
+}
+
+export interface MovimientoResponse {
+    id: number;
+    tipoMovimiento: string;
+    serie: string;
+    numero: string;
+    documentoFormateado: string;
+    codigoOperacionSunat: string;
+    documentoReferencia: string;
+    almacenOrigenId: number;
+    almacenOrigenNombre: string;
+    almacenDestinoId: number | null;
+    almacenDestinoNombre: string | null;
+    fechaEmision: string;
+    estado: string;
+    observacion: string;
+    motivoAnulacion: string | null;
+    createdAt: string;
+    detalles: DetalleMovimientoResponse[];
+}
+
+export interface DetalleMovimientoResponse {
+    id: number;
+    productoId: number;
+    productoNombre: string;
+    loteId: number | null;
+    codigoLote: string | null;
+    unidadId: number;
+    unidadAbreviatura: string;
+    cantidad: number;
+    factorConversion: number;
+    cantidadBase: number;
+    costoUnitario: number;
+    subtotal: number;
+    tipoControlStock: string;
+    fechaVencimiento: string | null;
 }
 
 export interface MovimientoResumen {

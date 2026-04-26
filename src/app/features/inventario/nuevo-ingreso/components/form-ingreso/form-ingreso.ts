@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormArray, Validators, FormControl, FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { AlertService } from '@shared/services/alert.service';
 import { PRIMENG_TABLE_MODULES, PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { DividerModule } from 'primeng/divider';
@@ -36,7 +37,7 @@ import { CodigoSunat, MovimientoEntradaPayload } from '../../modelo/nuevo-ingres
         ...PRIMENG_TABLE_MODULES,
         ...PRIMENG_FORM_MODULES
     ],
-    providers: [MessageService],
+    providers: [],
     templateUrl: './form-ingreso.html',
     styleUrl: './form-ingreso.scss'
 })
@@ -47,11 +48,17 @@ export default class FormIngreso implements OnInit {
     private readonly correlativoService = inject(CorrelativoService);
     private readonly productoService = inject(ProductoService);
     private readonly nuevoIngresoService = inject(NuevoIngresoService);
-    private readonly messageService = inject(MessageService);
+    private readonly alertService = inject(AlertService);
     private readonly router = inject(Router);
+    private readonly route = inject(ActivatedRoute);
 
     // Variables de estado
+    readonly isViewMode = signal(false);
+    readonly cargandoDatos = signal(false);
+    readonly estadoMovimiento = signal<string>('');
+    readonly motivoAnulacion = signal<string | null>(null);
     readonly correlativoPreview = signal<CorrelativoPreview | null>(null);
+    readonly soloBorrador = signal(false);
     guardando = signal(false);
     totalGeneral = signal(0);
     productosSugeridos: ProductoBusqueda[] = [];
@@ -73,6 +80,7 @@ export default class FormIngreso implements OnInit {
         fechaEmision: [new Date(), Validators.required],
         codigoOperacionSunat: ['02', Validators.required],
         documentoReferencia: [''],
+        documentoFormateado: [''],
         observacion: [''],
         detalles: this.fb.array([])
     });
@@ -84,7 +92,7 @@ export default class FormIngreso implements OnInit {
     constructor() {
         effect(() => {
             const almacenId = this.contexto.almacenId();
-            if (almacenId) {
+            if (almacenId && !this.isViewMode()) {
                 this.cargarCorrelativo(almacenId);
             }
         });
@@ -93,6 +101,63 @@ export default class FormIngreso implements OnInit {
     ngOnInit() {
         this.detallesFormArray.valueChanges.subscribe(() => {
             this.actualizarTotalGeneral();
+        });
+
+        const id = this.route.snapshot.params['id'];
+        if (id) {
+            this.isViewMode.set(true);
+            this.cargarMovimiento(Number(id));
+        }
+    }
+
+    private cargarMovimiento(id: number) {
+        this.cargandoDatos.set(true);
+        this.nuevoIngresoService.getById(id).subscribe({
+            next: (res) => {
+                if (res.success && res.data) {
+                    const m = res.data;
+                    this.formulario.patchValue({
+                        fechaEmision: new Date(m.fechaEmision + 'T00:00:00'),
+                        codigoOperacionSunat: m.codigoOperacionSunat,
+                        documentoReferencia: m.documentoReferencia,
+                        documentoFormateado: m.documentoFormateado,
+                        observacion: m.observacion
+                    });
+
+                    this.estadoMovimiento.set(m.estado);
+                    this.motivoAnulacion.set(m.motivoAnulacion);
+
+                    // Cargar detalles
+                    this.detallesFormArray.clear();
+                    m.detalles.forEach(d => {
+                        const filaGroup = this.fb.group({
+                            productoId: [d.productoId],
+                            productoNombre: [d.productoNombre],
+                            unidadesList: [[]],
+                            unidadSeleccionada: [{ unidadNombre: d.unidadAbreviatura }],
+                            cantidad: [d.cantidad],
+                            cantidadBase: [d.cantidadBase],
+                            exigeLote: [!!d.codigoLote],
+                            codigoLote: [d.codigoLote],
+                            fechaVencimiento: [d.fechaVencimiento ? new Date(d.fechaVencimiento + 'T00:00:00') : null],
+                            costoUnitario: [d.costoUnitario],
+                            subtotal: [d.subtotal],
+                            tipoControlStock: [d.tipoControlStock]
+                        });
+                        this.detallesFormArray.push(filaGroup);
+                    });
+
+                    if (this.isViewMode()) {
+                        this.formulario.disable();
+                        this.buscadorControl.disable();
+                    }
+                }
+                this.cargandoDatos.set(false);
+            },
+            error: () => {
+                this.alertService.error('No se pudo cargar el movimiento');
+                this.cargandoDatos.set(false);
+            }
         });
     }
 
@@ -165,12 +230,16 @@ export default class FormIngreso implements OnInit {
         this.totalGeneral.set(total);
     }
 
-    guardar() {
+    private formatearFecha(date: Date | string): string {
+        return (date instanceof Date ? date : new Date(date)).toISOString().split('T')[0];
+    }
+
+    confirmarIngreso() {
         const almacenId = this.contexto.almacenId();
         if (!almacenId) return;
 
         if (this.formulario.invalid || this.detallesFormArray.length === 0) {
-            this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Complete los campos obligatorios y agregue al menos un producto.' });
+            this.alertService.warn('Complete los campos obligatorios y agregue al menos un producto.');
             this.formulario.markAllAsTouched();
             return;
         }
@@ -183,7 +252,7 @@ export default class FormIngreso implements OnInit {
             almacenDestinoId: almacenId,
             codigoOperacionSunat: formData.codigoOperacionSunat as string,
             documentoReferencia: formData.documentoReferencia as string,
-            fechaEmision: (formData.fechaEmision as Date).toISOString().split('T')[0],
+            fechaEmision: this.formatearFecha(formData.fechaEmision as Date),
             observacion: formData.observacion as string,
             detalles: formData.detalles.map((d: any) => ({
                 productoId: d.productoId,
@@ -192,23 +261,27 @@ export default class FormIngreso implements OnInit {
                 factorConversion: d.unidadSeleccionada?.factorConversionBase || 1,
                 costoUnitario: d.costoUnitario,
                 codigoLote: d.codigoLote ? d.codigoLote : null,
-                fechaVencimiento: d.fechaVencimiento ? (d.fechaVencimiento as Date).toISOString().split('T')[0] : null
+                fechaVencimiento: d.fechaVencimiento ? this.formatearFecha(d.fechaVencimiento as Date) : null
             }))
         };
 
-        this.nuevoIngresoService.registrarIngreso(payload).subscribe({
+        const request$ = this.soloBorrador() 
+            ? this.nuevoIngresoService.registrarIngreso(payload)
+            : this.nuevoIngresoService.registrarIngresoDirecto(payload);
+
+        request$.subscribe({
             next: (res) => {
                 this.guardando.set(false);
                 if (res.success) {
-                    this.messageService.add({ severity: 'success', summary: 'Éxito', detail: `Ingreso ${res.data?.serie}-${res.data?.numero} OK.` });
+                    this.alertService.success(`Ingreso ${res.data?.serie}-${res.data?.numero} registrado ${this.soloBorrador() ? 'como borrador' : 'y procesada'}.`);
                     this.router.navigate(['/inventario/nuevo-ingreso']);
                 } else {
-                    this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message });
+                    this.alertService.error(res.message);
                 }
             },
-            error: () => {
+            error: (err) => {
                 this.guardando.set(false);
-                this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Fallo al guardar.' });
+                this.alertService.error(err.error?.message || 'Fallo al guardar.');
             }
         });
     }

@@ -53,6 +53,7 @@ export interface PresentacionUpSert {
   FACTOR_CONVERSION_BASE: number;
   CODIGO_BARRAS: string;
   ES_PRINCIPAL: boolean;
+  ACTIVO?: boolean;
 }
 
 export interface StockAperturaUpSert {
