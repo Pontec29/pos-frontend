@@ -40,6 +40,10 @@ export const routes: Routes = [
             loadComponent: () => import('@ventas/facturacion/facturacion.component'),
           },
           {
+            path: 'ver/:id',
+            loadComponent: () => import('@ventas/facturacion/facturacion.component'),
+          },
+          {
             path: 'listar-ventas',
             loadComponent: () => import('@ventas/lista-ventas/lista-ventas'),
           },
@@ -125,6 +129,14 @@ export const routes: Routes = [
           { path: '', loadComponent: () => import('@compras/compras') },
           {
             path: 'nueva',
+            loadComponent: () => import('@compras/components/nueva-compra/nueva-compra'),
+          },
+          {
+            path: 'ver/:id',
+            loadComponent: () => import('@compras/components/nueva-compra/nueva-compra'),
+          },
+          {
+            path: 'editar/:id',
             loadComponent: () => import('@compras/components/nueva-compra/nueva-compra'),
           },
           {

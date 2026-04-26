@@ -157,7 +157,8 @@ export default class EmpresasPage implements OnInit {
         email: ['', [Validators.email]],
         tipoEmpresa: [''],
         empresaPrincipal: [false],
-        activo: [true]
+        activo: [true],
+        logoUrl: ['']
     });
 
     openNew = () => {
@@ -171,7 +172,8 @@ export default class EmpresasPage implements OnInit {
             email: '',
             tipoEmpresa: '',
             empresaPrincipal: false,
-            activo: true
+            activo: true,
+            logoUrl: ''
         });
         this.showDialog.set(true);
     };
@@ -187,10 +189,22 @@ export default class EmpresasPage implements OnInit {
             email: e.email,
             tipoEmpresa: e.tipoEmpresa,
             empresaPrincipal: e.empresaPrincipal,
-            activo: e.activo
+            activo: e.activo,
+            logoUrl: e.logoUrl
         });
         this.showDialog.set(true);
     };
+
+    onFileSelected(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = () => {
+                this.form.patchValue({ logoUrl: reader.result as string });
+            };
+            reader.readAsDataURL(file);
+        }
+    }
 
     save = () => {
         if (this.form.invalid) return;

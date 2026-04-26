@@ -8,7 +8,7 @@ import { MessageService } from 'primeng/api';
 import { CardModule } from 'primeng/card';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { TableModule } from 'primeng/table';
 import { Toast } from "primeng/toast";
 import { GeneralService } from '@shared/services/general.service';
@@ -32,6 +32,7 @@ import { ProductoService } from '@inventario/productos/services/producto.service
 export default class NuevaCompra implements OnInit {
   private fb = inject(FormBuilder);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
   private readonly messageService = inject(MessageService);
 
   private readonly compService = inject(ComprasService);
@@ -39,6 +40,8 @@ export default class NuevaCompra implements OnInit {
   private readonly productoService = inject(ProductoService);
 
   saving = signal(false);
+  isViewMode = signal(false);
+  isEditMode = signal(false);
   tiposOperacion = signal<TipoOperacion[]>([]);
   afectacionesIgv = signal<SunatAfectacionIgv[]>([]);
 
@@ -61,13 +64,14 @@ export default class NuevaCompra implements OnInit {
   filteredSuppliers = signal<any[]>([]);
   filteredProducts = signal<any[]>([]);
   selectedSupplier = signal<any | null>(null);
+  availablePresentations = signal<any[]>([]);
 
   // ! FORMULARIO REACTIVO
   form = this.fb.group({
     ID_ALMACEN: [1, [Validators.required]], // Default almacén 1
-    ID_PROVEEDOR: [null as number | null, [Validators.required]],
+    ID_PROVEEDOR: [null as any | null, [Validators.required]],
     ID_TIPO_OPERACION: [null as number | null, [Validators.required]],
-    ID_TIPO_COMPROBANTE: [null as string | null, [Validators.required]],
+    ID_TIPO_COMPROBANTE: ['01', [Validators.required]],
     SERIE: ['', [Validators.required, Validators.maxLength(4)]],
     NUMERO: ['', [Validators.required, Validators.maxLength(10)]],
     FECHA_EMISION: [new Date(), [Validators.required]],
@@ -81,6 +85,7 @@ export default class NuevaCompra implements OnInit {
 
     // CAMPOS TEMPORALES PARA AGREGAR PRODUCTO
     TEMP_PRODUCTO: [null as any | null],
+    TEMP_UNIDAD: [null as any | null],
     TEMP_CANTIDAD: [null as number | null],
     TEMP_COSTO: [null as number | null],
     TEMP_AFECTACION: [null as SunatAfectacionIgv | null],
@@ -92,6 +97,86 @@ export default class NuevaCompra implements OnInit {
 
   ngOnInit() {
     this.loadCatalogs();
+
+    this.form.valueChanges.subscribe(() => {
+      this.formUpdateTrigger.update(v => v + 1);
+    });
+
+    const id = this.route.snapshot.paramMap.get('id');
+    const path = this.route.snapshot.url[0]?.path;
+    
+    if (path === 'editar') {
+      this.isEditMode.set(true);
+    }
+
+    if (id) {
+      if (path === 'ver') this.isViewMode.set(true);
+      this.loadCompra(Number(id));
+    }
+  }
+
+  loadCompra(id: number) {
+    this.compService.getById(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const compra = res.data;
+          
+          // Mapear cabecera
+          this.form.patchValue({
+            ID_ALMACEN: compra.ID_ALMACEN,
+            ID_PROVEEDOR: { id: compra.ID_PROVEEDOR, businessName: compra.PROVEEDOR },
+            ID_TIPO_OPERACION: compra.ID_TIPO_OPERACION,
+            ID_TIPO_COMPROBANTE: compra.ID_TIPO_COMPROBANTE,
+            SERIE: compra.SERIE,
+            NUMERO: compra.NUMERO,
+            FECHA_EMISION: new Date(compra.FECHA_EMISION + 'T00:00:00'),
+            FECHA_VENCIMIENTO: compra.FECHA_VENCIMIENTO ? new Date(compra.FECHA_VENCIMIENTO + 'T00:00:00') : null,
+            ID_MONEDA: compra.ID_MONEDA,
+            TIPO_CAMBIO: compra.TIPO_CAMBIO,
+            OBSERVACIONES: compra.OBSERVACIONES,
+            GENERA_INGRESO: false // No aplica para visualización
+          });
+
+          // Limpiar detalles y cargar nuevos
+          this.detalles.clear();
+          if (compra.DETALLES) {
+            compra.DETALLES.forEach((d: any) => {
+              const detalleGroup = this.fb.group({
+                ID_PRODUCTO: [d.ID_PRODUCTO],
+                PRODUCTO_NOMBRE: [d.PRODUCTO_NOMBRE],
+                ID_AFECTACION_IGV: [d.ID_AFECTACION_IGV],
+                AFECTACION_NOMBRE: [d.AFECTACION_NOMBRE],
+                CANTIDAD: [d.CANTIDAD],
+                ID_UNIDAD: [d.ID_UNIDAD],
+                UNIDAD_NOMBRE: [d.UNIDAD_NOMBRE],
+                FACTOR_CONVERSION: [d.FACTOR_CONVERSION],
+                VALOR_UNITARIO: [d.VALOR_UNITARIO],
+                PRECIO_UNITARIO: [d.PRECIO_UNITARIO],
+                PORCENTAJE_IGV: [d.PORCENTAJE_IGV],
+                CODIGO_LOTE: [d.CODIGO_LOTE],
+                FECHA_VENCIMIENTO: [d.FECHA_VENCIMIENTO ? new Date(d.FECHA_VENCIMIENTO + 'T00:00:00') : null],
+                SUBTOTAL: [d.SUBTOTAL],
+                IGV: [d.IGV],
+                TOTAL: [d.TOTAL]
+              });
+              this.detalles.push(detalleGroup);
+            });
+          }
+
+          if (this.isViewMode()) {
+            this.form.disable();
+          } else {
+            this.form.enable();
+          }
+
+          // Forzar recálculo de totales
+          this.formUpdateTrigger.update(v => v + 1);
+        }
+      },
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo cargar la compra' });
+      }
+    });
   }
 
   loadCatalogs() {
@@ -129,23 +214,27 @@ export default class NuevaCompra implements OnInit {
   }
 
   // ! REATIVIDAD PARA TOTALES
-  private formValue = toSignal(this.form.valueChanges, { initialValue: this.form.value });
+  // Usamos un signal que se actualiza manualmente o mediante un stream que incluya controles deshabilitados
+  private formUpdateTrigger = signal(0);
 
   // ! CALCULOS COMPUTADOS
   subtotalGeneral = computed(() => {
-    const detalles = this.formValue()?.DETALLES as any[];
+    this.formUpdateTrigger(); // Dependencia
+    const detalles = this.form.getRawValue().DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => acc + (curr.SUBTOTAL || 0), 0);
   });
 
   igvTotal = computed(() => {
-    const detalles = this.formValue()?.DETALLES as any[];
+    this.formUpdateTrigger();
+    const detalles = this.form.getRawValue().DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => acc + (curr.IGV || 0), 0);
   });
 
   totalGeneral = computed(() => {
-    const detalles = this.formValue()?.DETALLES as any[];
+    this.formUpdateTrigger();
+    const detalles = this.form.getRawValue().DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => {
       const isGratuito = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV)?.esBonificacion;
@@ -154,7 +243,8 @@ export default class NuevaCompra implements OnInit {
   });
 
   opGratuita = computed(() => {
-    const detalles = this.formValue()?.DETALLES as any[];
+    this.formUpdateTrigger();
+    const detalles = this.form.getRawValue().DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => {
       const isGratuito = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV)?.esBonificacion;
@@ -163,7 +253,8 @@ export default class NuevaCompra implements OnInit {
   });
 
   noGravado = computed(() => {
-    const detalles = this.formValue()?.DETALLES as any[];
+    this.formUpdateTrigger();
+    const detalles = this.form.getRawValue().DETALLES as any[];
     if (!detalles) return 0;
     return detalles.reduce((acc, curr) => {
       const afectacion = this.afectacionesIgv().find(a => a.id === curr.ID_AFECTACION_IGV);
@@ -202,8 +293,7 @@ export default class NuevaCompra implements OnInit {
           const mappedProducts = res.data.map(p => ({
             id: p.id,
             name: p.nombre,
-            unitId: p.idUnidadBase || 1,
-            igv: 18 // Default IGV, ideally this should come from the product or company config
+            presentaciones: p.presentaciones || []
           }));
           this.filteredProducts.set(mappedProducts);
         }
@@ -211,22 +301,39 @@ export default class NuevaCompra implements OnInit {
     });
   }
 
+  onProductSelect(event: any) {
+    // PrimeNG autocomplete puede devolver el objeto directamente o dentro de event.value
+    const product = event.value || event;
+    
+    if (product && product.presentaciones) {
+      this.availablePresentations.set(product.presentaciones);
+      // Seleccionar la principal por defecto
+      const principal = product.presentaciones.find((p: any) => p.esPrincipal) || product.presentaciones[0];
+      this.form.patchValue({ TEMP_UNIDAD: principal });
+    } else {
+      this.availablePresentations.set([]);
+      this.form.patchValue({ TEMP_UNIDAD: null });
+    }
+  }
+
   // ! MANEJO DEL PROVEEDOR SELECCIONADO
   // Helper para manejar la selección del autocomplete y setear el ID en el form
-  onSupplierSelect(supplier: any) {
-    this.form.patchValue({ ID_PROVEEDOR: supplier.id });
+  onSupplierSelect(event: any) {
+    const supplier = event.value || event;
+    this.form.patchValue({ ID_PROVEEDOR: supplier });
   }
 
   // ! AGREGAR Y ELIMINAR LINEAS
   addLine() {
     const values = this.form.value;
     const product = values.TEMP_PRODUCTO;
+    const unit = values.TEMP_UNIDAD;
     const quantity = values.TEMP_CANTIDAD;
     const cost = values.TEMP_COSTO;
     const afectacion = values.TEMP_AFECTACION;
 
-    if (!product || !quantity || !cost || !afectacion) {
-      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Complete los datos del producto' });
+    if (!product || !unit || !quantity || !cost || !afectacion) {
+      this.messageService.add({ severity: 'warn', summary: 'Atención', detail: 'Complete los datos del producto y unidad' });
       return;
     }
 
@@ -242,7 +349,9 @@ export default class NuevaCompra implements OnInit {
       ID_AFECTACION_IGV: [afectacion.id, [Validators.required]],
       AFECTACION_NOMBRE: [afectacion.descripcion],
       CANTIDAD: [quantity, [Validators.required, Validators.min(0.01)]],
-      ID_UNIDAD: [product.unitId || 1, [Validators.required]],
+      ID_UNIDAD: [unit.unidadId, [Validators.required]],
+      UNIDAD_NOMBRE: [unit.unidadNombre],
+      FACTOR_CONVERSION: [unit.factorConversionBase || 1],
       VALOR_UNITARIO: [cost, [Validators.required]],
       PRECIO_UNITARIO: [(cost || 0) * (aplicaIgv ? (1 + igvPercent / 100) : 1)],
       PORCENTAJE_IGV: [igvPercent, [Validators.required]],
@@ -258,6 +367,7 @@ export default class NuevaCompra implements OnInit {
     // Reset fields en el form
     this.form.patchValue({
       TEMP_PRODUCTO: null,
+      TEMP_UNIDAD: null,
       TEMP_CANTIDAD: null,
       TEMP_COSTO: null,
       TEMP_LOTE: '',
@@ -303,7 +413,22 @@ export default class NuevaCompra implements OnInit {
   save() {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Complete los campos obligatorios' });
+      
+      // Identificar qué campo está fallando para avisar al usuario
+      const invalidFields = [];
+      const controls = this.form.controls as any;
+      for (const name in controls) {
+        if (controls[name].invalid) {
+          invalidFields.push(name);
+        }
+      }
+
+      console.log('Campos inválidos:', invalidFields);
+      this.messageService.add({ 
+        severity: 'error', 
+        summary: 'Formulario Incompleto', 
+        detail: `Por favor revise los siguientes campos: ${invalidFields.join(', ')}` 
+      });
       return;
     }
 
@@ -313,7 +438,7 @@ export default class NuevaCompra implements OnInit {
     // Ensure dates are strings YYYY-MM-DD
     const compra: CompraCrear = {
       ID_ALMACEN: formValue.ID_ALMACEN!,
-      ID_PROVEEDOR: formValue.ID_PROVEEDOR!,
+      ID_PROVEEDOR: formValue.ID_PROVEEDOR?.id || formValue.ID_PROVEEDOR,
       ID_TIPO_OPERACION: formValue.ID_TIPO_OPERACION!,
       ID_TIPO_COMPROBANTE: formValue.ID_TIPO_COMPROBANTE!,
       SERIE: formValue.SERIE!,
@@ -337,20 +462,30 @@ export default class NuevaCompra implements OnInit {
     };
 
     this.saving.set(true);
-    this.compService.create(compra).subscribe({
+    const id = this.route.snapshot.paramMap.get('id');
+    
+    const obs$ = (id && this.isEditMode())
+      ? this.compService.update(Number(id), compra)
+      : this.compService.create(compra);
+
+    obs$.subscribe({
       next: (response: any) => {
         this.saving.set(false);
         if (response.success) {
-          this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Compra registrada correctamente' });
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: 'Éxito', 
+            detail: this.isEditMode() ? 'Compra actualizada correctamente' : 'Compra registrada correctamente' 
+          });
           this.router.navigate(['/compras']);
         } else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'No se pudo registrar la compra' });
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: response.message || 'No se pudo procesar la compra' });
         }
       },
       error: (err: any) => {
         this.saving.set(false);
         console.error('Error al guardar compra:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Ocurrió un error al guardar la compra' });
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: err.message || 'Ocurrió un error al guardar la compra' });
       }
     });
   }

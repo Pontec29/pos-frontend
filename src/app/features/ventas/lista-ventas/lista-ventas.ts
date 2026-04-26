@@ -11,6 +11,7 @@ import { VentaResumen, EstadoVenta } from '@ventas/models/venta.models';
 import { TagModule } from 'primeng/tag';
 import { MenuModule } from 'primeng/menu';
 import { TableLazyLoadEvent } from 'primeng/table';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-lista-ventas',
@@ -32,6 +33,7 @@ import { TableLazyLoadEvent } from 'primeng/table';
 export default class ListaVentas implements OnInit {
   private readonly ventasService = inject(VentasService);
   private readonly messageService = inject(MessageService);
+  private readonly router = inject(Router);
 
   // ! FILTROS
   readonly searchText = signal('');
@@ -240,7 +242,7 @@ export default class ListaVentas implements OnInit {
     const search = this.searchText().toLowerCase();
 
     if (search) {
-      filtered = filtered.filter(v => 
+      filtered = filtered.filter(v =>
         (v.clienteNombre && v.clienteNombre.toLowerCase().includes(search)) ||
         (v.clienteNumeroDocumento && v.clienteNumeroDocumento.includes(search)) ||
         (v.numero && v.numero.includes(search))
@@ -294,8 +296,12 @@ export default class ListaVentas implements OnInit {
     return { valid, invalid };
   }
 
+  onNuevaVenta() {
+    this.router.navigate(['/ventas/facturacion']);
+  }
+
   verDetalle(venta: VentaResumen) {
-    this.messageService.add({ severity: 'info', summary: 'Detalle', detail: `Ver detalle venta #${venta.id}` });
+    this.router.navigate(['/ventas/ver', venta.id]);
   }
 
   imprimirPdf(venta: VentaResumen) {

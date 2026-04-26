@@ -6,7 +6,7 @@
 
                 <div class="erp-card erp-header-card">
                     <div class="header-info">
-                        <h1 class="header-title">Registro de Compra</h1>
+                        <h1 class="header-title">{{ isViewMode() ? 'Detalle de Compra' : 'Registro de Compra' }}</h1>
                     </div>
 
                     <div class="header-actions">
@@ -49,7 +49,14 @@
                     <div class="row items-end">
                         <div class="col-6 col-md-6 form-field">
                             <label>Proveedor (Razón Social o RUC)</label>
-                            <p-autoComplete [ngModel]="selectedSupplier()" (ngModelChange)="selectedSupplier.set($event)" [ngModelOptions]="{standalone: true}" [suggestions]="filteredSuppliers()" (completeMethod)="filterSuppliers($event)" optionLabel="businessName" (onSelect)="onSupplierSelect($event)" placeholder="Buscar proveedor por nombre o RUC..." [forceSelection]="true" fluid>
+                            <p-autoComplete 
+                                formControlName="ID_PROVEEDOR"
+                                [suggestions]="filteredSuppliers()" 
+                                (completeMethod)="filterSuppliers($event)" 
+                                optionLabel="businessName" 
+                                placeholder="Buscar proveedor por nombre o RUC..." 
+                                [forceSelection]="true" 
+                                fluid>
                             </p-autoComplete>
                         </div>
 
@@ -82,12 +89,29 @@
                     </div>
                 </div>
 
-                <div class="erp-card product-selector-card">
+                <div class="erp-card product-selector-card" *ngIf="!isViewMode()">
                     <div class="selector-grid">
                         <div class="field-group product-field">
                             <label>Producto</label>
-                            <p-autoComplete formControlName="TEMP_PRODUCTO" [suggestions]="filteredProducts()" (completeMethod)="filterProducts($event)" optionLabel="name" placeholder="Buscar producto..." [forceSelection]="true" fluid>
+                            <p-autoComplete formControlName="TEMP_PRODUCTO" [suggestions]="filteredProducts()" (completeMethod)="filterProducts($event)" optionLabel="name" placeholder="Buscar producto..." [forceSelection]="true" (onSelect)="onProductSelect($event)" fluid>
                             </p-autoComplete>
+                        </div>
+    
+                        <div class="field-group unit-field">
+                            <label>Unidad</label>
+                            <p-select formControlName="TEMP_UNIDAD" [options]="availablePresentations()" placeholder="Seleccione..." fluid>
+                                <ng-template pTemplate="selectedItem" let-selectedOption>
+                                    <div class="flex items-center" *ngIf="selectedOption">
+                                        <div>{{ selectedOption.unidadNombre }}</div>
+                                    </div>
+                                </ng-template>
+                                <ng-template pTemplate="item" let-option>
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-xs">{{ option.unidadNombre }}</span>
+                                        <small class="text-muted text-xxs">Factor: {{ option.factorConversionBase | number:'1.0-4' }}</small>
+                                    </div>
+                                </ng-template>
+                            </p-select>
                         </div>
 
                         <div class="field-group afectacion-field">
@@ -122,13 +146,14 @@
                             <tr>
                                 <th class="text-center" style="width: 40px;">#</th>
                                 <th>Producto</th>
-                                <th class="text-center" style="width: 100px;">Cant.</th>
-                                <th class="text-right" style="width: 120px;">Costo Unit.</th>
+                                <th class="text-center" style="width: 80px;">Unidad</th>
+                                <th class="text-center" style="width: 90px;">Cant.</th>
+                                <th class="text-right" style="width: 110px;">Costo Unit.</th>
                                 <th class="text-right" style="width: 120px;">Subtotal (s/ IGV)</th>
                                 <th class="text-right" style="width: 100px;">I.G.V.</th>
                                 <th class="text-right" style="width: 120px;">Total</th>
                                 <th class="text-center" style="width: 120px;">Operación</th>
-                                <th class="text-center" style="width: 50px;"></th>
+                                <th class="text-center" style="width: 50px;" *ngIf="!isViewMode()"></th>
                             </tr>
                         </ng-template>
 
@@ -143,6 +168,9 @@
                                                 Lote: {{ item.get('CODIGO_LOTE')?.value }}
                                             </small>
                                         </div>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="unit-badge">{{ item.get('UNIDAD_NOMBRE')?.value }}</span>
                                     </td>
                                     <td>
                                         <p-inputNumber formControlName="CANTIDAD" (onInput)="updateRowTotals(ri)" [min]="0.01" [showButtons]="false" class="table-input" fluid>
@@ -164,7 +192,7 @@
                                     <td class="text-center">
                                         <span class="op-badge">{{ item.get('AFECTACION_NOMBRE')?.value }}</span>
                                     </td>
-                                    <td class="text-center">
+                                    <td class="text-center" *ngIf="!isViewMode()">
                                         <button class="btn-delete-row" type="button" (click)="removeLine(ri)" title="Eliminar línea">
                                             <i class="pi pi-times"></i>
                                         </button>
@@ -215,7 +243,7 @@
                     </div>
 
                     <div class="actions-group mt-5">
-                        <button type="submit" class="btn-issue-voucher mb-2" [disabled]="form.invalid || saving()">
+                        <button type="submit" class="btn-issue-voucher mb-2" [disabled]="saving()" *ngIf="!isViewMode()">
                             <i [class]="saving() ? 'pi pi-spin pi-spinner' : 'pi pi-save'"></i>
                             {{ saving() ? 'Procesando...' : 'Guardar Compra' }}
                         </button>
@@ -225,7 +253,7 @@
                     </div>
                 </div>
 
-                <div class="erp-card warehouse-config-card">
+                <div class="erp-card warehouse-config-card" *ngIf="!isViewMode()">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex flex-col">
                             <span class="font-bold text-sm">Generar Nota de Entrada</span>

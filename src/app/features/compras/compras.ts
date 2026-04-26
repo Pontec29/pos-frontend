@@ -200,11 +200,15 @@ export default class Compras implements OnInit {
   }
 
   onEditCompra(compra: Compra): void {
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Editar',
-      detail: `Editar compra #${compra.ID_COMPRA}`
-    });
+    if (compra.ESTADO_DESCRIPCION !== 'Registrado') {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Acción no permitida',
+        detail: 'Solo se pueden editar compras en estado "Registrado".'
+      });
+      return;
+    }
+    this.router.navigate(['/compras/editar', compra.ID_COMPRA]);
   }
 
   onDeleteCompra(compra: Compra): void {
@@ -216,7 +220,7 @@ export default class Compras implements OnInit {
   }
 
   onViewCompra(compra: Compra): void {
-    this.router.navigate(['/compras', compra.ID_COMPRA]);
+    this.router.navigate(['/compras/ver', compra.ID_COMPRA]);
   }
 
   getEstadoSeverity(estadoDescripcion: string | null | undefined): 'success' | 'danger' | 'warn' | 'info' {

@@ -28,6 +28,15 @@ export class ComprasService {
     );
   }
 
+  getById(id: number): Observable<ApiResponse<Compra>> {
+    return this.http.get<ApiResponse<CompraDto>>(`${this.apiUrl}/${id}`).pipe(
+      map((res) => ({
+        ...res,
+        data: ComprasAdapter.adapt(res.data)
+      }))
+    );
+  }
+
   getTiposOperacion(): Observable<ApiResponse<TipoOperacion[]>> {
     return this.http.get<ApiResponse<TipoOperacion[]>>(`${this.apiUrl}/catalogos/tipos-operacion`);
   }
@@ -38,6 +47,12 @@ export class ComprasService {
 
   create(request: CompraCrear): Observable<ApiResponseSuccess> {
     return this.http.post<ApiResponseSuccess>(`${this.apiUrl}`, ComprasAdapter.adaptToCreate(request)).pipe(
+      catchError(this.handleHttpError.bind(this))
+    );
+  }
+
+  update(id: number, request: CompraCrear): Observable<ApiResponseSuccess> {
+    return this.http.put<ApiResponseSuccess>(`${this.apiUrl}/${id}`, ComprasAdapter.adaptToCreate(request)).pipe(
       catchError(this.handleHttpError.bind(this))
     );
   }

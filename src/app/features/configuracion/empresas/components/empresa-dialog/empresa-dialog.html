@@ -1,6 +1,22 @@
 <p-dialog [visible]="visible" [modal]="true" [style]="{width:'600px'}" [draggable]="false" [closable]="false">
     <ng-template #header>Empresa</ng-template>
     <form [formGroup]="form" class="form-grid">
+        <!-- SECCIÓN LOGO -->
+        <div class="logo-upload-container">
+            <div class="logo-preview">
+                <img *ngIf="form.get('logoUrl')?.value" [src]="form.get('logoUrl')?.value" alt="Logo preview">
+                <div *ngIf="!form.get('logoUrl')?.value" class="logo-placeholder">
+                    <i class="pi pi-image"></i>
+                    <span>Sin Logo</span>
+                </div>
+            </div>
+            <div class="logo-actions">
+                <input #fileInput type="file" (change)="fileSelected.emit($event)" accept="image/*" style="display: none;">
+                <app-button preset="add" icon="pi pi-upload" label="Subir Logo" (clicked)="fileInput.click()"></app-button>
+                <small class="text-muted block mt-2">Formatos: PNG, JPG (Recomendado 200x200)</small>
+            </div>
+        </div>
+
         <div class="form-row">
             <label for="razonSocial">Razón Social</label>
             <input pInputText id="razonSocial" formControlName="razonSocial" />

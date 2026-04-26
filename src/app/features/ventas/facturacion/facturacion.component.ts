@@ -10,7 +10,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '@auth/services/auth.service';
 import { Cliente } from '@clientes/models/cliente.model';
 import { ClientesService } from '@clientes/services/clientes';
@@ -69,6 +69,7 @@ export default class FacturacionComponent {
 
   // Signals para estado
   guardando = signal(false);
+  isViewMode = signal(false);
   mostrarModalCliente = signal(false);
 
   // Opciones para selects usando los modelos
@@ -105,7 +106,8 @@ export default class FacturacionComponent {
     () => this.contexto.selectedSucursal()?.nombre ?? 'Sin sucursal',
   );
 
-  // === Formularios Reactivos ===
+  private readonly activatedRoute = inject(ActivatedRoute);
+
   buscadorControl = new FormControl<string | ProductoBusqueda | null>(null);
 
   ventaForm: FormGroup = this.fb.group({
@@ -174,6 +176,12 @@ export default class FacturacionComponent {
     this.cargarCorrelativo();
     this.cargarMetodosPago();
 
+    const id = this.activatedRoute.snapshot.paramMap.get('id');
+    if (id) {
+      this.isViewMode.set(true);
+      this.loadVenta(Number(id));
+    }
+
     // Cargar tipos de afectación desde el servicio general
     this.generalService.getAllAfectacionesIgv().subscribe({
       next: (res) => {
@@ -217,6 +225,65 @@ export default class FacturacionComponent {
       error: (err) => {
         console.error('Error cargando métodos de pago', err);
       },
+    });
+  }
+
+  loadVenta(id: number) {
+    this.ventasService.getVentaById(id).subscribe({
+      next: (res) => {
+        if (res.success && res.data) {
+          const venta = res.data;
+          this.tipoComprobanteSeleccionado.set(venta.tipoComprobanteId);
+          this.actualSerie.set(venta.serie);
+          this.actualNumero.set(venta.numero);
+          this.serieCorrelativo.set(`${venta.serie}-${venta.numero}`);
+
+          // Cargar cliente
+          const clienteObj: any = {
+            id: venta.clienteId as number,
+            razonSocial: venta.clienteNombre || 'CLIENTE VARIOS',
+            numeroDocumento: venta.clienteNumeroDocumento || '00000000',
+            tipoDocumento: '',
+            direccionFiscal: '',
+            correoElectronico: '',
+            telefono: '',
+            esCliente: true,
+            esProveedor: false,
+            estado: true
+          };
+          this.clienteDisplay = clienteObj;
+
+          this.ventaForm.patchValue({
+            fechaEmision: new Date(venta.fEmision),
+            cliente: clienteObj,
+            moneda: venta.monedaId,
+            condicionPago: {
+              condicion: venta.formaPago,
+              formaPago: venta.metodoPagoId,
+              refOperacion: ''
+            }
+          });
+
+          // Cargar detalles
+          this.detallesFormArray.clear();
+          venta.detalles.forEach(d => {
+            const filaGroup = this.fb.group({
+              productoId: [d.productoId],
+              productoNombre: [d.productoNombre],
+              productoCodigo: [d.productoCodigo],
+              cantidad: [d.cantidad],
+              precioUnitario: [d.precioUnitario],
+              subtotal: [d.subtotal],
+              afectacion: [d.tipoAfectacionId]
+            });
+            this.detallesFormArray.push(filaGroup);
+          });
+
+          if (this.isViewMode()) {
+            this.ventaForm.disable();
+          }
+        }
+      }
     });
   }
 
@@ -506,7 +573,7 @@ export default class FacturacionComponent {
             summary: 'Venta Guardada',
             detail: 'La venta se ha registrado exitosamente.',
           });
-          this.router.navigate(['/ventas/facturacion']);
+          this.router.navigate(['/ventas/listar-ventas']);
         } else {
           this.messageService.add({
             severity: 'error',
@@ -528,7 +595,7 @@ export default class FacturacionComponent {
   }
 
   volver() {
-    this.router.navigate(['/ventas/facturacion']);
+    this.router.navigate(['/ventas/listar-ventas']);
   }
 
   limpiarFormulario() {

@@ -56,7 +56,7 @@
                             </p-autoComplete>
                         </div>
 
-                        <div class="col-6 col-md-2 form-field">
+                        <div class="col-6 col-md-2 form-field" *ngIf="!isViewMode()">
                             <p-button label="Nuevo Cliente" icon="pi pi-plus" (click)="abrirModalCliente()" fluid styleClass="btn-new-client w-full"></p-button>
                         </div>
 
@@ -68,7 +68,7 @@
                     </div>
                 </div>
 
-                <div class="erp-card erp-search-section">
+                <div class="erp-card erp-search-section" *ngIf="!isViewMode()">
                     <div class="row items-end">
                         <div class="col-12 col-md-4 form-field">
                             <label>Buscar Producto</label>
@@ -113,7 +113,7 @@
                                 <th class="text-center" style="width: 100px;">Cant.</th>
                                 <th class="text-right" style="width: 120px;">Unitario</th>
                                 <th class="text-right" style="width: 120px;">Total</th>
-                                <th class="action-col" style="width: 60px;"></th>
+                                <th class="action-col" style="width: 60px;" *ngIf="!isViewMode()"></th>
                             </tr>
                         </thead>
                         <tbody formArrayName="detalles">
@@ -133,7 +133,7 @@
                                 <td><p-inputnumber formControlName="cantidad" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
                                 <td><p-inputnumber formControlName="precioUnitario" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
                                 <td class="text-right font-bold">{{ item.get('subtotal')?.value | number:'1.2-2' }}</td>
-                                <td class="text-center">
+                                <td class="text-center" *ngIf="!isViewMode()">
                                     <button class="btn-delete" type="button" (click)="eliminarFila(i)">
                                         <i class="pi pi-trash"></i>
                                     </button>
@@ -163,9 +163,13 @@
                             <span class="total-number">{{ totalGeneral() | number:'1.2-2' }}</span>
                         </div>
                     </div>
-                    <button type="submit" class="btn-issue-voucher" [disabled]="guardando()">
+                    <button type="submit" class="btn-issue-voucher" [disabled]="guardando()" *ngIf="!isViewMode()">
                         <i [class]="guardando() ? 'pi pi-spin pi-spinner' : 'pi pi-file-export'"></i>
                         {{ guardando() ? 'Procesando...' : 'Emitir Comprobante' }}
+                    </button>
+                    <button type="button" class="btn-issue-voucher" (click)="volver()" *ngIf="isViewMode()" style="background: #64748b;">
+                        <i class="pi pi-arrow-left"></i>
+                        Volver a la Lista
                     </button>
                 </div>
 
@@ -176,8 +180,8 @@
                     <div class="form-grid">
                         <div class="col-12 form-field">
                             <div class="payment-toggle">
-                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CONTADO'" (click)="ventaForm.get('condicionPago.condicion')?.setValue('CONTADO')">Contado</button>
-                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CRÉDITO'" (click)="ventaForm.get('condicionPago.condicion')?.setValue('CRÉDITO')">Crédito</button>
+                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CONTADO'" (click)="!isViewMode() && ventaForm.get('condicionPago.condicion')?.setValue('CONTADO')" [disabled]="isViewMode()">Contado</button>
+                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CRÉDITO'" (click)="!isViewMode() && ventaForm.get('condicionPago.condicion')?.setValue('CRÉDITO')" [disabled]="isViewMode()">Crédito</button>
                             </div>
                         </div>
                         <div class="col-12 form-field">

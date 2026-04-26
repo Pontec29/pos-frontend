@@ -20,6 +20,7 @@ export class EmpresaDialogComponent {
   @Input() visible = false;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<void>();
+  @Output() fileSelected = new EventEmitter<any>();
 
   onHide() {
     this.visibleChange.emit(false);

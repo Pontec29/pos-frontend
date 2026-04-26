@@ -8,4 +8,5 @@ export interface Empresa {
   tipoEmpresa: string | null;
   empresaPrincipal: boolean;
   activo: boolean;
+  logoUrl?: string;
 }

@@ -268,7 +268,7 @@
 
   .selector-grid {
     display: grid;
-    grid-template-columns: 1.5fr 1fr 100px 120px 140px;
+    grid-template-columns: 1.5fr 0.8fr 1fr 100px 120px 140px;
     gap: var(--space-4);
     align-items: end;
 
@@ -553,6 +553,18 @@
     border-radius: var(--radius-sm);
     color: var(--gray-600);
     white-space: nowrap;
+  }
+
+  .unit-badge {
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 0.25rem 0.6rem;
+    background: var(--primary-lighter);
+    color: var(--primary);
+    border: 1px solid var(--primary-light);
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    display: inline-block;
   }
 
   .btn-delete-row {

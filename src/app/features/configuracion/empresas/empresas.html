@@ -156,4 +156,4 @@
     </section>
 </div>
 
-<app-empresa-dialog [form]="form" [statusOptions]="statusOptions" [visible]="showDialog()" (visibleChange)="showDialog.set($event)" (save)="save()"></app-empresa-dialog>
+<app-empresa-dialog [form]="form" [statusOptions]="statusOptions" [visible]="showDialog()" (visibleChange)="showDialog.set($event)" (save)="save()" (fileSelected)="onFileSelected($event)"></app-empresa-dialog>
