@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Sucursales</h6>
-            <p class="subtitle">Gestión de las sedes de la empresa.</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nueva Sucursal" (clicked)="openNew()"></app-button>
@@ -15,23 +14,19 @@
                 <div class="table-section__header-actions--left">
                     <span class="p-input-icon-left search-wrapper">
                         <i class="pi pi-search" aria-hidden="true"></i>
-                        <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-                            placeholder="Buscar por nombre, dirección o email..." class="search-input" />
+                        <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Buscar por nombre, dirección o email..." class="search-input" />
                     </span>
                 </div>
 
                 <div class="table-section__header-actions--right">
                     <label>Estado:</label>
-                    <p-select [options]="statusOptions" [ngModel]="selectedStatus()"
-                        (ngModelChange)="selectedStatus.set($event); first.set(0)" placeholder="Todos" [showClear]="true"
-                        class="filter-dropdown">
+                    <p-select [options]="statusOptions" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); first.set(0)" placeholder="Todos" [showClear]="true" class="filter-dropdown">
                     </p-select>
                 </div>
             </div>
 
             <div class="table-section__main-table sucursales-table" [class.table-loading]="loading()">
-                <p-table [value]="filteredSucursales()" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-                    class="p-datatable-sm custom-table">
+                <p-table [value]="filteredSucursales()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table">
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 4rem">#</th>
@@ -61,17 +56,14 @@
                             <td>{{ sucursal.telefono || '-' }}</td>
                             <td>{{ sucursal.email || '-' }}</td>
                             <td class="text-center">
-                                <p-tag [value]="sucursal.activo ? 'Activo' : 'Inactivo'"
-                                    [severity]="sucursal.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                                <p-tag [value]="sucursal.activo ? 'Activo' : 'Inactivo'" [severity]="sucursal.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>
                             <td class="text-center">
                                 <div class="action-buttons">
-                                    <button class="action-buttons--edit" (click)="editSucursal(sucursal)" pTooltip="Editar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--edit" (click)="editSucursal(sucursal)" pTooltip="Editar" tooltipPosition="top">
                                         <i class="pi pi-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--delete" (click)="deleteSucursal(sucursal)" pTooltip="Eliminar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--delete" (click)="deleteSucursal(sucursal)" pTooltip="Eliminar" tooltipPosition="top">
                                         <i class="pi pi-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -114,10 +106,7 @@
             </div>
 
             <div class="table-section__footer-paginated">
-                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-                    [totalRecords]="filteredSucursales().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
-                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                    class="custom-paginator">
+                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filteredSucursales().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
                 </p-paginator>
             </div>
         </div>
@@ -127,10 +116,8 @@
 <p-confirmDialog [style]="{width: '450px'}" />
 
 @if (visible()) {
-    @if (modalData()) {
-        <app-modal-form 
-            [data]="modalData()!" 
-            (closed)="onModalClosed($event)">
-        </app-modal-form>
-    }
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)">
+</app-modal-form>
+}
 }

@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Gestión de Empresas</h6>
-            <p class="subtitle">Administre las entidades y su configuración multiempresa dentro del sistema.</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nueva Empresa" (clicked)="openNew()"></app-button>
@@ -15,23 +14,19 @@
                 <div class="table-section__header-actions--left">
                     <span class="p-input-icon-left search-wrapper">
                         <i class="pi pi-search" aria-hidden="true"></i>
-                        <input pInputText type="text" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)"
-                            placeholder="Buscar por razón social, NIT o correo..." class="search-input"
-                            aria-label="Buscar por razón social, NIT o correo" />
+                        <input pInputText type="text" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" placeholder="Buscar por razón social, NIT o correo..." class="search-input" aria-label="Buscar por razón social, NIT o correo" />
                     </span>
                 </div>
 
                 <div class="table-section__header-actions--right">
                     <label>Estado:</label>
-                    <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [(ngModel)]="selectedStatus"
-                        class="filter-dropdown">
+                    <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [(ngModel)]="selectedStatus" class="filter-dropdown">
                     </p-select>
                 </div>
             </div>
 
             <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-                    class="p-datatable-sm custom-table" dataKey="tenantId">
+                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="tenantId">
                     <ng-template pTemplate="header">
                         <tr>
                             @if (isSelected('tenantId')) {
@@ -77,8 +72,7 @@
                                     <div class="user-details">
                                         <span class="user-name">{{ e.razonSocial }}</span>
                                         @if (e.empresaPrincipal) {
-                                        <p-tag value="Principal" severity="info" [rounded]="true"
-                                            styleClass="text-xs"></p-tag>
+                                        <p-tag value="Principal" severity="info" [rounded]="true" styleClass="text-xs"></p-tag>
                                         }
                                     </div>
                                 </div>
@@ -100,23 +94,19 @@
                             }
                             @if (isSelected('activo')) {
                             <td class="text-center">
-                                <p-tag [value]="e.activo ? 'Activo' : 'Inactivo'"
-                                    [severity]="e.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                                <p-tag [value]="e.activo ? 'Activo' : 'Inactivo'" [severity]="e.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>
                             }
                             @if (isSelected('actions')) {
                             <td class="text-center">
                                 <div class="action-buttons">
-                                    <button class="action-buttons--view" (click)="manageModules(e)" pTooltip="Módulos"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--view" (click)="manageModules(e)" pTooltip="Módulos" tooltipPosition="top">
                                         <i class="pi pi-box" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--edit" (click)="editEmpresa(e)" pTooltip="Editar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--edit" (click)="editEmpresa(e)" pTooltip="Editar" tooltipPosition="top">
                                         <i class="pi pi-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--delete" (click)="remove(e)" pTooltip="Eliminar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--delete" (click)="remove(e)" pTooltip="Eliminar" tooltipPosition="top">
                                         <i class="pi pi-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -159,15 +149,11 @@
             </div>
 
             <div class="table-section__footer-paginated">
-                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows2()"
-                    [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
-                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                    class="custom-paginator">
+                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows2()" [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
                 </p-paginator>
             </div>
         </div>
     </section>
 </div>
 
-<app-empresa-dialog [form]="form" [statusOptions]="statusOptions" [visible]="showDialog()"
-    (visibleChange)="showDialog.set($event)" (save)="save()"></app-empresa-dialog>
+<app-empresa-dialog [form]="form" [statusOptions]="statusOptions" [visible]="showDialog()" (visibleChange)="showDialog.set($event)" (save)="save()"></app-empresa-dialog>

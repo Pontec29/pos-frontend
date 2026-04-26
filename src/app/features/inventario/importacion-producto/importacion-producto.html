@@ -1,58 +1,68 @@
+<p-toast></p-toast>
+
 <div class="container">
   <section class="header-section">
     <div class="header-section--title">
       <h2>Importación de Producto</h2>
-      <p>Importa los productos a tu inventario</p>
     </div>
     <div class="header-section--actions">
-      <app-button type="success" icon="history" label="Historial"></app-button>
-      <app-button type="primary" icon="template" label="Plantilla"></app-button>
-      <app-button type="primary" icon="upload" label="Carga Masiva"></app-button>
+      <app-button type="primary" icon="template" label="Descargar Plantilla" (clicked)="downloadTemplate()"></app-button>
     </div>
   </section>
   <section>
     <!-- ! IMPORTAR PRODUCTOS -->
     <div class="upload-section">
       <div class="upload-zone" (click)="triggerFileInput()" (dragover)="onDragOver($event)" (dragleave)="onDragLeave($event)" (drop)="onDrop($event)" [class.drag-over]="isDragging">
-        <div class="upload-content">
+        <div class="upload-content" *ngIf="!isLoading">
           <i class="pi pi-file" style="font-size: 3rem; color: var(--gray-400);"></i>
           <p class="upload-title">Haz clic para subir un archivo o arrástralo aquí</p>
           <p class="upload-subtitle">Formato permitidos: .xlsx, .xls Tamaño máximo: 20 MB</p>
           <input #fileInput type="file" accept=".xlsx,.xls" style="display: none;" (change)="onFileSelected($event)">
           <app-button type="primary" icon="upload" label="Seleccionar Archivo" (clicked)="triggerFileInput()"></app-button>
         </div>
+        <div class="loading-content" *ngIf="isLoading">
+          <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="4" fill="var(--surface-ground)" animationDuration=".5s" />
+          <p class="upload-title">Procesando archivo...</p>
+        </div>
       </div>
     </div>
 
-    <!-- ! TABLA DE FALLOS EN LA CARGA MASIVA -->
+    <!-- ! TABLA DE RESULTADOS -->
     <div class="results-section">
       <div class="results-header">
         <div class="search-bar">
           <p-iconField iconPosition="left">
             <p-inputicon class="pi pi-search" />
-            <input pInputText type="text" placeholder="Buscar..." [(ngModel)]="searchQuery" />
+            <input pInputText type="text" placeholder="Buscar en resultados..." [(ngModel)]="searchQuery" />
           </p-iconField>
         </div>
       </div>
 
       <div class="results-table">
-        <p-table [value]="importResults" [rowHover]="true" [scrollable]="true" scrollHeight="300px">
+        <p-table [value]="importResults" [rowHover]="true" [scrollable]="true" scrollHeight="400px" [rows]="pageSize">
           <ng-template pTemplate="header">
             <tr>
-              <th>Fila</th>
-              <th>Código</th>
+              <th style="width: 80px;">Fila</th>
+              <th>SKU</th>
               <th>Producto</th>
-              <th>Error</th>
-              <th>Estado</th>
+              <th>Error / Detalle</th>
+              <th style="width: 120px;">Estado</th>
             </tr>
           </ng-template>
 
           <ng-template pTemplate="body" let-result>
             <tr>
               <td>{{ result.row }}</td>
-              <td>{{ result.code }}</td>
-              <td>{{ result.product }}</td>
-              <td>{{ result.error }}</td>
+              <td>{{ result.sku }}</td>
+              <td>{{ result.nombre }}</td>
+              <td>
+                <span *ngIf="result.status === 'error'" class="error-text text-red-500">
+                  {{ result.error }}
+                </span>
+                <span *ngIf="result.status === 'success'" class="text-green-500">
+                  Importado correctamente
+                </span>
+              </td>
               <td>
                 <span class="status-badge" [ngClass]="'status-' + result.status">
                   {{ result.status === 'success' ? 'Exitoso' : 'Error' }}
@@ -65,8 +75,8 @@
             <tr>
               <td colspan="5" class="empty-state">
                 <i class="pi pi-search" style="font-size: 3rem; color: var(--gray-400);"></i>
-                <p class="empty-title">No se encontraron resultados</p>
-                <p class="empty-subtitle">Cargue una tabla para mostrar datos</p>
+                <p class="empty-title">No hay datos para mostrar</p>
+                <p class="empty-subtitle">Cargue un archivo para ver los resultados de la importación</p>
               </td>
             </tr>
           </ng-template>
@@ -78,25 +88,9 @@
           <span>Mostrar</span>
           <p-select [options]="pageSizeOptions" [(ngModel)]="pageSize" [style]="{width: '70px'}"></p-select>
           <span>por página</span>
-          <span class="results-count">0-0 de 0</span>
-        </div>
-        <div class="pagination-controls">
-          <button class="pagination-btn" disabled>
-            <i class="pi pi-angle-double-left"></i>
-          </button>
-          <button class="pagination-btn" disabled>
-            <i class="pi pi-angle-left"></i>
-          </button>
-          <button class="pagination-btn pagination-btn--active">1</button>
-          <button class="pagination-btn" disabled>
-            <i class="pi pi-angle-right"></i>
-          </button>
-          <button class="pagination-btn" disabled>
-            <i class="pi pi-angle-double-right"></i>
-          </button>
+          <span class="results-count">Total: {{ importResults.length }} registros</span>
         </div>
       </div>
     </div>
   </section>
 </div>
-

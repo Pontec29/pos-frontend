@@ -2,7 +2,6 @@
     <div class="title-row">
         <div class="title-content">
             <h1>Control de Lotes</h1>
-            <p class="subtitle">Gestión de lotes y fechas de vencimiento</p>
         </div>
     </div>
 </div>
@@ -13,20 +12,17 @@
             <div class="search">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input type="text" pInputText placeholder="Buscar producto o lote..." [(ngModel)]="searchQuery"
-                        style="width: 250px;" />
+                    <input type="text" pInputText placeholder="Buscar producto o lote..." [(ngModel)]="searchQuery" style="width: 250px;" />
                 </span>
             </div>
             <div class="chips">
                 <div class="chip">
                     <label style="margin-right: 0.5rem;">Sucursal:</label>
-                    <p-select [options]="branches" [(ngModel)]="selectedBranchId" optionLabel="name" optionValue="id"
-                        (onChange)="onBranchChange()" [style]="{ width: '200px' }" />
+                    <p-select [options]="branches" [(ngModel)]="selectedBranchId" optionLabel="name" optionValue="id" (onChange)="onBranchChange()" [style]="{ width: '200px' }" />
                 </div>
                 <div class="chip">
                     <label style="margin-right: 0.5rem;">Filtro:</label>
-                    <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label"
-                        optionValue="value" (onChange)="onFilterChange()" [style]="{ width: '220px' }" />
+                    <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label" optionValue="value" (onChange)="onFilterChange()" [style]="{ width: '220px' }" />
                 </div>
             </div>
         </div>
@@ -37,8 +33,7 @@
     }
 
     @if (!loading()) {
-    <p-table [value]="lots()" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[10, 15, 25, 50]"
-        [globalFilterFields]="['productName', 'lotCode']" [tableStyle]="{ 'min-width': '60rem' }">
+    <p-table [value]="lots()" [paginator]="true" [rows]="15" [rowsPerPageOptions]="[10, 15, 25, 50]" [globalFilterFields]="['productName', 'lotCode']" [tableStyle]="{ 'min-width': '60rem' }">
         <ng-template #header>
             <tr>
                 <th pSortableColumn="lotCode">Código Lote <p-sortIcon field="lotCode" /></th>

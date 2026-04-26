@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Almacenes</h6>
-            <p class="subtitle">Gestión de almacenes y depósitos de la empresa.</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nuevo Almacén" (clicked)="openNew()"></app-button>
@@ -15,23 +14,19 @@
                 <div class="table-section__header-actions--left">
                     <span class="p-input-icon-left search-wrapper">
                         <i class="pi pi-search" aria-hidden="true"></i>
-                        <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)"
-                            placeholder="Buscar por nombre o código SUNAT..." class="search-input" />
+                        <input pInputText type="text" [ngModel]="searchQuery()" (ngModelChange)="searchQuery.set($event)" placeholder="Buscar por nombre o código SUNAT..." class="search-input" />
                     </span>
                 </div>
 
                 <div class="table-section__header-actions--right">
                     <label>Estado:</label>
-                    <p-select [options]="statusOptions" [ngModel]="selectedStatus()"
-                        (ngModelChange)="selectedStatus.set($event); first.set(0)" placeholder="Todos" [showClear]="true"
-                        class="filter-dropdown">
+                    <p-select [options]="statusOptions" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); first.set(0)" placeholder="Todos" [showClear]="true" class="filter-dropdown">
                     </p-select>
                 </div>
             </div>
 
             <div class="table-section__main-table almacenes-table" [class.table-loading]="loading()">
-                <p-table [value]="filteredAlmacenes()" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-                    class="p-datatable-sm custom-table">
+                <p-table [value]="filteredAlmacenes()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table">
                     <ng-template pTemplate="header">
                         <tr>
                             <th style="width: 4rem">#</th>
@@ -61,25 +56,20 @@
                                 <span class="code-badge">{{ almacen.codigoSunat || '-' }}</span>
                             </td>
                             <td class="text-center">
-                                <p-tag [value]="almacen.esPrincipal ? 'Sí' : 'No'"
-                                    [severity]="almacen.esPrincipal ? 'success' : 'secondary'" [rounded]="true"></p-tag>
+                                <p-tag [value]="almacen.esPrincipal ? 'Sí' : 'No'" [severity]="almacen.esPrincipal ? 'success' : 'secondary'" [rounded]="true"></p-tag>
                             </td>
                             <td class="text-center">
-                                <p-tag [value]="almacen.permiteVenta ? 'Sí' : 'No'"
-                                    [severity]="almacen.permiteVenta ? 'success' : 'secondary'" [rounded]="true"></p-tag>
+                                <p-tag [value]="almacen.permiteVenta ? 'Sí' : 'No'" [severity]="almacen.permiteVenta ? 'success' : 'secondary'" [rounded]="true"></p-tag>
                             </td>
                             <td class="text-center">
-                                <p-tag [value]="almacen.activo ? 'Activo' : 'Inactivo'"
-                                    [severity]="almacen.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                                <p-tag [value]="almacen.activo ? 'Activo' : 'Inactivo'" [severity]="almacen.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>
                             <td class="text-center">
                                 <div class="action-buttons">
-                                    <button class="action-buttons--edit" (click)="editAlmacen(almacen)" pTooltip="Editar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--edit" (click)="editAlmacen(almacen)" pTooltip="Editar" tooltipPosition="top">
                                         <i class="pi pi-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--delete" (click)="deleteAlmacen(almacen)" pTooltip="Eliminar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--delete" (click)="deleteAlmacen(almacen)" pTooltip="Eliminar" tooltipPosition="top">
                                         <i class="pi pi-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -122,10 +112,7 @@
             </div>
 
             <div class="table-section__footer-paginated">
-                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-                    [totalRecords]="filteredAlmacenes().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
-                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                    class="custom-paginator">
+                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filteredAlmacenes().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
                 </p-paginator>
             </div>
         </div>
@@ -134,6 +121,5 @@
 
 <p-confirmDialog [style]="{width: '450px'}" />
 
-<app-almacen-form-dialog [visible]="visible()" [almacen]="selectedAlmacen()" (save)="onSaveAlmacen($event)"
-    (cancel)="onCancelDialog()">
+<app-almacen-form-dialog [visible]="visible()" [almacen]="selectedAlmacen()" (save)="onSaveAlmacen($event)" (cancel)="onCancelDialog()">
 </app-almacen-form-dialog>

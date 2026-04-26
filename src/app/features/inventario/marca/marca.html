@@ -2,7 +2,6 @@
   <section class="header-content">
     <div class="header-content--title">
       <h6>Marcas</h6>
-      <p class="subtitle">Gestión de marcas del inventario</p>
     </div>
     <div class="header-content--actions">
       <app-button preset="add" label="Nueva Marca" (clicked)="openNew()"></app-button>
@@ -15,23 +14,19 @@
         <div class="table-section__header-actions--left">
           <span class="p-input-icon-left search-wrapper">
             <i class="pi pi-search" aria-hidden="true"></i>
-            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)"
-              placeholder="Buscar por nombre..." class="search-input"
-              aria-label="Buscar por nombre" />
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por nombre..." class="search-input" aria-label="Buscar por nombre" />
           </span>
         </div>
 
         <div class="table-section__header-actions--right">
           <label>Estado:</label>
-          <p-select [options]="statusOptions()" placeholder="Todos" [showClear]="true" [ngModel]="statusFilter()"
-            (ngModelChange)="onStatusChange($event)">
+          <p-select [options]="statusOptions()" placeholder="Todos" [showClear]="true" [ngModel]="statusFilter()" (ngModelChange)="onStatusChange($event)">
           </p-select>
         </div>
       </div>
 
       <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-        <p-table [value]="paginatedMarcas()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-          class="p-datatable-sm custom-table" dataKey="ID_MARCA">
+        <p-table [value]="paginatedMarcas()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="ID_MARCA">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 4rem">#</th>
@@ -57,17 +52,14 @@
               </td>
               <td>{{ marca.DESCRIPCION || '-' }}</td>
               <td>
-                <p-tag [value]="marca.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(marca.ACTIVO)"
-                  [rounded]="true"></p-tag>
+                <p-tag [value]="marca.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(marca.ACTIVO)" [rounded]="true"></p-tag>
               </td>
               <td class="text-center">
                 <div class="action-buttons">
-                  <button class="action-buttons--edit" (click)="editMarca(marca)" pTooltip="Editar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--edit" (click)="editMarca(marca)" pTooltip="Editar" tooltipPosition="top">
                     <i class="pi pi-pencil"></i>
                   </button>
-                  <button class="action-buttons--delete" (click)="deleteMarca(marca)" pTooltip="Eliminar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--delete" (click)="deleteMarca(marca)" pTooltip="Eliminar" tooltipPosition="top">
                     <i class="pi pi-trash"></i>
                   </button>
                 </div>
@@ -120,16 +112,13 @@
 
               <div class="mobile-card__info">
                 <div class="mobile-card__status-badge">
-                  <p-tag [value]="marca.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(marca.ACTIVO)"
-                    [rounded]="true"></p-tag>
+                  <p-tag [value]="marca.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="getActivoSeverity(marca.ACTIVO)" [rounded]="true"></p-tag>
                 </div>
                 <span class="mobile-card__name">{{ marca.NOMBRE }}</span>
               </div>
 
               <div class="mobile-card__actions">
-                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded"
-                  (click)="selectedMarcaForMenu.set(marca); menu.toggle($event)"
-                  [ariaLabel]="'Acciones para marca ' + marca.NOMBRE"></button>
+                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded" (click)="selectedMarcaForMenu.set(marca); menu.toggle($event)" [ariaLabel]="'Acciones para marca ' + marca.NOMBRE"></button>
               </div>
             </div>
           </div>
@@ -152,9 +141,7 @@
       </div>
 
       <div class="table-section__footer-paginated">
-        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-          [totalRecords]="filteredMarcas().length" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filteredMarcas().length" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
         </p-paginator>
       </div>
 
@@ -164,11 +151,5 @@
 
 <app-modal-confirmacion></app-modal-confirmacion>
 
-<app-marca-form
-    [visible]="visible()"
-    [marca]="selectedMarca()"
-    [loading]="saving()"
-    (visibleChange)="visible.set($event)"
-    (save)="onSaveMarca($event)"
-    (cancel)="onCancelDialog()">
+<app-marca-form [visible]="visible()" [marca]="selectedMarca()" [loading]="saving()" (visibleChange)="visible.set($event)" (save)="onSaveMarca($event)" (cancel)="onCancelDialog()">
 </app-marca-form>

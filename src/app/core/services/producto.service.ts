@@ -25,4 +25,16 @@ export class ProductoService {
             params: { term }
         });
     }
+
+    importar(file: File): Observable<ApiResponse<any[]>> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return this.http.post<ApiResponse<any[]>>(`${this.apiUrl}/importar`, formData);
+    }
+
+    descargarPlantilla(): Observable<Blob> {
+        return this.http.get(`${this.apiUrl}/plantilla`, {
+            responseType: 'blob'
+        });
+    }
 }

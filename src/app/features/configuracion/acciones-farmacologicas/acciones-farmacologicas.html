@@ -2,7 +2,6 @@
     <div class="title-row">
         <div class="title-content">
             <h1>Acciones Farmacológicas</h1>
-            <p class="subtitle">Clasificación por efecto terapéutico</p>
         </div>
         <div class="actions">
             <app-button label="Nueva Acción" icon="pi pi-plus" (onClick)="openNew()" />
@@ -16,8 +15,7 @@
             <div class="search">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input type="text" pInputText placeholder="Buscar..." [(ngModel)]="searchQuery"
-                        style="width: 300px;" />
+                    <input type="text" pInputText placeholder="Buscar..." [(ngModel)]="searchQuery" style="width: 300px;" />
                 </span>
             </div>
         </div>
@@ -28,8 +26,7 @@
     }
 
     @if (!loading()) {
-    <p-table [value]="actions()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-        [globalFilterFields]="['name', 'description']">
+    <p-table [value]="actions()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name', 'description']">
         <ng-template #header>
             <tr>
                 <th>Nombre</th>
@@ -49,11 +46,8 @@
                 </td>
                 <td>
                     <div class="actions">
-                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
-                            (click)="edit(item)" pTooltip="Editar"></button>
-                        <button pButton pRipple icon="pi pi-trash"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(item)"
-                            pTooltip="Eliminar"></button>
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="edit(item)" pTooltip="Editar"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(item)" pTooltip="Eliminar"></button>
                     </div>
                 </td>
             </tr>
@@ -70,18 +64,15 @@
     }
 </div>
 
-<p-dialog [header]="selectedItem() ? 'Editar Acción' : 'Nueva Acción'" [(visible)]="visible" [modal]="true"
-    [style]="{ width: '500px' }" [draggable]="false" [resizable]="false">
+<p-dialog [header]="selectedItem() ? 'Editar Acción' : 'Nueva Acción'" [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" [resizable]="false">
     <div class="form-grid" style="grid-template-columns: 1fr;">
         <div class="form-row">
             <label for="name" class="required">Nombre</label>
-            <input id="name" type="text" pInputText [(ngModel)]="form.name"
-                placeholder="Ej: Analgésico, Antiinflamatorio" />
+            <input id="name" type="text" pInputText [(ngModel)]="form.name" placeholder="Ej: Analgésico, Antiinflamatorio" />
         </div>
         <div class="form-row">
             <label for="description">Descripción</label>
-            <textarea id="description" pTextarea [(ngModel)]="form.description" placeholder="Descripción"
-                rows="3"></textarea>
+            <textarea id="description" pTextarea [(ngModel)]="form.description" placeholder="Descripción" rows="3"></textarea>
         </div>
     </div>
     <ng-template #footer>

@@ -2,7 +2,6 @@
   <div class="title-row">
     <div class="title-content">
       <h1>Laboratorios</h1>
-      <p class="subtitle">Gestión de laboratorios farmacéuticos</p>
     </div>
     <div class="actions">
       <app-button label="Nuevo Laboratorio" icon="pi pi-plus" (onClick)="openNew()" />
@@ -17,8 +16,7 @@
       <div class="search">
         <span class="p-input-icon-left">
           <i class="pi pi-search"></i>
-          <input type="text" pInputText placeholder="Buscar laboratorio..." [(ngModel)]="searchQuery"
-            style="width: 300px;" />
+          <input type="text" pInputText placeholder="Buscar laboratorio..." [(ngModel)]="searchQuery" style="width: 300px;" />
         </span>
       </div>
     </div>
@@ -31,8 +29,7 @@
 
   <!-- Tabla -->
   @if (!loading()) {
-  <p-table [value]="laboratories()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-    [globalFilterFields]="['name', 'description']" [tableStyle]="{ 'min-width': '50rem' }">
+  <p-table [value]="laboratories()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name', 'description']" [tableStyle]="{ 'min-width': '50rem' }">
     <ng-template #header>
       <tr>
         <th>Nombre</th>
@@ -52,11 +49,8 @@
         </td>
         <td>
           <div class="actions">
-            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
-              (click)="edit(lab)" pTooltip="Editar"></button>
-            <button pButton pRipple icon="pi pi-trash"
-              class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(lab)"
-              pTooltip="Eliminar"></button>
+            <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="edit(lab)" pTooltip="Editar"></button>
+            <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(lab)" pTooltip="Eliminar"></button>
           </div>
         </td>
       </tr>
@@ -75,8 +69,7 @@
 
 <!-- Dialog de formulario -->
 <!-- Dialog de formulario -->
-<app-laboratory-form-dialog [(visible)]="visible" [laboratory]="selectedLab()" (save)="save($event)"
-  (cancel)="cancel()"></app-laboratory-form-dialog>
+<app-laboratory-form-dialog [(visible)]="visible" [laboratory]="selectedLab()" (save)="save($event)" (cancel)="cancel()"></app-laboratory-form-dialog>
 
 <app-modal-confirmacion />
 <p-toast />

@@ -2,7 +2,6 @@
   <section class="header-content">
     <div class="header-content--title">
       <h6><i class="fa-solid fa-cash-register"></i> Lista de Ventas</h6>
-      <p class="subtitle">Listado de ventas realizadas</p>
     </div>
     <div class="header-content--actions">
       <app-button preset="add" label="Nueva Venta"></app-button>
@@ -15,49 +14,18 @@
         <div class="table-section__header-actions--left">
           <span class="p-input-icon-left search-wrapper">
             <i class="pi pi-search" aria-hidden="true"></i>
-            <input
-              pInputText
-              type="text"
-              (input)="onSearchChange($any($event.target).value)"
-              placeholder="Buscar por cliente, DNI/RUC o N° de documento..."
-              class="search-input"
-              aria-label="Buscar por cliente, DNI/RUC o N° de documento"
-            />
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por cliente, DNI/RUC o N° de documento..." class="search-input" aria-label="Buscar por cliente, DNI/RUC o N° de documento" />
           </span>
         </div>
         <div class="table-section__header-actions--right">
           <label>Estado:</label>
-          <p-select
-            placeholder="Cualquier Estado"
-            [options]="statusOptions"
-            [showClear]="true"
-            [ngModel]="selectedStatus()"
-            (ngModelChange)="onStatusChange($event)"
-          ></p-select>
-          <p-datepicker
-            placeholder="Este Mes"
-            [showIcon]="true"
-            [ngModel]="selectedMonth()"
-            (ngModelChange)="onMonthChange($event)"
-            view="month"
-            dateFormat="mm/yy"
-          ></p-datepicker>
+          <p-select placeholder="Cualquier Estado" [options]="statusOptions" [showClear]="true" [ngModel]="selectedStatus()" (ngModelChange)="onStatusChange($event)"></p-select>
+          <p-datepicker placeholder="Este Mes" [showIcon]="true" [ngModel]="selectedMonth()" (ngModelChange)="onMonthChange($event)" view="month" dateFormat="mm/yy"></p-datepicker>
         </div>
       </div>
 
       <div class="table-section__main-table compras-table" [class.table-loading]="cargando()">
-        <p-table
-          [value]="ventas()"
-          [loading]="cargando()"
-          [(selection)]="selectedVentas"
-          dataKey="id"
-          [lazy]="true"
-          (onLazyLoad)="onLazyLoad($event)"
-          [rowHover]="true"
-          [scrollable]="true"
-          scrollHeight="flex"
-          class="p-datatable-sm custom-table"
-        >
+        <p-table [value]="ventas()" [loading]="cargando()" [(selection)]="selectedVentas" dataKey="id" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 3.5rem">#</th>
@@ -95,9 +63,7 @@
               </td>
               <td style="font-size: 13px; color: #475569;">{{ item.fEmision | date: 'dd/MM/yyyy HH:mm' }}</td>
               <td>
-                <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;"
-                  [style.background]="item.moneda === 'USD' ? '#eff6ff' : '#f0fdf4'"
-                  [style.color]="item.moneda === 'USD' ? '#1d4ed8' : '#166534'">
+                <span style="font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 4px;" [style.background]="item.moneda === 'USD' ? '#eff6ff' : '#f0fdf4'" [style.color]="item.moneda === 'USD' ? '#1d4ed8' : '#166534'">
                   {{ item.moneda }}
                 </span>
               </td>
@@ -107,13 +73,13 @@
               </td>
               <td>
                 @if (item.enviadoSunat) {
-                  <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#16a34a; font-weight:600;">
-                    <i class="pi pi-check-circle"></i> Enviado
-                  </span>
+                <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#16a34a; font-weight:600;">
+                  <i class="pi pi-check-circle"></i> Enviado
+                </span>
                 } @else {
-                  <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#dc2626; font-weight:600;">
-                    <i class="pi pi-clock"></i> Pendiente
-                  </span>
+                <span style="display:flex; align-items:center; gap:4px; font-size:12px; color:#dc2626; font-weight:600;">
+                  <i class="pi pi-clock"></i> Pendiente
+                </span>
                 }
               </td>
               <td class="text-right" style="font-weight: 700; color: #1e293b;">

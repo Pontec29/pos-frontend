@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Unidades de Medida</h6>
-            <p class="subtitle">Gestión de unidades de medida para productos</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nueva Unidad" (clicked)="openNew()"></app-button>
@@ -120,10 +119,8 @@
 <app-modal-confirmacion></app-modal-confirmacion>
 
 @if (visible()) {
-    @if (modalData()) {
-        <app-modal-form 
-            [data]="modalData()!" 
-            (closed)="onModalClosed($event)">
-        </app-modal-form>
-    }
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)">
+</app-modal-form>
+}
 }

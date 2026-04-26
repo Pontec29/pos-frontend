@@ -7,7 +7,6 @@
                 <span class="alert-badge">{{ alertCount() }}</span>
                 }
             </h1>
-            <p class="subtitle">Notificaciones de stock bajo, agotado y vencimientos</p>
         </div>
         <div class="actions">
             <app-button label="Actualizar" icon="pi pi-refresh" severity="secondary" (onClick)="load()" />
@@ -21,8 +20,7 @@
             <div class="chips">
                 <div class="chip">
                     <label style="margin-right: 0.5rem;">Tipo:</label>
-                    <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label"
-                        optionValue="value" (onChange)="onFilterChange()" [style]="{ width: '200px' }" />
+                    <p-select [options]="filterOptions" [(ngModel)]="selectedFilter" optionLabel="label" optionValue="value" (onChange)="onFilterChange()" [style]="{ width: '200px' }" />
                 </div>
             </div>
         </div>
@@ -33,8 +31,7 @@
     }
 
     @if (!loading()) {
-    <p-table [value]="alerts()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-        [tableStyle]="{ 'min-width': '60rem' }">
+    <p-table [value]="alerts()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [tableStyle]="{ 'min-width': '60rem' }">
         <ng-template #header>
             <tr>
                 <th style="width: 50px;"></th>
@@ -50,8 +47,7 @@
             <tr>
                 <td style="text-align: center;">
                     <i [class]="getAlertIcon(alert.alertType)" [ngClass]="{'text-danger': alert.alertType === 'VENCIDO' || alert.alertType === 'STOCK_AGOTADO',
-                          'text-warning': alert.alertType === 'PROXIMO_VENCER' || alert.alertType === 'STOCK_BAJO'}"
-                        style="font-size: 1.25rem;"></i>
+                          'text-warning': alert.alertType === 'PROXIMO_VENCER' || alert.alertType === 'STOCK_BAJO'}" style="font-size: 1.25rem;"></i>
                 </td>
                 <td>
                     <p-tag [value]="getAlertLabel(alert.alertType)" [severity]="getAlertSeverity(alert.alertType)" />
@@ -62,12 +58,8 @@
                 <td>{{ alert.alertDate | date:'dd/MM/yyyy HH:mm' }}</td>
                 <td style="text-align: center;">
                     <div class="flex justify-content-center gap-1">
-                        <button pButton pRipple icon="pi pi-eye"
-                            class="p-button-rounded p-button-text p-button-sm p-button-info" (click)="markAsRead(alert)"
-                            pTooltip="Marcar como leída"></button>
-                        <button pButton pRipple icon="pi pi-check"
-                            class="p-button-rounded p-button-text p-button-sm p-button-success"
-                            (click)="markAsResolved(alert)" pTooltip="Resolver"></button>
+                        <button pButton pRipple icon="pi pi-eye" class="p-button-rounded p-button-text p-button-sm p-button-info" (click)="markAsRead(alert)" pTooltip="Marcar como leída"></button>
+                        <button pButton pRipple icon="pi pi-check" class="p-button-rounded p-button-text p-button-sm p-button-success" (click)="markAsResolved(alert)" pTooltip="Resolver"></button>
                     </div>
                 </td>
             </tr>

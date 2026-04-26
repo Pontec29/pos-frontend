@@ -2,7 +2,6 @@
   <section class="header-content">
     <div class="header-content--title">
       <h6>Proveedores</h6>
-      <p class="subtitle">Gestión de proveedores y distribuidores</p>
     </div>
     <div class="header-content--actions">
       <app-button preset="add" label="Nuevo Proveedor" (clicked)="openNew()"></app-button>
@@ -15,24 +14,19 @@
         <div class="table-section__header-actions--left">
           <span class="p-input-icon-left search-wrapper">
             <i class="pi pi-search" aria-hidden="true"></i>
-            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)"
-              placeholder="Buscar por nombre, RUC o código..." class="search-input"
-              aria-label="Buscar por nombre, RUC o código" />
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por nombre, RUC o código..." class="search-input" aria-label="Buscar por nombre, RUC o código" />
           </span>
         </div>
 
         <div class="table-section__header-actions--right">
           <label>Estado:</label>
-          <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()"
-            (ngModelChange)="onStatusChange($event)">
+          <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()" (ngModelChange)="onStatusChange($event)">
           </p-select>
         </div>
       </div>
 
       <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-        <p-table [value]="proveedores()" [loading]="loading()" [(selection)]="selectedProveedores"
-          dataKey="ID_PROVEEDOR" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true"
-          scrollHeight="flex" class="p-datatable-sm custom-table">
+        <p-table [value]="proveedores()" [loading]="loading()" [(selection)]="selectedProveedores" dataKey="ID_PROVEEDOR" [lazy]="true" (onLazyLoad)="onLazyLoad($event)" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table">
           <ng-template pTemplate="header">
             <tr>
               <th style="width: 4rem">#</th>
@@ -65,21 +59,17 @@
               <td>{{ proveedor.EMAIL || '-' }}</td>
               <td>{{ proveedor.TELEFONO || '-' }}</td>
               <td>
-                <p-tag [value]="proveedor.ACTIVO ? 'Activo' : 'Inactivo'"
-                  [severity]="proveedor.ACTIVO ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                <p-tag [value]="proveedor.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="proveedor.ACTIVO ? 'success' : 'danger'" [rounded]="true"></p-tag>
               </td>
               <td class="text-center">
                 <div class="action-buttons">
-                  <button class="action-buttons--view" (click)="onViewProveedor(proveedor)" pTooltip="Ver detalle"
-                    tooltipPosition="top">
+                  <button class="action-buttons--view" (click)="onViewProveedor(proveedor)" pTooltip="Ver detalle" tooltipPosition="top">
                     <i class="pi pi-eye" aria-hidden="true"></i>
                   </button>
-                  <button class="action-buttons--edit" (click)="editProveedor(proveedor)" pTooltip="Editar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--edit" (click)="editProveedor(proveedor)" pTooltip="Editar" tooltipPosition="top">
                     <i class="pi pi-pencil" aria-hidden="true"></i>
                   </button>
-                  <button class="action-buttons--delete" (click)="deleteProveedor(proveedor)" pTooltip="Eliminar"
-                    tooltipPosition="top">
+                  <button class="action-buttons--delete" (click)="deleteProveedor(proveedor)" pTooltip="Eliminar" tooltipPosition="top">
                     <i class="pi pi-trash" aria-hidden="true"></i>
                   </button>
                 </div>
@@ -131,17 +121,14 @@
 
               <div class="mobile-card__info">
                 <div class="mobile-card__status-badge">
-                  <p-tag [value]="proveedor.ACTIVO ? 'Activo' : 'Inactivo'"
-                    [severity]="proveedor.ACTIVO ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                  <p-tag [value]="proveedor.ACTIVO ? 'Activo' : 'Inactivo'" [severity]="proveedor.ACTIVO ? 'success' : 'danger'" [rounded]="true"></p-tag>
                 </div>
                 <span class="mobile-card__name">{{ proveedor.RAZONSOCIAL || proveedor.NOMBRE_PROVEEDOR }}</span>
                 <span class="mobile-card__dni">{{ proveedor.RUC }}</span>
               </div>
 
               <div class="mobile-card__actions">
-                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded"
-                  (click)="selectedProveedorForMenu.set(proveedor); menu.toggle($event)"
-                  [ariaLabel]="'Acciones para proveedor ' + proveedor.ID_PROVEEDOR"></button>
+                <button pButton icon="pi pi-ellipsis-v" class="p-button-text p-button-secondary p-button-rounded" (click)="selectedProveedorForMenu.set(proveedor); menu.toggle($event)" [ariaLabel]="'Acciones para proveedor ' + proveedor.ID_PROVEEDOR"></button>
               </div>
             </div>
           </div>
@@ -164,9 +151,7 @@
       </div>
 
       <div class="table-section__footer-paginated">
-        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-          [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true"
-          currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
+        <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
         </p-paginator>
       </div>
 
@@ -177,7 +162,7 @@
 <app-modal-confirmacion></app-modal-confirmacion>
 
 @if (visible()) {
-  @if (modalData()) {
-    <app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)"></app-modal-form>
-  }
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)"></app-modal-form>
+}
 }

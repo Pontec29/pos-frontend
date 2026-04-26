@@ -16,9 +16,14 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return authService.getSession().pipe(
         switchMap(session => {
             const headersToSet: Record<string, string> = {
-                'Content-Type': 'application/json',
                 'X-Tenant-ID': '1'
             };
+
+            // Solo agregamos Content-Type si NO es una subida de archivo (FormData)
+            // Cuando es FormData, el navegador debe establecer el Content-Type con el boundary correcto.
+            if (!(req.body instanceof FormData)) {
+                headersToSet['Content-Type'] = 'application/json';
+            }
 
             if (session && session.token) {
                 headersToSet['Authorization'] = `Bearer ${session.token}`;

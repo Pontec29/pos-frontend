@@ -2,7 +2,7 @@
     <div class="title-row">
         <div class="title-content">
             <h1>Principios Activos</h1>
-            <p class="subtitle">Componentes activos de los medicamentos</p>
+
         </div>
         <div class="actions">
             <app-button label="Nuevo Principio" icon="pi pi-plus" (onClick)="openNew()" />
@@ -16,8 +16,7 @@
             <div class="search">
                 <span class="p-input-icon-left">
                     <i class="pi pi-search"></i>
-                    <input type="text" pInputText placeholder="Buscar principio activo..." [(ngModel)]="searchQuery"
-                        style="width: 300px;" />
+                    <input type="text" pInputText placeholder="Buscar principio activo..." [(ngModel)]="searchQuery" style="width: 300px;" />
                 </span>
             </div>
         </div>
@@ -28,8 +27,7 @@
     }
 
     @if (!loading()) {
-    <p-table [value]="principles()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]"
-        [globalFilterFields]="['name', 'description']">
+    <p-table [value]="principles()" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10, 25, 50]" [globalFilterFields]="['name', 'description']">
         <ng-template #header>
             <tr>
                 <th>Nombre</th>
@@ -49,11 +47,8 @@
                 </td>
                 <td>
                     <div class="actions">
-                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm"
-                            (click)="edit(item)" pTooltip="Editar"></button>
-                        <button pButton pRipple icon="pi pi-trash"
-                            class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(item)"
-                            pTooltip="Eliminar"></button>
+                        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-sm" (click)="edit(item)" pTooltip="Editar"></button>
+                        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger p-button-sm" (click)="delete(item)" pTooltip="Eliminar"></button>
                     </div>
                 </td>
             </tr>
@@ -71,8 +66,7 @@
     }
 </div>
 
-<p-dialog [header]="selectedItem() ? 'Editar Principio Activo' : 'Nuevo Principio Activo'" [(visible)]="visible"
-    [modal]="true" [style]="{ width: '500px' }" [draggable]="false" [resizable]="false">
+<p-dialog [header]="selectedItem() ? 'Editar Principio Activo' : 'Nuevo Principio Activo'" [(visible)]="visible" [modal]="true" [style]="{ width: '500px' }" [draggable]="false" [resizable]="false">
     <div class="form-grid" style="grid-template-columns: 1fr;">
         <div class="form-row">
             <label for="name" class="required">Nombre</label>
@@ -80,8 +74,7 @@
         </div>
         <div class="form-row">
             <label for="description">Descripción</label>
-            <textarea id="description" pTextarea [(ngModel)]="form.description" placeholder="Descripción o notas"
-                rows="3"></textarea>
+            <textarea id="description" pTextarea [(ngModel)]="form.description" placeholder="Descripción o notas" rows="3"></textarea>
         </div>
     </div>
     <ng-template #footer>

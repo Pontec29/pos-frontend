@@ -2,7 +2,6 @@
     <section class="header-content">
         <div class="header-content--title">
             <h6>Gestión de Roles</h6>
-            <p class="subtitle">Defina los niveles de acceso y permisos para los diferentes perfiles del sistema.</p>
         </div>
         <div class="header-content--actions">
             <app-button preset="add" label="Nuevo Rol" (clicked)="openNew()"></app-button>
@@ -15,22 +14,19 @@
                 <div class="table-section__header-actions--left">
                     <span class="p-input-icon-left search-wrapper">
                         <i class="pi pi-search" aria-hidden="true"></i>
-                        <input pInputText type="text" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)"
-                            placeholder="Buscar rol por nombre..." class="search-input" />
+                        <input pInputText type="text" [ngModel]="searchValue()" (ngModelChange)="searchValue.set($event)" placeholder="Buscar rol por nombre..." class="search-input" />
                     </span>
                 </div>
 
                 <div class="table-section__header-actions--right">
                     <label>Estado:</label>
-                    <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()"
-                        (ngModelChange)="selectedStatus.set($event); first.set(0)" class="filter-dropdown">
+                    <p-select [options]="statusOptions" placeholder="Todos" [showClear]="true" [ngModel]="selectedStatus()" (ngModelChange)="selectedStatus.set($event); first.set(0)" class="filter-dropdown">
                     </p-select>
                 </div>
             </div>
 
             <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex"
-                    class="p-datatable-sm custom-table" dataKey="id">
+                <p-table [value]="paged()" [loading]="loading()" [rowHover]="true" [scrollable]="true" scrollHeight="flex" class="p-datatable-sm custom-table" dataKey="id">
                     <ng-template pTemplate="header">
                         <tr>
                             @if (isSelected('id')) {
@@ -75,19 +71,16 @@
                             }
                             @if (isSelected('activo')) {
                             <td class="text-center">
-                                <p-tag [value]="r.activo ? 'Activo' : 'Inactivo'"
-                                    [severity]="r.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
+                                <p-tag [value]="r.activo ? 'Activo' : 'Inactivo'" [severity]="r.activo ? 'success' : 'danger'" [rounded]="true"></p-tag>
                             </td>
                             }
                             @if (isSelected('actions')) {
                             <td class="text-center">
                                 <div class="action-buttons">
-                                    <button class="action-buttons--edit" (click)="editRole(r)" pTooltip="Editar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--edit" (click)="editRole(r)" pTooltip="Editar" tooltipPosition="top">
                                         <i class="pi pi-pencil" aria-hidden="true"></i>
                                     </button>
-                                    <button class="action-buttons--delete" (click)="remove(r)" pTooltip="Eliminar"
-                                        tooltipPosition="top">
+                                    <button class="action-buttons--delete" (click)="remove(r)" pTooltip="Eliminar" tooltipPosition="top">
                                         <i class="pi pi-trash" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -131,10 +124,7 @@
             </div>
 
             <div class="table-section__footer-paginated">
-                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()"
-                    [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true"
-                    currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros"
-                    class="custom-paginator">
+                <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="filtered().length" [rowsPerPageOptions]="[10, 20, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator">
                 </p-paginator>
             </div>
         </div>
@@ -143,12 +133,10 @@
 
 <!-- Componente Genérico para el Modal -->
 @if (showDialog()) {
-    @if (modalData()) {
-        <app-modal-form 
-            [data]="modalData()!" 
-            (closed)="onModalClosed($event)">
-        </app-modal-form>
-    }
+@if (modalData()) {
+<app-modal-form [data]="modalData()!" (closed)="onModalClosed($event)">
+</app-modal-form>
+}
 }
 
 <p-confirmDialog [style]="{width: '450px'}" />
