@@ -40,6 +40,7 @@ export interface ProductoUpSertDTO {
   stockMaximo?: number;
   tipoControlStock?: string;
   activoTiendaOnline?: boolean;
+  imagenUrl?: string;
 
   // ! STOCK DE APERTURA
   stockApertura?: StockAperturaUpSertDTO;

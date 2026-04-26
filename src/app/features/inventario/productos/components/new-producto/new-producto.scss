@@ -42,6 +42,14 @@
         background-color: white;
     }
 
+    &.drag-active {
+        border-color: var(--primary);
+        background-color: var(--primary-lighter);
+        border-style: solid;
+        transform: scale(1.02);
+        box-shadow: 0 15px 30px rgba(0, 102, 204, 0.1);
+    }
+
     .image-upload-placeholder {
         display: flex;
         flex-direction: column;

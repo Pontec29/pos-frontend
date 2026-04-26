@@ -18,7 +18,13 @@
       <div class="erp-col-3 erp-col-md-12">
         <div class="erp-card">
           <h3 class="card-title">Imagen</h3>
-          <div class="image-upload-dropzone" role="button" tabindex="0" aria-label="Subir imagen" (click)="imageFileInput.click()" [class.has-image]="!!imagePreviewUrl()">
+          <div class="image-upload-dropzone" role="button" tabindex="0" aria-label="Subir imagen" 
+               (click)="imageFileInput.click()" 
+               (dragover)="onImageDragOver($event)"
+               (dragleave)="onImageDragLeave($event)"
+               (drop)="onImageDrop($event)"
+               [class.has-image]="!!imagePreviewUrl()"
+               [class.drag-active]="imageDragActive()">
 
             @if (imagePreviewUrl()) {
             <button type="button" class="image-upload-clear-btn" (click)="onClearImage($event)">
@@ -38,8 +44,15 @@
             </div>
             }
 
-            <input #imageFileInput type="file" id="productImageInput" class="hidden" formControlName="image" accept=".png,.jpg,.jpeg,.gif,.svg" (change)="onImageSelected($event)" />
+            <input #imageFileInput type="file" id="productImageInput" class="hidden" accept=".png,.jpg,.jpeg,.gif,.svg" (change)="onImageSelected($event)" />
           </div>
+
+          @if (imageError()) {
+            <div class="image-upload-error p-2 mt-2 text-xs text-red-500 bg-red-50 border-round flex align-items-center gap-2">
+              <i class="pi pi-exclamation-circle"></i>
+              <span>{{ imageError() }}</span>
+            </div>
+          }
         </div>
       </div>
 

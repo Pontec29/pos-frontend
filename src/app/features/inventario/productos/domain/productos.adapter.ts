@@ -111,7 +111,9 @@ export class ProductoAdapter {
         lote: form.STOCK_APERTURA.LOTE,
         fechaVencimiento: form.STOCK_APERTURA.FECHA_VENCIMIENTO,
         series: form.STOCK_APERTURA.SERIES,
-      } : undefined
+      } : undefined,
+
+      imagenUrl: form.IMAGEN_URL
     };
     return this.cleanPayload(dto);
   }

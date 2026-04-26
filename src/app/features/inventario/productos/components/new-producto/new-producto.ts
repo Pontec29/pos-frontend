@@ -26,6 +26,7 @@ import { forkJoin, finalize } from 'rxjs';
 import { PRIMENG_FORM_MODULES } from '@shared/ui/prime-imports';
 import { AppButton } from '@shared/ui/button';
 import { GeneralService } from '@shared/services/general.service';
+import { AlertService } from '@shared/services/alert.service';
 import { ApiResponseSuccess } from '@shared/domains/api-response.model';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ResponseAfectacionIgvDto, ResponseMonedaDto } from '@shared/domains/general.dto';
@@ -89,6 +90,7 @@ export default class NewProductoPage implements OnInit {
   private categoriaService = inject(CategoriaService);
   private unidadMedidaService = inject(UnidadMedidaService);
   private generalService = inject(GeneralService);
+  private alertService = inject(AlertService);
 
   productId = signal<number | null>(null);
   isEditMode = signal<boolean>(false);
@@ -419,6 +421,7 @@ export default class NewProductoPage implements OnInit {
 
     if (product.IMAGEN_URL) {
       this.imagePreviewUrl.set(product.IMAGEN_URL);
+      this.productForm.patchValue({ image: product.IMAGEN_URL });
     }
   }
 
@@ -655,17 +658,10 @@ export default class NewProductoPage implements OnInit {
     }
 
     const duplicate = this.presentationsData().some(
-      row =>
-        row.ID_UNIDAD === value.unidadId &&
-        row.FACTOR_CONVERSION_BASE === value.factor &&
-        row.CODIGO_BARRAS === barcode
+      row => row.ID_UNIDAD === value.unidadId
     );
     if (duplicate) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atención',
-        detail: 'Esta combinación de unidad, moneda y factor ya fue agregada'
-      });
+      this.alertService.warn('Esta unidad de medida ya ha sido agregada para este producto', 'Atención');
       this.formularioValido = false;
       return;
     }
@@ -674,11 +670,7 @@ export default class NewProductoPage implements OnInit {
     if (value.factor === 1) {
       const hasFactor1 = this.presentationsData().some(p => p.FACTOR_CONVERSION_BASE === 1);
       if (hasFactor1) {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Operación denegada',
-          detail: 'Ya existe una presentación principal con Factor 1. Las cajas o fardos adicionales deben tener un factor mayor a 1.'
-        });
+        this.alertService.error('Ya existe una presentación principal con Factor 1. Las cajas o fardos adicionales deben tener un factor mayor a 1.', 'Operación denegada');
         return;
       }
     }
