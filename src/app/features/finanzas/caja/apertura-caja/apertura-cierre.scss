@@ -1,272 +1,103 @@
 @use 'table' as *;
 
-.main-content {
-  .form-container {
-    width: 100%;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(560px, 1fr));
-    gap: 20px;
-    align-items: start;
-
-    .form {
-      width: 100%;
-      min-width: 0;
-      display: grid;
-      grid-template-columns: minmax(160px, 160px) minmax(0, 1fr);
-      align-items: start;
-      gap: 16px;
-
-      &.form--disabled {
-        opacity: 0.8;
-      }
-
-      .form-section-left {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100%;
-        min-width: 0;
-
-        ::ng-deep .apertura-button {
-          width: 100% !important;
-          min-width: 160px !important;
-          min-height: 72px !important;
-          font-size: 16px !important;
-          font-weight: bold !important;
-          padding: var(--space-4) var(--space-6) !important;
-        }
-      }
-
-      .form-section-right {
-        width: 100%;
-        min-width: 0;
-        padding: 16px 0;
-        border-radius: 14px;
-
-        .row {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          align-items: start;
-          gap: 12px;
-          margin-bottom: 12px;
-
-          &:last-child {
-            margin-bottom: 0;
-          }
-
-          .item-form {
-            width: 100%;
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid #e8f0fc;
-            background-color: #ffffff;
-            box-shadow: 0 4px 10px rgba(12, 58, 120, 0.05);
-            transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-
-            .field-label {
-              display: flex;
-              align-items: center;
-              flex-wrap: wrap;
-              gap: 8px;
-              margin: 0;
-              font-family: var(--font-family);
-              font-size: 12px;
-              font-weight: 600;
-              letter-spacing: 0.04em;
-              line-height: 1.2;
-              color: #13356e;
-              text-transform: uppercase;
-            }
-
-            .field-icon {
-              font-size: 12px;
-              color: #2b6ed2;
-            }
-
-            .required-asterisk {
-              color: #ef4444;
-              font-weight: 700;
-            }
-
-            .field-error {
-              color: #ef4444;
-              font-size: 12px;
-              font-weight: 500;
-              margin-top: -4px;
-            }
-
-            .field-caption {
-              color: #5f7aa5;
-              font-size: 11px;
-              margin-top: -4px;
-            }
-
-            ::ng-deep .p-select,
-            ::ng-deep .p-inputnumber-input,
-            textarea[pInputTextarea],
-            input[pInputText] {
-              width: 100%;
-              max-width: 100%;
-              height: 40px;
-              border-radius: 8px;
-              border: 1px solid #cfe0fb;
-              background: #ffffff;
-              color: #1b3f79;
-              font-size: 13px;
-              transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-            }
-
-            ::ng-deep .p-select:not(.p-disabled):hover,
-            ::ng-deep .p-inputnumber-input:hover,
-            textarea[pInputTextarea]:hover,
-            input[pInputText]:hover {
-              border-color: #9dbef3;
-            }
-
-            ::ng-deep .p-select.p-focus,
-            ::ng-deep .p-inputnumber-input:focus,
-            textarea[pInputTextarea]:focus,
-            input[pInputText]:focus {
-              border-color: #6f9fe7;
-              box-shadow: 0 0 0 3px rgba(111, 159, 231, 0.2);
-              outline: none;
-            }
-
-            ::ng-deep .p-select.p-disabled,
-            textarea[pInputTextarea]:disabled,
-            input[pInputText]:disabled {
-              background: #f1f6ff;
-              color: #6a84ad;
-              opacity: 1;
-            }
-
-            textarea[pInputTextarea] {
-              min-height: 92px;
-              height: auto;
-              resize: vertical;
-              padding: 10px 12px;
-            }
-          }
-
-          .item-form--full {
-            grid-column: span 2;
-          }
-
-          .item-form--denominacion {
-            ::ng-deep .denominacion-action-button {
-              width: 100% !important;
-              min-height: 40px !important;
-              display: inline-flex !important;
-              justify-content: center;
-            }
-
-            ::ng-deep .denominacion-action-button--sent {
-              width: 100% !important;
-              border-color: #16a34a !important;
-              color: #16a34a !important;
-              background: transparent !important;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .list-container {
-    width: 100%;
-    margin-top: 20px;
-
-    h6 {
-      font-size: 18px;
-      font-weight: bold;
-      color: #091730;
-      margin-bottom: 12px;
-    }
-  }
+/* --- ESTILOS DE STATUS PILL (PARA EL HEADER) --- */
+.status-pill {
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 11px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  
+  i { font-size: 8px; }
+  &--open { background: #dcfce7; color: #15803d; border-color: #bbf7d0; i { color: #22c55e; } }
+  &--closed { background: #f1f5f9; color: #475569; border-color: #e2e8f0; i { color: #94a3b8; } }
 }
 
-.w-full {
-  width: 100%;
-  max-width: 100%;
-}
-
-@media (max-width: 1400px) {
-  .main-content {
-    .form-container {
-      grid-template-columns: 1fr;
-    }
-  }
-}
-
-@media (max-width: 1024px) {
-  .main-content {
-    .form-container {
-      .form {
-        grid-template-columns: 1fr;
-        gap: 12px;
-
-        .form-section-left {
-          min-height: auto;
-        }
-
-        .form-section-right {
-          .row {
-            grid-template-columns: 1fr;
-          }
-        }
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .main-content {
-    .form-container {
-      .form {
-        .form-section-left {
-          min-height: auto;
-        }
-
-        .form-section-right {
-          padding: 10px;
-
-          .row {
-            gap: 12px;
-          }
-        }
-      }
-    }
-  }
-}
-
-// ! MODAL BACKDROP STYLES
-.modal-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
+/* --- AJUSTES ESPECÍFICOS PARA LA TABLA (SIGUIENDO FORMATO USUARIOS) --- */
+::ng-deep .custom-table {
+  .user-info-cell {
     display: flex;
     align-items: center;
+    gap: 12px;
+
+    .avatar-circle {
+      width: 32px;
+      height: 32px;
+      background: #f1f5f9;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 800;
+      color: #64748b;
+      border: 1px solid #e2e8f0;
+    }
+
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      
+      .user-name {
+        font-weight: 700;
+        color: #1e293b;
+        font-size: 13px;
+      }
+      
+      .user-dni {
+        font-size: 11px;
+        color: #94a3b8;
+      }
+    }
+  }
+
+  /* Botones de acción al estilo Usuarios */
+  .action-buttons {
+    display: flex;
+    gap: 6px;
     justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(2px);
+
+    button {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: none;
+      background: #f8fafc;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      i { font-size: 14px; }
+
+      &.action-buttons--view:hover { background: #e0e7ff; color: #4338ca; }
+      &.action-buttons--edit:hover { background: #fef3c7; color: #d97706; }
+      &.action-buttons--delete:hover { background: #fee2e2; color: #dc2626; }
+    }
+  }
+}
+
+/* --- MODAL ARQUEO (NEXORA STYLE) --- */
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(8px);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
 }
 
 .modal-content {
-    width: min(760px, calc(100vw - 32px));
-    max-height: calc(100vh - 32px);
-    overflow: auto;
-}
-
-app-arqueo-caja {
-    position: relative;
-    z-index: 1001;
-    width: 100%;
-    display: block;
+  background: #ffffff;
+  border-radius: 24px;
+  width: min(800px, 95vw);
+  max-height: 90vh;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
 }

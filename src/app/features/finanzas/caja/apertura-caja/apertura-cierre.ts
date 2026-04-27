@@ -29,7 +29,9 @@ import {
 import { MessageService, SortEvent } from 'primeng/api';
 import { PaginatorState } from 'primeng/paginator';
 import { TooltipModule } from 'primeng/tooltip';
+import { TagModule } from 'primeng/tag';
 import { ArqueoCaja } from './components/arqueo-caja/arqueo-caja';
+import { GestionSesionComponent } from './components/gestion-sesion/gestion-sesion.component';
 import { AuthService } from '@auth/services/auth.service';
 import { CurrencyFormatPipe } from '@shared/pipe/currencyFormat.pipe';
 import { DateFormatPipe } from '@shared/pipe/dateFormat.pipe';
@@ -52,7 +54,9 @@ interface CajaOption {
     TooltipModule,
     ArqueoCaja,
     CurrencyFormatPipe,
-    DateFormatPipe
+    DateFormatPipe,
+    GestionSesionComponent,
+    TagModule
   ],
   templateUrl: './apertura-cierre.html',
   styleUrl: './apertura-cierre.scss',
@@ -119,7 +123,21 @@ export default class AperturaCierre implements OnInit {
     { initialValue: this.formCierre.status },
   );
 
-  readonly esFormularioAperturaDeshabilitado = this.authService.cajaAbierta;
+  readonly isManageModalOpen = signal(false);
+  readonly esCajaAbierta = this.authService.cajaAbierta;
+  readonly vistaActual = signal<'HISTORIAL' | 'GESTION'>('HISTORIAL');
+
+  abrirGestionCaja() {
+    this.vistaActual.set('GESTION');
+  }
+
+  volverAlHistorial() {
+    this.vistaActual.set('HISTORIAL');
+  }
+
+  cerrarGestionCaja() {
+    this.isManageModalOpen.set(false);
+  }
   readonly esFormularioCierreDeshabilitado = computed(
     () => this.cajaSesionLoading() || !this.sesionCajaId(),
   );

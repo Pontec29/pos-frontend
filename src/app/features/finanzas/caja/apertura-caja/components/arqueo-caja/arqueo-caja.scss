@@ -5,12 +5,12 @@
 .arqueo-caja {
   position: relative;
   width: 100%;
-  border: 1px solid #d7e7ff;
-  border-radius: 12px;
-  background: #fff;
-  padding: 14px;
+  background: #ffffff;
+  border-radius: 16px;
   overflow: hidden;
-  transition: transform 0.24s ease, box-shadow 0.24s ease;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
 
   &__loading {
     position: absolute;
@@ -19,214 +19,246 @@
     align-items: center;
     justify-content: center;
     flex-direction: column;
-    gap: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    z-index: 2;
-    animation: fade-in 0.2s ease;
-
-    span {
-      font-size: 12px;
-      color: #36588b;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-    }
-  }
-
-  &--title {
-    margin: 0 0 12px;
-    font-size: 16px;
-    font-weight: 700;
-    color: #13356e;
-  }
-
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    transition: opacity 0.22s ease, filter 0.22s ease;
-
-    &.is-loading {
-      opacity: 0.55;
-      filter: blur(0.4px);
-      pointer-events: none;
-    }
-  }
-
-  &__table-wrapper {
-    max-width: 100%;
-    max-height: 60vh;
-    width: 100%;
-    overflow-y: auto;
-    overflow-x: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-gutter: stable;
-    scrollbar-width: thin;
-    -ms-overflow-style: auto;
-
-    &:focus-visible {
-      outline: 2px solid #6f9fe7;
-      outline-offset: 2px;
-      border-radius: 8px;
-    }
-  }
-
-  &__table {
-    width: 100%;
-    min-width: 540px;
-    border-collapse: collapse;
-
-    th,
-    td {
-      border: 1px solid #bfd6fa;
-      padding: 8px 10px;
-      text-align: left;
-      vertical-align: top;
-    }
-
-    thead th {
-      color: #123b7a;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      background: #f4f8ff;
-    }
-
-    td.denominacion,
-    td.total {
-      font-weight: 600;
-      color: #13356e;
-      white-space: nowrap;
-    }
-  }
-
-  .cantidad-input {
-    width: 100%;
-    min-width: 110px;
-    border: 1px solid #9ec0f5;
-    border-radius: 8px;
-    height: 36px;
-    padding: 0 10px;
-    font-size: 13px;
-    color: #16376c;
-    outline: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
-
-    &:focus {
-      border-color: #6f9fe7;
-      box-shadow: 0 0 0 3px rgba(111, 159, 231, 0.2);
-    }
-  }
-
-  .input-error {
-    display: block;
-    margin-top: 4px;
-    color: #dc2626;
-    font-size: 11px;
-    font-weight: 500;
-  }
-
-  &__summary {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border: 1px solid #9cc0ff;
-    border-radius: 10px;
-    padding: 14px 16px;
-    background: linear-gradient(120deg, #f8fbff 0%, #edf5ff 100%);
-    box-shadow: inset 0 0 0 1px rgba(113, 157, 231, 0.1);
-
-    &-labels {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-      min-width: 0;
-    }
-
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(4px);
+    z-index: 10;
+    
     span {
       font-size: 13px;
+      color: #1e3a8a;
+      font-weight: 600;
+    }
+  }
+}
+
+/* --- Header Compacto --- */
+.arqueo-header {
+  padding: 12px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+
+  &__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    color: #0f172a;
+    letter-spacing: -0.01em;
+  }
+
+  &__subtitle {
+    margin: 1px 0 0;
+    font-size: 11px;
+    color: #64748b;
+  }
+
+  &__total {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+
+    .label {
+      font-size: 9px;
       font-weight: 700;
-      color: #2d5188;
+      color: #3b82f6;
       letter-spacing: 0.05em;
     }
 
-    small {
-      font-size: 11px;
-      font-weight: 500;
-      color: #5a78a8;
-    }
-
-    strong {
-      font-size: 28px;
-      line-height: 1;
-      color: #09306f;
-      font-weight: 800;
-      white-space: nowrap;
-      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    .amount {
+      font-size: 24px;
+      font-weight: 900;
+      color: #1e3a8a;
+      line-height: 1.1;
     }
   }
+}
+
+/* --- Body Scrollable --- */
+.arqueo-caja--body {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px;
+  gap: 16px;
+
+  &.is-loading {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+.arqueo-content-scroll {
+  overflow-y: auto;
+  padding-right: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+  }
+}
+
+/* --- Secciones y Grid --- */
+.arqueo-section {
+  &__title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin: 0 0 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    i {
+      color: #3b82f6;
+      font-size: 14px;
+    }
+  }
+}
+
+.arqueo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 10px;
+
+  &.compact {
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  }
+}
+
+/* --- Cards de Denominación Compactas --- */
+.arqueo-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #3b82f6;
+    background: #f8faff;
+  }
+
+  &.is-active {
+    border-color: #3b82f6;
+    background: #f0f7ff;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.05);
+
+    .value { color: #2563eb; }
+    .total-value { color: #1e40af; }
+  }
+
+  &__label {
+    .value {
+      font-size: 16px;
+      font-weight: 800;
+      color: #334155;
+
+      &::before {
+        content: 'S/ ';
+        font-size: 11px;
+        color: #94a3b8;
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__input {
+    .denominacion-input {
+      width: 100%;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      height: 34px;
+      padding: 0 8px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1e293b;
+      text-align: center;
+      transition: all 0.2s ease;
+
+      &:focus {
+        background: #fff;
+        border-color: #3b82f6;
+        outline: none;
+      }
+    }
+  }
+
+  &__result {
+    .total-value {
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+  }
+
+  /* Variante para monedas compactas */
+  &.coin {
+    border-radius: 8px;
+    padding: 8px 10px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    .arqueo-card__label { min-width: 45px; }
+    .arqueo-card__input {
+        width: 50px;
+        .denominacion-input {
+            height: 28px;
+            font-size: 13px;
+            padding: 0 4px;
+        }
+    }
+  }
+}
+
+/* --- Footer --- */
+.arqueo-footer {
+  padding: 14px 20px;
+  background: #fff;
+  border-top: 1px solid #e2e8f0;
 
   &__actions {
     display: flex;
     justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
+    gap: 8px;
 
-    &-submit,
-    &-cancel {
-      ::ng-deep .p-button {
-        min-height: 40px;
-        border-radius: 9px;
-        font-weight: 600;
-        transition: transform 0.18s ease, box-shadow 0.2s ease, filter 0.2s ease;
-      }
-
-      ::ng-deep .p-button:hover:not(:disabled) {
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(14, 48, 104, 0.14);
-      }
-
-      ::ng-deep .p-button:active:not(:disabled) {
-        transform: translateY(0);
-      }
+    app-button {
+      flex: 1;
+      max-width: 160px;
     }
-  }
-}
 
-@media (max-width: 768px) {
-  .arqueo-caja {
-    padding: 10px;
-
-    &--title {
+    ::ng-deep .p-button {
+      width: 100%;
+      height: 40px;
+      border-radius: 10px;
+      font-weight: 700;
       font-size: 14px;
     }
-
-    &__summary {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
-
-      strong {
-        font-size: 22px;
-      }
-    }
-
-    &__actions {
-      justify-content: stretch;
-
-      app-button {
-        width: 100%;
-      }
-    }
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+/* --- Responsive --- */
+@media (max-width: 640px) {
+  .arqueo-header { padding: 12px 16px; }
+  .arqueo-caja--body { padding: 12px 16px; }
+  .arqueo-grid { grid-template-columns: repeat(2, 1fr); }
+  .arqueo-footer__actions app-button { max-width: none; }
 }

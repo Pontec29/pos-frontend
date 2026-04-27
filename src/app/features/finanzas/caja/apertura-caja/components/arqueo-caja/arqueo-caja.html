@@ -1,67 +1,93 @@
 <div class="arqueo-caja">
   @if (isEntering()) {
   <div class="arqueo-caja__loading" aria-live="polite" aria-busy="true">
-    <p-progressspinner strokeWidth="4" [style]="{ width: '46px', height: '46px' }" />
-    <span>Cargando arqueo de caja...</span>
+    <p-progressspinner strokeWidth="4" [style]="{ width: '32px', height: '32px' }" />
+    <span>Procesando...</span>
   </div>
   }
 
-  <h6 class="arqueo-caja--title">ARQUEO DE CAJA</h6>
+  <div class="arqueo-header">
+    <div class="arqueo-header__info">
+      <h6 class="arqueo-header__title">ARQUEO DE CAJA</h6>
+      <p class="arqueo-header__subtitle">Conteo de efectivo</p>
+    </div>
+    <div class="arqueo-header__total">
+      <span class="label">TOTAL ACTUAL</span>
+      <span class="amount">{{ montoFinalCalculado() | currency:'PEN':'S/ ' }}</span>
+    </div>
+  </div>
+
   <div class="arqueo-caja--body" [class.is-loading]="isEntering()">
-    <div class="arqueo-caja__table-wrapper" tabindex="0" aria-label="Tabla de denominaciones de arqueo de caja">
-      <table class="arqueo-caja__table">
-        <thead>
-          <tr>
-            <th>DENOMINACIÓN</th>
-            <th>CANTIDAD</th>
-            <th>TOTAL</th>
-          </tr>
-        </thead>
-        <tbody>
+    
+    <div class="arqueo-content-scroll">
+      <!-- Sección Billetes -->
+      <div class="arqueo-section">
+        <h3 class="arqueo-section__title"><i class="pi pi-money-bill"></i> Billetes</h3>
+        <div class="arqueo-grid">
           @for (fila of filas(); track fila.ID_DENOMINACION) {
-          <tr>
-            <td class="denominacion">{{ fila.VALOR }}</td>
-            <td>
-              <input
-                type="text"
-                inputmode="numeric"
-                class="cantidad-input"
-                [value]="fila.CANTIDAD === 0 ? '' : fila.CANTIDAD"
-                (input)="onCantidadInput(fila.ID_DENOMINACION, $any($event.target).value)"
-                placeholder="0"
-              />
-              @if (getError(fila.ID_DENOMINACION)) {
-              <small class="input-error">{{ getError(fila.ID_DENOMINACION) }}</small>
-              }
-            </td>
-            <td class="total">{{ fila.TOTAL }}</td>
-          </tr>
+            @if (fila.VALOR >= 10) {
+              <div class="arqueo-card" [class.is-active]="fila.CANTIDAD > 0">
+                <div class="arqueo-card__label">
+                  <span class="value">{{ fila.VALOR }}</span>
+                </div>
+                <div class="arqueo-card__input">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    class="denominacion-input"
+                    [value]="fila.CANTIDAD === 0 ? '' : fila.CANTIDAD"
+                    (input)="onCantidadInput(fila.ID_DENOMINACION, $any($event.target).value)"
+                    placeholder="0"
+                  />
+                </div>
+                <div class="arqueo-card__result">
+                  <span class="total-value">{{ fila.TOTAL | currency:'PEN':'S/ ' }}</span>
+                </div>
+              </div>
+            }
           }
-        </tbody>
-      </table>
-    </div>
-
-    <div class="arqueo-caja__summary">
-      <div class="arqueo-caja__summary-labels">
-        <span>MONTO FINAL DEL ARQUEO</span>
-        <small>Total calculado en tiempo real</small>
+        </div>
       </div>
-      <strong>{{ montoFinalCalculado() }}</strong>
+
+      <!-- Sección Monedas -->
+      <div class="arqueo-section">
+        <h3 class="arqueo-section__title"><i class="pi pi-stop-circle"></i> Monedas</h3>
+        <div class="arqueo-grid compact">
+          @for (fila of filas(); track fila.ID_DENOMINACION) {
+            @if (fila.VALOR < 10) {
+              <div class="arqueo-card coin" [class.is-active]="fila.CANTIDAD > 0">
+                <div class="arqueo-card__label">
+                  <span class="value">{{ fila.VALOR }}</span>
+                </div>
+                <div class="arqueo-card__input">
+                  <input
+                    type="text"
+                    inputmode="numeric"
+                    class="denominacion-input"
+                    [value]="fila.CANTIDAD === 0 ? '' : fila.CANTIDAD"
+                    (input)="onCantidadInput(fila.ID_DENOMINACION, $any($event.target).value)"
+                    placeholder="0"
+                  />
+                </div>
+              </div>
+            }
+          }
+        </div>
+      </div>
     </div>
 
-    <div class="arqueo-caja__actions">
-      <div class="arqueo-caja__actions-cancel">
+    <div class="arqueo-footer">
+      <div class="arqueo-footer__actions">
         <app-button
           label="Cancelar"
           type="secondary"
           [outlined]="true"
           (clicked)="cancelar()"
         ></app-button>
-      </div>
-      <div class="arqueo-caja__actions-submit">
         <app-button
-          label="Enviar Denominación"
+          label="Guardar Arqueo"
           type="success"
+          icon="pi pi-check"
           [disabled]="!canSubmit() || isEntering()"
           (clicked)="enviarDenominacion()"
         ></app-button>

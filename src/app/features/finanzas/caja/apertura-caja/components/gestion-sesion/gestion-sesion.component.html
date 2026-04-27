@@ -1,0 +1,92 @@
+<div class="gestion-container animate__animated animate__fadeIn">
+  
+  <div class="back-btn-wrapper">
+    <button class="back-btn" (click)="onVolver.emit()">
+      <i class="pi pi-arrow-left"></i>
+      <span>Regresar</span>
+    </button>
+  </div>
+
+  <div class="gestion-card-wrapper">
+    @if (!isCajaAbierta()) {
+      <!-- APERTURA (MATCH IMAGEN) -->
+      <div class="gestion-card gestion-card--apertura">
+        <div class="gestion-card__header">
+          <div class="icon-box"><i class="pi pi-lock-open"></i></div>
+          <div class="text-box">
+            <h3>Apertura de Caja</h3>
+            <p>Inicia una nueva sesión de ventas configurando los detalles iniciales.</p>
+          </div>
+        </div>
+
+        <form [formGroup]="formApertura()" (ngSubmit)="onSubmitApertura.emit()" class="gestion-form">
+          <div class="form-grid">
+            <div class="field-item">
+              <label>PUNTO DE VENTA</label>
+              <p-select formControlName="cajaId" [options]="cajaOptions()" optionLabel="label" optionValue="value" 
+                placeholder="Seleccione caja..." class="w-full custom-select" />
+            </div>
+
+            <div class="field-item">
+              <label>DENOMINACIÓN INICIAL</label>
+              <button type="button" class="action-btn" (click)="onAbrirDenominacion.emit('apertura')" [class.is-valid]="arqueoConfirmadoApertura()">
+                <i [class]="arqueoConfirmadoApertura() ? 'pi pi-check-circle' : 'pi pi-money-bill'"></i>
+                <span>{{ arqueoConfirmadoApertura() ? 'Configurado' : 'Realizar Arqueo' }}</span>
+              </button>
+            </div>
+
+            <div class="field-item full-width">
+              <label>OBSERVACIONES</label>
+              <textarea pInputTextarea formControlName="observacionApertura" rows="3" 
+                placeholder="Notas de apertura..." class="w-full custom-textarea"></textarea>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <app-button label="Abrir Caja Ahora" type="success" icon="pi pi-play" 
+              [disabled]="!canSubmitApertura()" (clicked)="onSubmitApertura.emit()" styleClass="main-submit-btn" />
+          </div>
+        </form>
+      </div>
+    } @else {
+      <!-- CIERRE (MATCH IMAGEN) -->
+      <div class="gestion-card gestion-card--cierre">
+        <div class="gestion-card__header">
+          <div class="icon-box"><i class="pi pi-lock"></i></div>
+          <div class="text-box">
+            <h3>Arqueo y Cierre de Sesión</h3>
+            <p>Verifica el efectivo total y finaliza las operaciones.</p>
+          </div>
+        </div>
+
+        <form [formGroup]="formCierre()" (ngSubmit)="onSubmitCierre.emit()" class="gestion-form">
+          <div class="form-grid">
+            <div class="field-item">
+              <label>CAJA EN OPERACIÓN</label>
+              <input pInputText type="text" [value]="cajaSesionNombre()" [readonly]="true" class="w-full custom-input" />
+            </div>
+
+            <div class="field-item">
+              <label>ARQUEO DE CIERRE</label>
+              <button type="button" class="action-btn action-btn--danger" (click)="onAbrirDenominacion.emit('cierre')" [class.is-valid]="arqueoConfirmadoCierre()">
+                <i [class]="arqueoConfirmadoCierre() ? 'pi pi-check-circle' : 'pi pi-money-bill'"></i>
+                <span>{{ arqueoConfirmadoCierre() ? 'Realizado' : 'Realizar Arqueo de Cierre' }}</span>
+              </button>
+            </div>
+
+            <div class="field-item full-width">
+              <label>OBSERVACIONES FINALES</label>
+              <textarea pInputTextarea formControlName="observacionCierre" rows="3" 
+                placeholder="Detalles sobre diferencias en el arqueo o incidencias..." class="w-full custom-textarea"></textarea>
+            </div>
+          </div>
+
+          <div class="form-footer">
+            <app-button label="Finalizar Turno y Cerrar Caja" type="danger" icon="pi pi-power-off" 
+              [loading]="closing()" [disabled]="!isCierreFormValid()" (clicked)="onSubmitCierre.emit()" styleClass="main-submit-btn" />
+          </div>
+        </form>
+      </div>
+    }
+  </div>
+</div>

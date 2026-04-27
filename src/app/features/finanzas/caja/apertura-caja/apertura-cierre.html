@@ -1,261 +1,133 @@
-<div class="container">
+@if (vistaActual() === 'HISTORIAL') {
+<div class="container animate__animated animate__fadeIn">
+  <!-- CABECERA AL ESTILO USUARIOS -->
   <section class="header-content">
     <div class="header-content--title">
-      <h6>Apertura y Cierre de Caja</h6>
-
+      <h6>Gestión de Caja</h6>
+    </div>
+    <div class="header-content--actions">
+      <app-button 
+        preset="add"
+        [label]="esCajaAbierta() ? 'Finalizar Turno' : 'Aperturar Caja'" 
+        [type]="esCajaAbierta() ? 'danger' : 'success'" 
+        (clicked)="abrirGestionCaja()" />
     </div>
   </section>
 
   <section class="main-content">
-    <div class="form-container">
-      <!-- FORMULARIO APERTURA -->
-      <form class="form" [formGroup]="formApertura" (ngSubmit)="onSubmit()" [ngClass]="{ 'form--disabled': esFormularioAperturaDeshabilitado() }">
-        <div class="form-section-left">
-          <app-button preset="add" label="Aperturar Caja" type="success" [disabled]="!canSubmitApertura() || esFormularioAperturaDeshabilitado()" [pTooltip]="
-              esFormularioAperturaDeshabilitado()
-                ? aperturaDeshabilitadaTooltip()
-                : !canSubmitApertura()
-                  ? aperturaTooltip()
-                  : ''
-            " tooltipPosition="top" (clicked)="onSubmit()" styleClass="apertura-button" />
+    <div class="table-section">
+      <!-- ACCIONES DE CABECERA DE TABLA -->
+      <div class="table-section__header-actions">
+        <div class="table-section__header-actions--left">
+          <span class="p-input-icon-left search-wrapper">
+            <i class="pi pi-search" aria-hidden="true"></i>
+            <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" 
+              placeholder="Buscar por caja, monto o fecha..." class="search-input" aria-label="Buscar" />
+          </span>
         </div>
-        <div class="form-section-right">
-          <div class="row">
-            <div class="item-form">
-              <label for="cajaId" class="field-label">
-                <i class="pi pi-briefcase field-icon"></i>CAJA
-                <span class="required-asterisk">*</span>
-              </label>
-              <p-select inputId="cajaId" formControlName="cajaId" [options]="cajaOptions()" optionLabel="label" optionDisabled="disabled" optionValue="value" placeholder="Seleccione una caja" [loading]="cajasLoading()" [emptyMessage]="
-                  cajasLoading()
-                    ? 'Cargando cajas...'
-                    : cajasError()
-                      ? 'Error al cargar cajas'
-                      : 'No hay cajas disponibles'
-                " (onShow)="onCajaCatalogInteraction()" (onClick)="onCajaCatalogInteraction()" (onChange)="onCajaAperturaChange($event.value)" [class.p-invalid]="
-                  formApertura.controls.cajaId.invalid && formApertura.controls.cajaId.touched
-                " class="w-full" />
-            </div>
-            <div class="item-form item-form--denominacion">
-              <label class="field-label">
-                <i class="pi pi-money-bill field-icon"></i>Denominación Inicial
-                <span class="required-asterisk">*</span>
-              </label>
-              <app-button preset="add" label="Agregar Denominación" type="primary" [outlined]="true" (clicked)="abrirDenominacion('apertura')" [pTooltip]="tooltipApertura()" tooltipPosition="top" [styleClass]="
-                  arqueoConfirmadoApertura()
-                    ? 'denominacion-action-button denominacion-action-button--sent'
-                    : 'denominacion-action-button'
-                " />
-            </div>
+        
+        <div class="table-section__header-actions--right">
+          <!-- Espacio para filtros si se requieren en el futuro -->
+          <div [class]="esCajaAbierta() ? 'status-pill status-pill--open' : 'status-pill status-pill--closed'">
+            <i class="pi pi-circle-fill"></i>
+            {{ esCajaAbierta() ? 'SESIÓN ACTIVA' : 'SIN SESIÓN' }}
           </div>
-          <div class="row">
-            <div class="item-form item-form--full">
-              <label for="observacionApertura" class="field-label">
-                <i class="pi pi-align-left field-icon"></i>OBSERVACIONES
-              </label>
-              <textarea pInputTextarea id="observacionApertura" formControlName="observacionApertura" rows="3" placeholder="Detalle de la apertura de caja" class="w-full" style="resize: none"></textarea>
-            </div>
-          </div>
-        </div>
-      </form>
-
-      <!-- FORMULARIO CIERRE -->
-      <form class="form" [formGroup]="formCierre" (ngSubmit)="onSubmitCierre()" [ngClass]="{ 'form--disabled': isCierreLocked() || esFormularioCierreDeshabilitado() }">
-        <div class="form-section-left">
-          <app-button preset="add" label="Cerrar Caja" type="danger" [loading]="closing()" [disabled]="
-              !isCierreFormValid() || isCierreLocked() || esFormularioCierreDeshabilitado()
-            " [pTooltip]="
-              esFormularioCierreDeshabilitado()
-                ? cierreDeshabilitadoTooltip()
-                : !isCierreFormValid()
-                  ? 'COMPLETAR TODOS LOS CAMPOS PARA CERRAR LA CAJA'
-                  : ''
-            " tooltipPosition="top" (clicked)="onSubmitCierre()" styleClass="apertura-button" />
-        </div>
-        <div class="form-section-right">
-          <div class="row">
-            <div class="item-form">
-              <label for="cajaIdCierre" class="field-label">
-                <i class="pi pi-briefcase field-icon"></i>CAJA
-                <span class="required-asterisk">*</span>
-              </label>
-              <!-- ✅ FIX: id duplicado corregido (era "cajaId" igual que en apertura) -->
-              <input pInputText id="cajaIdCierre" type="text" class="w-full" [readonly]="true" [value]="cajaSesionLoading() ? 'Cargando caja...' : cajaSesionNombre()" placeholder="Sin caja abierta" />
-            </div>
-            <div class="item-form item-form--denominacion">
-              <label class="field-label">
-                <i class="pi pi-money-bill field-icon"></i>Denominación Final
-                <span class="required-asterisk">*</span>
-              </label>
-              <app-button preset="add" label="Agregar Denominación" type="primary" [outlined]="true" (clicked)="abrirDenominacion('cierre')" [pTooltip]="tooltipCierre()" tooltipPosition="top" [styleClass]="
-                  arqueoConfirmadoCierre()
-                    ? 'denominacion-action-button denominacion-action-button--sent'
-                    : 'denominacion-action-button'
-                " />
-            </div>
-          </div>
-          <div class="row">
-            <div class="item-form item-form--full">
-              <label for="observacionCierre" class="field-label">
-                <i class="pi pi-align-left field-icon"></i>OBSERVACIONES
-              </label>
-              <textarea pInputTextarea id="observacionCierre" formControlName="observacionCierre" rows="3" placeholder="Detalle del cierre de caja" class="w-full" style="resize: none"></textarea>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-
-    <!-- TABLA DE SESIONES -->
-    <div class="list-container">
-      <h6>Mis Aperturas de Caja</h6>
-      <div class="table-section">
-        <div class="table-section__header-actions">
-          <div class="table-section__header-actions--left">
-            <span class="p-input-icon-left search-wrapper">
-              <i class="pi pi-search" aria-hidden="true"></i>
-              <input pInputText type="text" (input)="onSearchChange($any($event.target).value)" placeholder="Buscar por caja, monto o fecha..." class="search-input" aria-label="Buscar por caja, monto o fecha" />
-            </span>
-          </div>
-        </div>
-        <div class="table-section__main-table compras-table" [class.table-loading]="loading()">
-          <p-table [value]="dataSesiones()" [loading]="loading()" dataKey="ID_SESION" [rowHover]="true" [customSort]="true" (sortFunction)="onCustomSort($event)" class="p-datatable-sm custom-table">
-            <ng-template pTemplate="header">
-              <tr>
-                <th style="width: 4rem" pSortableColumn="ID_SESION">
-                  # <p-sortIcon field="ID_SESION" />
-                </th>
-                <th pSortableColumn="CAJA_NOMBRE">CAJA <p-sortIcon field="CAJA_NOMBRE" /></th>
-                <th pSortableColumn="MONTO_APERTURA_PEN">
-                  MONTO APERTURA <p-sortIcon field="MONTO_APERTURA_PEN" />
-                </th>
-                <th pSortableColumn="MONTO_CIERRE_REAL_PEN">
-                  MONTO CIERRE <p-sortIcon field="MONTO_CIERRE_REAL_PEN" />
-                </th>
-                <th pSortableColumn="FECHA_APERTURA">
-                  FECHA APERTURA <p-sortIcon field="FECHA_APERTURA" />
-                </th>
-                <th pSortableColumn="FECHA_CIERRE">
-                  FECHA CIERRE <p-sortIcon field="FECHA_CIERRE" />
-                </th>
-                <th pSortableColumn="ESTADO">ESTADO <p-sortIcon field="ESTADO" /></th>
-                <th class="text-center">ACCIONES</th>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="body" let-apertura>
-              <tr>
-                <td>{{ apertura.ID_SESION }}</td>
-                <td>{{ apertura.CAJA_NOMBRE || 'Caja ' + apertura.ID_CAJA }}</td>
-                <td>
-                  {{ apertura.MONTO_APERTURA_PEN | currencyFormat:'PEN':2 }}
-                </td>
-                <td>
-                  {{ apertura.MONTO_CIERRE_REAL_PEN | currencyFormat:'PEN':2 }}
-                </td>
-                <td>{{ apertura.FECHA_APERTURA | dateFormat:'long' }}</td>
-                <td>{{ apertura.FECHA_CIERRE | dateFormat:'long' }}</td>
-                <td>
-                  <span [class]="
-                      apertura.ESTADO === 'ABIERTA'
-                        ? 'status status--caja-abierta'
-                        : 'status status--caja-cerrada'
-                    ">
-                    {{ apertura.ESTADO }}
-                  </span>
-                </td>
-                <td class="text-center">
-                  <button type="button" class="p-link" pTooltip="Ver detalle" tooltipPosition="top">
-                    <i class="pi pi-eye" style="font-size: 1.2rem; color: var(--primary-color)"></i>
-                  </button>
-                </td>
-              </tr>
-            </ng-template>
-
-            <ng-template pTemplate="emptymessage">
-              <tr>
-                <td colspan="8">
-                  @if (hasError()) {
-                  <div class="table-state table-state--error" role="alert" aria-live="assertive">
-                    <div class="table-state__icon">
-                      <i class="pi pi-exclamation-triangle" aria-hidden="true"></i>
-                    </div>
-                    <div class="table-state__content">
-                      <div class="table-state__title">No se pudo cargar la información</div>
-                      <div class="table-state__subtitle">{{ errorMessage() }}</div>
-                      <button type="button" class="table-state__action" (click)="reloadMovimientos()">
-                        Reintentar
-                      </button>
-                    </div>
-                  </div>
-                  } @else {
-                  <div class="table-state table-state--empty" role="status" aria-live="polite">
-                    <div class="table-state__icon">
-                      <i class="pi pi-search" aria-hidden="true"></i>
-                    </div>
-                    <div class="table-state__content">
-                      <div class="table-state__title">No se encontraron resultados</div>
-                      <div class="table-state__subtitle">
-                        Intenta ajustar la búsqueda o los filtros.
-                      </div>
-                    </div>
-                  </div>
-                  }
-                </td>
-              </tr>
-            </ng-template>
-          </p-table>
-
-          <!-- Vista móvil -->
-          <div class="mobile-card-list">
-            @for (item of dataSesiones(); track item.ID_SESION) {
-            <div class="mobile-card">
-              <div class="mobile-card__header">
-                <div class="mobile-card__avatar-wrapper">
-                  <div class="avatar-circle" aria-hidden="true">
-                    {{ (item.CAJA_NOMBRE || 'C' + item.ID_CAJA).substring(0, 2).toUpperCase() }}
-                  </div>
-                </div>
-                <div class="mobile-card__info">
-                  <span class="mobile-card__name">{{
-                    item.CAJA_NOMBRE || 'Caja ' + item.ID_CAJA
-                    }}</span>
-                  <span class="mobile-card__dni" [style.color]="
-                        item.ESTADO === 'ABIERTA'
-                          ? 'var(--primary-color)'
-                          : 'var(--text-color-secondary)'
-                      " style="font-weight: 500">{{ item.ESTADO }}</span>
-                  <span class="mobile-card__dni">Apertura: {{ item.MONTO_APERTURA_PEN }}</span>
-                  <span class="mobile-card__dni">Cierre:
-                    {{ item.MONTO_CIERRE_REAL_PEN > 0 ? item.MONTO_CIERRE_REAL_PEN : '-' }}</span>
-                  <span class="mobile-card__dni">Fecha Ap.: {{ item.FECHA_APERTURA }}</span>
-                  <span class="mobile-card__dni">Fecha Cierre: {{ item.FECHA_CIERRE || '-' }}</span>
-                </div>
-              </div>
-            </div>
-            }
-            @if (dataSesiones().length === 0 && !loading()) {
-            <div class="table-state table-state--empty mobile-card-empty" role="status" aria-live="polite">
-              <div class="table-state__icon"><i class="pi pi-search" aria-hidden="true"></i></div>
-              <div class="table-state__content">
-                <div class="table-state__title">No se encontraron resultados</div>
-                <div class="table-state__subtitle">
-                  Intenta ajustar la búsqueda o los filtros.
-                </div>
-              </div>
-            </div>
-            }
-          </div>
-        </div>
-
-        <div class="table-section__footer-paginated">
-          <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator" />
         </div>
       </div>
+
+      <!-- TABLA PRINCIPAL -->
+      <div class="table-section__main-table" [class.table-loading]="loading()">
+        <p-table [value]="dataSesiones()" [loading]="loading()" [rowHover]="true" [stripedRows]="true" class="p-datatable-sm custom-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 4rem">#</th>
+              <th>CAJA</th>
+              <th>APERTURA</th>
+              <th>CIERRE</th>
+              <th>FECHA APERTURA</th>
+              <th style="width: 8rem" class="text-center">ESTADO</th>
+              <th style="width: 10rem" class="text-center">ACCIONES</th>
+            </tr>
+          </ng-template>
+          
+          <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ first() + rowIndex + 1 }}</td>
+              <td>
+                <div class="user-info-cell">
+                  <div class="avatar-circle" aria-hidden="true">
+                    {{ (item.CAJA_NOMBRE || 'C').substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div class="user-details">
+                    <span class="user-name">{{ item.CAJA_NOMBRE }}</span>
+                    <span class="user-dni">ID: #{{ item.ID_SESION }}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="font-bold">{{ item.MONTO_APERTURA_PEN | currencyFormat:'PEN':2 }}</td>
+              <td class="text-muted">{{ item.MONTO_CIERRE_REAL_PEN | currencyFormat:'PEN':2 }}</td>
+              <td>
+                <div class="flex flex-column">
+                  <span class="text-sm font-medium">{{ item.FECHA_APERTURA | dateFormat:'long' }}</span>
+                </div>
+              </td>
+              <td class="text-center">
+                <p-tag [value]="item.ESTADO" [severity]="item.ESTADO === 'ABIERTA' ? 'success' : 'secondary'" [rounded]="true"></p-tag>
+              </td>
+              <td class="text-center">
+                 <div class="action-buttons">
+                    <button class="action-buttons--view" pTooltip="Ver Detalle" tooltipPosition="top">
+                        <i class="pi pi-eye" aria-hidden="true"></i>
+                    </button>
+                    <button class="action-buttons--edit" pTooltip="Imprimir Ticket" tooltipPosition="top">
+                        <i class="pi pi-print" aria-hidden="true"></i>
+                    </button>
+                 </div>
+              </td>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td colspan="7">
+                <div class="table-state table-state--empty" role="status" aria-live="polite">
+                  <div class="table-state__icon"><i class="pi pi-search" aria-hidden="true"></i></div>
+                  <div class="table-state__content">
+                    <div class="table-state__title">No se encontraron resultados</div>
+                    <div class="table-state__subtitle">Intenta ajustar la búsqueda o los filtros.</div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+
+      <p-paginator (onPageChange)="onPageChange($event)" [first]="first()" [rows]="rows()" [totalRecords]="totalRecords()" [rowsPerPageOptions]="[10, 25, 50]" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} registros" class="custom-paginator" />
     </div>
   </section>
 </div>
+} @else {
+  <!-- VISTA DE GESTIÓN (PANTALLA COMPLETA) -->
+  <app-gestion-sesion 
+    [isCajaAbierta]="esCajaAbierta()"
+    [formApertura]="formApertura"
+    [formCierre]="formCierre"
+    [cajaOptions]="cajaOptions()"
+    [cajaSesionNombre]="cajaSesionNombre()"
+    [arqueoConfirmadoApertura]="arqueoConfirmadoApertura()"
+    [arqueoConfirmadoCierre]="arqueoConfirmadoCierre()"
+    [canSubmitApertura]="canSubmitApertura()"
+    [isCierreFormValid]="isCierreFormValid()"
+    [closing]="closing()"
+    (onVolver)="volverAlHistorial()"
+    (onAbrirDenominacion)="abrirDenominacion($event)"
+    (onSubmitApertura)="onSubmit()"
+    (onSubmitCierre)="onSubmitCierre()"
+  />
+}
 
+<!-- MODAL DE ARQUEO -->
 @if (isModalOpen()) {
 <div class="modal-backdrop" (click)="cerrarDenominacion()">
   <div class="modal-content" (click)="$event.stopPropagation()">
