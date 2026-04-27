@@ -203,5 +203,12 @@
     </form>
 </div>
 
-<!-- <app-cliente-form-dialog [visible]="mostrarModalCliente()" (save)="onSaveCliente($event)" (cancel)="onCancelCliente()">
-</app-cliente-form-dialog> -->
+<!-- ! MODAL DE PAGOS MÚLTIPLES -->
+@if (showPaymentModal()) {
+    <app-modal-venta
+        [total]="totalGeneral()"
+        [cart]="detallesFormArray.value"
+        (closed)="showPaymentModal.set(false)"
+        (confirmed)="onVentaConfirmada($event)"
+    />
+}

@@ -78,6 +78,13 @@ export interface CuotaResponse {
   montoPagado: number;
 }
 
+export interface VentaPagoResponse {
+  id: number;
+  metodoPagoId: number;
+  monto: number;
+  referencia: string | null;
+}
+
 // ─────────────────────────────────────────────────────────────────
 //  RESPUESTA COMPLETA (detalle de una venta)
 // ─────────────────────────────────────────────────────────────────
@@ -146,6 +153,7 @@ export interface VentaResponse {
 
   detalles: DetalleVentaResponse[];
   cuotas: CuotaResponse[];
+  pagos: VentaPagoResponse[];
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -251,6 +259,7 @@ export interface VentaRequest {
 
   detalles: DetalleVentaRequest[];
   cuotas?: CuotaRequest[];
+  pagos: { metodoPagoId: number; monto: number; referencia?: string }[];
 }
 
 // ─────────────────────────────────────────────────────────────────

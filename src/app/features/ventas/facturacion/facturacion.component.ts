@@ -32,6 +32,7 @@ import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputTextModule } from 'primeng/inputtext';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { SidebarCobro } from '@ventas/venta-rapida/components/sidebar-cobro/sidebar-cobro';
 
 @Component({
   selector: 'app-facturacion',
@@ -51,6 +52,7 @@ import { TooltipModule } from 'primeng/tooltip';
     TooltipModule,
     ...PRIMENG_TABLE_MODULES,
     ...PRIMENG_FORM_MODULES,
+    SidebarCobro,
   ],
   templateUrl: './facturacion.component.html',
   styleUrl: './facturacion.component.scss',
@@ -71,6 +73,7 @@ export default class FacturacionComponent {
   guardando = signal(false);
   isViewMode = signal(false);
   mostrarModalCliente = signal(false);
+  showPaymentModal = signal(false);
 
   // Opciones para selects usando los modelos
   // Opciones para selects
@@ -116,9 +119,10 @@ export default class FacturacionComponent {
     moneda: [{ value: 1, disabled: true }, Validators.required], // 1 = PEN
     condicionPago: this.fb.group({
       condicion: ['CONTADO', Validators.required],
-      formaPago: [null, Validators.required],
+      formaPago: [null], // Se vuelve opcional ya que se manejará en el modal para contado
       refOperacion: [''],
     }),
+    cuotas: this.fb.array([]),
     detalles: this.fb.array([]),
   });
 
@@ -161,6 +165,10 @@ export default class FacturacionComponent {
 
   get detallesFormArray() {
     return this.ventaForm.get('detalles') as FormArray;
+  }
+
+  get cuotasFormArray() {
+    return this.ventaForm.get('cuotas') as FormArray;
   }
 
   constructor() {
@@ -216,11 +224,6 @@ export default class FacturacionComponent {
             value: m.id,
           })),
         );
-
-        // Establecer un valor por defecto si hay opciones
-        if (data.length > 0) {
-          this.ventaForm.get('condicionPago.formaPago')?.setValue(data[0].id);
-        }
       },
       error: (err) => {
         console.error('Error cargando métodos de pago', err);
@@ -312,6 +315,37 @@ export default class FacturacionComponent {
   onTipoComprobanteChange(id: number) {
     this.tipoComprobanteSeleccionado.set(id);
     this.cargarCorrelativo();
+  }
+
+  agregarCuota() {
+    const total = this.totalGeneral();
+    const cuotasActuales = this.cuotasFormArray.length;
+    const montoPendiente = total - this.cuotasFormArray.controls.reduce((sum, c) => sum + (c.get('monto')?.value || 0), 0);
+
+    const cuotaGroup = this.fb.group({
+      numeroCuota: [cuotasActuales + 1],
+      fechaVencimiento: [new Date(), Validators.required],
+      monto: [montoPendiente > 0 ? montoPendiente : 0, [Validators.required, Validators.min(0.01)]]
+    });
+    this.cuotasFormArray.push(cuotaGroup);
+  }
+
+  eliminarCuota(index: number) {
+    this.cuotasFormArray.removeAt(index);
+  }
+
+  generarCuotaUnica() {
+    this.cuotasFormArray.clear();
+    const total = this.totalGeneral();
+    const fecha = new Date();
+    fecha.setMonth(fecha.getMonth() + 1); // +30 días por defecto
+
+    const cuotaGroup = this.fb.group({
+      numeroCuota: [1],
+      fechaVencimiento: [fecha, Validators.required],
+      monto: [total, [Validators.required, Validators.min(0.01)]]
+    });
+    this.cuotasFormArray.push(cuotaGroup);
   }
 
   private tipoComprobanteToCodigo(id: number): string {
@@ -509,7 +543,18 @@ export default class FacturacionComponent {
       return;
     }
 
+    if (this.paymentCondition() === 'CONTADO') {
+      this.showPaymentModal.set(true);
+    } else {
+      // Para CRÉDITO o casos especiales, se procesa directo (aunque el backend espera al menos un pago)
+      // TODO: Implementar lógica de crédito si es necesario
+      this.onVentaConfirmada({ pagos: [] });
+    }
+  }
+
+  onVentaConfirmada(pagoData: any) {
     this.guardando.set(true);
+    this.showPaymentModal.set(false);
 
     const cliente = this.ventaForm.get('cliente')?.value as Cliente | null;
 
@@ -543,24 +588,30 @@ export default class FacturacionComponent {
       igvMonto: totales.igv,
       total: totales.total,
       totalNeto: totales.total,
-      metodoPagoId: this.ventaForm.get('condicionPago.formaPago')?.value ?? 1,
+      metodoPagoId: pagoData.pagos?.[0]?.metodoPagoId || 1,
       formaPago: (this.ventaForm.get('condicionPago.condicion')?.value as any) ?? 'CONTADO',
-      idUsuarioVendedor: this.session()?.tenantId ? Number(this.session()!.tenantId) : 1, //! debe ser del tokenb
+      idUsuarioVendedor: this.session()?.tenantId ? Number(this.session()!.tenantId) : 1,
       detalles: this.detallesFormArray.value.map((detalle: any) => ({
         productoId: detalle.productoId,
         productoCodigo: detalle.codigoInterno ?? undefined,
         productoNombre: detalle.productoNombre,
         cantidad: detalle.cantidad,
-        unidadMedidaId: detalle.unidadSeleccionada.unidadId, //! revisar ene l buscador y eliminar id causa cnfusion
+        unidadMedidaId: detalle.unidadSeleccionada.unidadId,
         tipoAfectacionId: detalle.afectacion,
         precioUnitario: detalle.precioUnitario,
         precioUnitarioTotal: detalle.precioUnitario,
         costoUnitario: 0,
         costoUnitarioTotal: 0,
         subtotal: detalle.subtotal,
-        igvMonto: 0, //! revisar
+        igvMonto: 0,
         total: detalle.subtotal,
       })),
+      pagos: pagoData.pagos,
+      cuotas: this.paymentCondition() === 'CRÉDITO' ? this.cuotasFormArray.value.map((c: any) => ({
+        numeroCuota: c.numeroCuota,
+        fechaVencimiento: c.fechaVencimiento.toISOString().split('T')[0],
+        monto: c.monto
+      })) : []
     };
 
     // Crear la venta

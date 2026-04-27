@@ -1,0 +1,160 @@
+<p-drawer 
+    [(visible)]="visible" 
+    position="right" 
+    [showCloseIcon]="false" 
+    [baseZIndex]="10000"
+    styleClass="cobro-drawer"
+    (onHide)="onClose()">
+    
+    <div class="sidebar-header">
+        <div class="header-main">
+            <h2 class="title">COBRAR</h2>
+            <button class="btn-close" (click)="onClose()">
+                <i class="pi pi-arrow-right"></i>
+            </button>
+        </div>
+        <div class="summary-bar">
+            <div class="summary-item">
+                <span class="label">Total venta:</span>
+                <span class="value teal">{{ total() | number: '1.2-2' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Pagado:</span>
+                <span class="value">{{ totalPagado() | number: '1.2-2' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Pendiente:</span>
+                <span class="value red">{{ pendiente() | number: '1.2-2' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="label">Vuelto:</span>
+                <span class="value">{{ vuelto() | number: '1.2-2' }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="sidebar-content">
+        <div class="payment-condition">
+            <span class="condition-label">Forma de pago:</span>
+            <div class="condition-options">
+                <div class="condition-item" (click)="condicion.set('CONTADO')">
+                    <div class="radio-circle" [class.active]="condicion() === 'CONTADO'"></div>
+                    <span class="radio-label">CONTADO</span>
+                </div>
+                <div class="condition-item" (click)="condicion.set('CRÉDITO')">
+                    <div class="radio-circle" [class.active]="condicion() === 'CRÉDITO'"></div>
+                    <span class="radio-label">CREDITO</span>
+                </div>
+            </div>
+        </div>
+
+        @if (condicion() === 'CONTADO') {
+            <div class="methods-selector mb-4">
+                <p-multiSelect 
+                    [options]="metodosCatalogo()" 
+                    [ngModel]="selectedMetodos()" 
+                    (ngModelChange)="onSelectionChange({value: $event}); selectedMetodos.set($event)"
+                    optionLabel="tipo"
+                    display="chip"
+                    [showClear]="false"
+                    placeholder="Seleccione métodos de pago"
+                    styleClass="w-full custom-multiselect"
+                    appendTo="body">
+                </p-multiSelect>
+            </div>
+
+            <div class="payments-details">
+                @for (metodo of selectedMetodos(); track metodo.id) {
+                    <div class="payment-item animate-fade-in">
+                        <div class="payment-row-main">
+                            <span class="method-name">{{ metodo.tipo }}</span>
+                            
+                            @if (metodo.requiereReferencia) {
+                                <div class="reference-wrapper">
+                                    <input 
+                                        type="text" 
+                                        class="ref-input" 
+                                        placeholder="Referencia de operación..."
+                                        [ngModel]="referenciasMap()[metodo.id]"
+                                        (ngModelChange)="updateReferencia(metodo.id, $event)">
+                                </div>
+                            }
+
+                            <div class="input-wrapper">
+                                <p-inputNumber 
+                                    [ngModel]="montosMap()[metodo.id]" 
+                                    (ngModelChange)="updateMonto(metodo.id, $event)"
+                                    mode="decimal" 
+                                    [minFractionDigits]="2"
+                                    [maxFractionDigits]="2"
+                                    [fluid]="true"
+                                    styleClass="monto-input">
+                                </p-inputNumber>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        } @else {
+            <div class="credito-section animate-fade-in">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="section-title">Cronograma de Cuotas</h3>
+                    <p-button icon="pi pi-plus" label="Nueva Cuota" (click)="agregarCuota()" size="small" [text]="true"></p-button>
+                </div>
+                
+                <div class="cuotas-list">
+                    @for (cuota of cuotas(); track $index) {
+                        <div class="cuota-card animate-fade-in">
+                            <div class="cuota-row">
+                                <div class="field-group">
+                                    <label>F. Vencimiento</label>
+                                    <p-datepicker 
+                                        [ngModel]="cuota.fechaVencimiento" 
+                                        (ngModelChange)="updateCuotaFecha($index, $event)"
+                                        [showIcon]="true" 
+                                        appendTo="body" 
+                                        fluid 
+                                        dateFormat="dd/mm/yy">
+                                    </p-datepicker>
+                                </div>
+                                <div class="field-group monto-field">
+                                    <label>Monto (S/)</label>
+                                    <p-inputNumber 
+                                        [ngModel]="cuota.monto" 
+                                        (ngModelChange)="updateCuotaMonto($index, $event)"
+                                        [minFractionDigits]="2" 
+                                        fluid>
+                                    </p-inputNumber>
+                                </div>
+                                <p-button icon="pi pi-trash" [text]="true" severity="danger" (click)="eliminarCuota($index)"></p-button>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (cuotas().length === 0) {
+                        <div class="text-center p-8 border-2 border-dashed border-slate-200 rounded-2xl text-slate-400">
+                            <i class="pi pi-calendar-plus text-3xl mb-3 opacity-20"></i>
+                            <p class="text-sm font-medium mb-4">No hay cuotas definidas</p>
+                            <p-button label="Generar Cuota Única (30 días)" (click)="generarCuotaUnica()" [outlined]="true"></p-button>
+                        </div>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="sidebar-footer">
+        <button class="btn-action cancel" (click)="onClose()">
+            <div class="icon-circle">
+                <i class="pi pi-times"></i>
+            </div>
+            <span>Cancelar</span>
+        </button>
+        <button class="btn-action accept" (click)="onAceptar()" [disabled]="pendiente() > 0">
+            <div class="icon-circle">
+                <i class="pi pi-check"></i>
+            </div>
+            <span>Aceptar</span>
+        </button>
+    </div>
+</p-drawer>

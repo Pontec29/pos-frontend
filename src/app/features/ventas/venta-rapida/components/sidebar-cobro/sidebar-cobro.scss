@@ -1,0 +1,324 @@
+$teal-primary: var(--primary);
+$teal-dark: #004080;
+$red-danger: var(--red-500, #ef4444);
+$bg-light: #f8fafc;
+$border-color: var(--gray-200, #e2e8f0);
+
+::ng-deep {
+  .cobro-drawer {
+    &.p-drawer-right {
+      width: 650px !important;
+      max-width: none !important;
+    }
+
+    padding: 0;
+    background: #f8fafc;
+    box-shadow: -15px 0 40px rgba(0, 0, 0, 0.15);
+
+    .p-drawer-content {
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #f8fafc;
+    }
+  }
+
+  .custom-multiselect {
+    border-radius: 4px;
+    .p-multiselect-label-container {
+      padding: 4px 8px;
+    }
+  }
+
+  .sidebar-header {
+    background: white;
+    border-bottom: 2px solid #eee;
+
+    .header-main {
+      background: $teal-primary;
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+      }
+
+      .btn-close {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 4px;
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    .summary-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      padding: 20px;
+      gap: 12px;
+      background: #f1f5f9;
+
+      .summary-item {
+        background: white;
+        padding: 12px 16px;
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        border: 1px solid #e2e8f0;
+
+        .label {
+          font-size: 11px;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #64748b;
+          font-weight: 700;
+        }
+        .value {
+          font-size: 1.4rem;
+          font-weight: 800;
+          color: #1e293b;
+        }
+        .value.teal {
+          color: $teal-primary;
+        }
+        .value.red {
+          color: $red-danger;
+        }
+      }
+    }
+  }
+
+  .sidebar-content {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+
+    .payment-condition {
+      background: white;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .condition-options {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+      }
+
+      .condition-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+      }
+
+      .condition-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #475569;
+      }
+    }
+
+    .credito-section {
+      .cuota-card {
+        background: white;
+        padding: 12px;
+        border: 1px solid $border-color;
+        border-radius: 12px;
+        margin-bottom: 12px;
+
+        .cuota-row {
+          display: flex;
+          align-items: flex-end;
+          gap: 12px;
+
+          .field-group {
+            flex: 1;
+            &.monto-field {
+              flex: 0 0 140px;
+            }
+
+            label {
+              display: block;
+              font-size: 10px;
+              font-weight: 800;
+              text-transform: uppercase;
+              color: #64748b;
+              margin-bottom: 4px;
+              letter-spacing: 0.5px;
+            }
+          }
+        }
+      }
+    }
+
+    .radio-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #ccc;
+      position: relative;
+
+      &.active {
+        border-color: #8bc34a;
+        background: white;
+        &::after {
+          content: '';
+          position: absolute;
+          inset: 2px;
+          background: #8bc34a;
+          border-radius: 50%;
+        }
+      }
+    }
+
+    .radio-label {
+      font-size: 12px;
+    }
+  }
+
+  .payment-item {
+    margin-bottom: 8px;
+    padding: 8px 16px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid $border-color;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+    .payment-row-main {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .method-name {
+        font-weight: 800;
+        font-size: 12px;
+        color: #334155;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+        min-width: 120px;
+      }
+
+      .reference-wrapper {
+        flex: 1;
+        .ref-input {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid $border-color;
+          border-radius: 6px;
+          font-size: 13px;
+          background: #fafafa;
+          &:focus {
+            outline: none;
+            border-color: $teal-primary;
+            background: white;
+          }
+        }
+      }
+
+      .input-wrapper {
+        width: 150px;
+
+        ::ng-deep .p-inputnumber-input {
+          font-size: 1.1rem;
+          font-weight: 800;
+          text-align: right;
+          padding: 6px 10px;
+          color: #1e293b;
+          background: #f8fafc;
+          border: 2px solid $border-color;
+          border-radius: 6px;
+
+          &:focus {
+            border-color: $teal-primary;
+            background: white;
+          }
+        }
+      }
+    }
+  }
+
+  .sidebar-footer {
+    padding: 20px;
+    display: flex;
+    gap: 15px;
+    background: white;
+    border-top: 1px solid #eee;
+
+    .btn-action {
+      flex: 1;
+      height: 48px;
+      border-radius: 6px;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: 14px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s;
+
+      &:active {
+        transform: scale(0.98);
+      }
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .icon-circle {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+      }
+
+      &.cancel {
+        background: #ff1744;
+      }
+      &.accept {
+        background: $teal-primary;
+      }
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}

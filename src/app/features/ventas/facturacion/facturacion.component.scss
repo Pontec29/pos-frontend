@@ -60,7 +60,7 @@
     max-width: 1600px;
     margin: 0 auto;
 
-    @media (max-width: 1200px) {
+    @media (max-width: 1024px) {
         grid-template-columns: 1fr;
     }
 }
@@ -310,31 +310,78 @@
     }
 }
 
-.payment-toggle {
-    display: flex;
-    background: #f1f5f9;
-    border-radius: var(--radius-sm);
-    padding: 4px;
-    width: 100%;
+  .payment-condition-card {
+    .payment-toggle {
+        display: flex;
+        background: #f1f5f9;
+        padding: 4px;
+        border-radius: 8px;
+        gap: 4px;
+        width: 100%;
 
-    .btn-pay {
-        flex: 1;
-        border: none;
-        background: transparent;
-        padding: 0.5rem;
-        border-radius: var(--radius-sm);
-        font-size: 0.875rem;
-        font-weight: 600;
-        color: var(--text-muted);
-        cursor: pointer;
+        .btn-pay {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
 
-        &.active {
-            background: white;
-            color: var(--primary);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+            &.active {
+                background: white;
+                color: var(--primary);
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+
+            &:disabled {
+                cursor: not-allowed;
+                opacity: 0.7;
+            }
         }
     }
-}
+
+    .contado-info-box {
+        background: rgba(37, 99, 235, 0.05);
+        border: 1px dashed rgba(37, 99, 235, 0.3);
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        gap: 10px;
+        align-items: flex-start;
+        color: var(--text-main);
+
+        i {
+            margin-top: 2px;
+            color: var(--primary);
+        }
+
+        p {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.4;
+            font-weight: 500;
+        }
+    }
+
+    .credito-section {
+        .cuota-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            transition: border-color 0.2s;
+
+            &:hover {
+                border-color: var(--primary);
+            }
+        }
+    }
+  }
 
 .sunat-alert {
     display: flex;

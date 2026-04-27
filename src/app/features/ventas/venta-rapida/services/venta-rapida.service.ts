@@ -6,8 +6,15 @@ import { environment } from '@environments/environment';
   providedIn: 'root',
 })
 export class VentaRapidaService {
-  private readonly apiUrl = `${environment.apiUrl}/pos`;
+  private readonly apiUrl = `${environment.apiUrl}/api/v1/ven/ventas`;
+  private readonly metodosUrl = `${environment.apiUrl}/api/v1/mto/metodos-pago`;
   private readonly http = inject(HttpClient);
 
-  getAll() {}
+  getMetodosPago() {
+    return this.http.get<any>(this.metodosUrl);
+  }
+
+  crearVenta(venta: any) {
+    return this.http.post<any>(this.apiUrl, venta);
+  }
 }

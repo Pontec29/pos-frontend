@@ -246,8 +246,11 @@
 }
 
 <!-- ! MODAL DE FINALIZAR COMPRA -->
-@if (false) {
-  <div class="modal-backdrop">
-    <app-modal-venta />
-  </div>
+@if (showPaymentModal()) {
+  <app-modal-venta
+    [total]="cartTotal()"
+    [cart]="cart()"
+    (closed)="showPaymentModal.set(false)"
+    (confirmed)="onVentaConfirmada($event)"
+  />
 }

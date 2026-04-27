@@ -181,27 +181,6 @@
                     </button>
                 </div>
 
-                <div formGroupName="condicionPago" class="erp-card">
-                    <div class="section-header mb-3">
-                        <h3 class="section-title">Condición de Pago</h3>
-                    </div>
-                    <div class="form-grid">
-                        <div class="col-12 form-field">
-                            <div class="payment-toggle">
-                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CONTADO'" (click)="!isViewMode() && ventaForm.get('condicionPago.condicion')?.setValue('CONTADO')" [disabled]="isViewMode()">Contado</button>
-                                <button type="button" class="btn-pay" [class.active]="paymentCondition() === 'CRÉDITO'" (click)="!isViewMode() && ventaForm.get('condicionPago.condicion')?.setValue('CRÉDITO')" [disabled]="isViewMode()">Crédito</button>
-                            </div>
-                        </div>
-                        <div class="col-12 form-field">
-                            <label>Forma de Pago</label>
-                            <p-select [options]="formaPagoOptions()" formControlName="formaPago" fluid></p-select>
-                        </div>
-                        <div class="col-12 form-field">
-                            <label>Ref. de Operación</label>
-                            <input pInputText type="text" formControlName="refOperacion" placeholder="Opcional" class="w-full">
-                        </div>
-                    </div>
-                </div>
 
                 <div class="sunat-alert">
                     <i class="pi pi-info-circle"></i>
@@ -215,5 +194,10 @@
     </form>
 </div>
 
-<!-- <app-cliente-form-dialog [visible]="mostrarModalCliente()" (save)="onSaveCliente($event)" (cancel)="onCancelCliente()">
-</app-cliente-form-dialog> -->
+<!-- ! SIDEBAR DE PAGOS (COBRO LATERAL) -->
+<app-sidebar-cobro
+    *ngIf="showPaymentModal()"
+    [total]="totalGeneral()"
+    (closed)="showPaymentModal.set(false)"
+    (confirmed)="onVentaConfirmada($event)"
+/>

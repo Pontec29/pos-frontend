@@ -21,6 +21,7 @@ import { CategoriaService } from '@inventario/categoria/services/categoria.servi
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Categoria } from '@inventario/categoria/domain/categoria.interface';
 import { catchError, map, of } from 'rxjs';
+import { VentaRapidaService } from './services/venta-rapida.service';
 
 @Component({
   selector: 'app-venta-rapida',
@@ -48,6 +49,7 @@ export default class VentaRapidaComponent {
   private readonly messageService = inject(MessageService);
   private readonly productoService = inject(ProductoService);
   private readonly categoriasService = inject(CategoriaService);
+  private readonly ventaRapidaService = inject(VentaRapidaService);
 
   // ! RESOLUTION
   readonly isMobil = signal<boolean>(false);
@@ -112,6 +114,7 @@ export default class VentaRapidaComponent {
   // ! SEARCH AND FILTERS
   searchQuery = signal('');
   filterAdvanced = signal<boolean>(false);
+  showPaymentModal = signal<boolean>(false);
 
   filteredProducts = computed(() => {
     const query = this.searchQuery().toLowerCase();
@@ -267,7 +270,47 @@ export default class VentaRapidaComponent {
   }
 
   openPayment() {
-    // Abrir modal de venta
-    this.messageService.add({ severity: 'info', summary: 'Finalizar', detail: 'abrir modal...' });
+    this.showPaymentModal.set(true);
+  }
+
+  onVentaConfirmada(pagoData: any) {
+    const request = {
+      sucursalId: 1, // TODO: Dinámico
+      almacenId: 1,  // TODO: Dinámico
+      tipoComprobanteId: 1, // Boleta por defecto
+      comprobanteCodigoSunat: '03',
+      serie: 'B001',
+      numero: '0', // Autogenerado
+      clienteId: 1, // Varios
+      monedaId: 1,
+      total: this.cartTotal(),
+      totalNeto: this.cartTotal(),
+      formaPago: 'CONTADO',
+      metodoPagoId: pagoData.pagos[0].metodoPagoId,
+      idUsuarioVendedor: 1,
+      detalles: this.cart().map(item => ({
+        productoId: item.product.id,
+        productoNombre: item.product.name,
+        cantidad: item.quantity,
+        precioUnitario: item.isBox ? item.product.priceBox : item.product.priceUnit,
+        precioUnitarioTotal: item.isBox ? item.product.priceBox : item.product.priceUnit,
+        costoUnitario: 0,
+        costoUnitarioTotal: 0,
+        subtotal: (item.isBox ? item.product.priceBox : item.product.priceUnit) * item.quantity,
+        total: (item.isBox ? item.product.priceBox : item.product.priceUnit) * item.quantity
+      })),
+      pagos: pagoData.pagos
+    };
+
+    this.ventaRapidaService.crearVenta(request).subscribe({
+      next: (res) => {
+        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Venta realizada correctamente' });
+        this.cart.set([]);
+        this.showPaymentModal.set(false);
+      },
+      error: (err) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudo registrar la venta' });
+      }
+    });
   }
 }

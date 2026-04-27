@@ -1,11 +1,10 @@
-<!-- ! (click)="onOverlayClick()" IMPLEMENTARLO SI ES NECESARIO -->
 <div class="modal-overlay">
   <div class="modal-container" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <div class="header-content">
         <div class="header-text">
-          <h2 class="modal-title font-lg font-bold">Prueba Modal</h2>
-          <p class="modal-subtitle font-sm font-regular">Prueba Modal</p>
+          <h2 class="modal-title font-lg font-bold">Finalizar Venta</h2>
+          <p class="modal-subtitle font-sm font-regular">Complete los datos de pago para generar el comprobante</p>
         </div>
       </div>
       <button class="close-button" (click)="onClose()" type="button" aria-label="Cerrar">
@@ -13,11 +12,103 @@
       </button>
     </div>
 
-    <div class="separator"></div>
+    <div class="modal-body">
+      <!-- Resumen de Montos -->
+      <div class="payment-summary">
+        <div class="summary-item total">
+          <span class="label">Total a Pagar</span>
+          <span class="amount">{{ total() | currency : 'PEN' }}</span>
+        </div>
+        <div class="summary-item paid">
+          <span class="label">Monto Pagado</span>
+          <span class="amount">{{ totalPagado() | currency : 'PEN' }}</span>
+        </div>
+        @if (saldoPendiente() > 0) {
+          <div class="summary-item balance">
+            <span class="label">Saldo Pendiente</span>
+            <span class="amount">{{ saldoPendiente() | currency : 'PEN' }}</span>
+          </div>
+        } @else {
+          <div class="summary-item change">
+            <span class="label">Vuelto</span>
+            <span class="amount">{{ vuelto() | currency : 'PEN' }}</span>
+          </div>
+        }
+      </div>
 
-    <div class="modal-body"></div>
+      <!-- Formulario de Agregar Pago -->
+      <div class="payment-form">
+        <div class="form-grid">
+          <div class="field">
+            <label>Método de Pago</label>
+            <p-select
+              [options]="metodosPago()"
+              [ngModel]="selectedMetodo()"
+              (ngModelChange)="selectedMetodo.set($event)"
+              optionLabel="tipo"
+              dataKey="id"
+              placeholder="Seleccione..."
+              [fluid]="true"
+            ></p-select>
+          </div>
+          <div class="field">
+            <label>Monto</label>
+            <p-inputNumber
+              [ngModel]="montoInput()"
+              (ngModelChange)="montoInput.set($event)"
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              styleClass="w-full"
+            ></p-inputNumber>
+          </div>
+          <div class="field">
+            <label>Referencia (Op/Tarjeta)</label>
+            <input
+              type="text"
+              pInputText
+              [ngModel]="referenciaInput()"
+              (ngModelChange)="referenciaInput.set($event)"
+              class="w-full"
+              placeholder="Ej: Op 1234..."
+            />
+          </div>
+          <div class="field-btn">
+            <app-button
+              label="Agregar"
+              icon="pi pi-plus"
+              (clicked)="agregarPago()"
+              [disabled]="!selectedMetodo() || montoInput() <= 0"
+            ></app-button>
+          </div>
+        </div>
+      </div>
 
-    <div class="separator"></div>
+      <!-- Lista de Pagos Agregados -->
+      <div class="payments-list">
+        <h3>Desglose de Pagos</h3>
+        @if (pagos().length === 0) {
+          <div class="empty-payments">No se han agregado pagos todavía</div>
+        } @else {
+          <div class="payment-table">
+            @for (pago of pagos(); track $index) {
+              <div class="payment-row">
+                <div class="p-info">
+                  <span class="p-metodo">{{ getMetodoNombre(pago.metodoPagoId) }}</span>
+                  @if (pago.referencia) {
+                    <span class="p-ref">Ref: {{ pago.referencia }}</span>
+                  }
+                </div>
+                <div class="p-amount">{{ pago.monto | currency : 'PEN' }}</div>
+                <button class="remove-pago" (click)="quitarPago($index)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
 
     <div class="modal-footer">
       <app-button
@@ -26,7 +117,14 @@
         (clicked)="onClose()"
         styleClass="cancel-button"
       ></app-button>
-      <app-button preset="save" label="Guardar" styleClass="submit-button"></app-button>
+      <app-button
+        preset="save"
+        label="Finalizar y Emitir Ticket"
+        icon="pi pi-check"
+        (clicked)="onFinalizar()"
+        [disabled]="!canFinalize()"
+        styleClass="submit-button"
+      ></app-button>
     </div>
   </div>
 </div>

@@ -24,7 +24,11 @@ $border-color: $rx-border;
 
 .container {
   display: flex;
-  gap: 20px;
+  flex-flow: row nowrap;
+  gap: 24px;
+  width: 100%;
+  align-items: flex-start;
+  box-sizing: border-box;
 
   .pos-card {
     background: $pos-card-bg;
@@ -37,8 +41,9 @@ $border-color: $rx-border;
   .product-content {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    width: 70%;
+    gap: 16px;
+    flex: 1;
+    min-width: 0;
 
     .search-section {
       display: flex;
@@ -245,7 +250,8 @@ $border-color: $rx-border;
   .cart-panel {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 360px;
+    flex: 0 0 360px;
     min-height: 0;
     overflow: hidden;
     background: $pos-card-bg;
@@ -586,15 +592,19 @@ $border-color: $rx-border;
     }
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 820px) {
     flex-direction: column;
+    flex-wrap: wrap;
+    gap: 16px;
 
     .product-content {
       width: 100%;
+      flex: none;
     }
 
     .cart-panel {
       width: 100%;
+      flex: none;
     }
   }
 }
