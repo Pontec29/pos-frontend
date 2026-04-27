@@ -72,11 +72,19 @@ export default class ListaVentas implements OnInit {
       }
     },
     {
-      label: 'Imprimir',
+      label: 'Imprimir A4',
       icon: 'pi pi-print',
       command: () => {
         const venta = this.selectedVentaForMenu();
-        if (venta) this.imprimirPdf(venta);
+        if (venta) this.imprimirPdf(venta, 'A4');
+      }
+    },
+    {
+      label: 'Imprimir Ticket (80mm)',
+      icon: 'pi pi-ticket',
+      command: () => {
+        const venta = this.selectedVentaForMenu();
+        if (venta) this.imprimirPdf(venta, 'TICKET_80MM');
       }
     },
     {
@@ -84,7 +92,7 @@ export default class ListaVentas implements OnInit {
       icon: 'pi pi-download',
       command: () => {
         const venta = this.selectedVentaForMenu();
-        if (venta) this.descargarPdf(venta);
+        if (venta) this.descargarPdf(venta, 'A4');
       }
     },
     {
@@ -304,12 +312,12 @@ export default class ListaVentas implements OnInit {
     this.router.navigate(['/ventas/ver', venta.id]);
   }
 
-  imprimirPdf(venta: VentaResumen) {
-    this.ventasService.abrirPdfEnNuevaPestana(venta.id);
+  imprimirPdf(venta: VentaResumen, formato: string = 'A4') {
+    this.ventasService.abrirPdfEnNuevaPestana(venta.id, formato);
   }
 
-  descargarPdf(venta: VentaResumen) {
-    this.ventasService.forzarDescargaPdf(venta.id, `Venta_${venta.numero || venta.id}.pdf`);
+  descargarPdf(venta: VentaResumen, formato: string = 'A4') {
+    this.ventasService.forzarDescargaPdf(venta.id, `Venta_${venta.numero || venta.id}.pdf`, formato);
   }
 
   anularVenta(venta: VentaResumen) {

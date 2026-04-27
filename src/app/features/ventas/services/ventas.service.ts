@@ -8,11 +8,16 @@ import {
     VentaResponse,
     VentaRequest,
 } from '../models/venta.models';
+import { AlertService } from '@shared/services/alert.service';
+import { LoaderService } from '@shared/services/loader.service';
+import { finalize } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class VentasService {
 
-    private readonly http    = inject(HttpClient);
+    private readonly http = inject(HttpClient);
+    private readonly alert = inject(AlertService);
+    private readonly loader = inject(LoaderService);
     private readonly baseUrl = `${environment.apiUrl}/api/v1/ventas`;
 
     getVentas(estado?: string): Observable<ApiResponse<VentaResumen[]>> {
@@ -36,28 +41,49 @@ export class VentasService {
         });
     }
 
-    descargarPdf(id: number): Observable<Blob> {
+    descargarPdf(id: number, formato: string = 'A4'): Observable<Blob> {
         return this.http.get(`${this.baseUrl}/${id}/pdf`, {
-            responseType: 'blob'
+            responseType: 'blob',
+            params: { formato }
         });
     }
 
-    abrirPdfEnNuevaPestana(id: number): void {
-        this.descargarPdf(id).subscribe(blob => {
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            setTimeout(() => URL.revokeObjectURL(url), 60_000);
-        });
+    abrirPdfEnNuevaPestana(id: number, formato: string = 'A4'): void {
+        this.alert.loading('Generando comprobante, por favor espere...', 'Impresión');
+
+        this.descargarPdf(id, formato)
+            .pipe(finalize(() => this.alert.clearLoading()))
+            .subscribe({
+                next: (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    window.open(url, '_blank');
+                    setTimeout(() => URL.revokeObjectURL(url), 60_000);
+                },
+                error: (err) => {
+                    console.error('Error al generar PDF', err);
+                    this.alert.warn('No se pudo generar el PDF. Intente de nuevo.', 'Error');
+                }
+            });
     }
 
-    forzarDescargaPdf(id: number, nombre: string): void {
-        this.descargarPdf(id).subscribe(blob => {
-            const url = URL.createObjectURL(blob);
-            const a   = document.createElement('a');
-            a.href     = url;
-            a.download = nombre;
-            a.click();
-            URL.revokeObjectURL(url);
-        });
+    forzarDescargaPdf(id: number, nombre: string, formato: string = 'A4'): void {
+        this.alert.loading('Preparando descarga...', 'Descarga');
+
+        this.descargarPdf(id, formato)
+            .pipe(finalize(() => this.alert.clearLoading()))
+            .subscribe({
+                next: (blob) => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = nombre;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                },
+                error: (err) => {
+                    console.error('Error al descargar PDF', err);
+                    this.alert.warn('No se pudo descargar el archivo.', 'Error');
+                }
+            });
     }
 }

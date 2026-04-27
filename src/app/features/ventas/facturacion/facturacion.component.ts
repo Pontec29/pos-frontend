@@ -616,6 +616,14 @@ export default class FacturacionComponent {
     this.buscadorControl.setValue(null);
   }
 
+  // Método para imprimir
+  imprimir(formato: string = 'A4') {
+    const id = this.activatedRoute.snapshot.paramMap.get('id');
+    if (id) {
+      this.ventasService.abrirPdfEnNuevaPestana(Number(id), formato);
+    }
+  }
+
   // Método para emitir comprobante
   emitirComprobante() {
     // TODO: Implementar lógica de emisión

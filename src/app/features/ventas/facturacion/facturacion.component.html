@@ -167,6 +167,14 @@
                         <i [class]="guardando() ? 'pi pi-spin pi-spinner' : 'pi pi-file-export'"></i>
                         {{ guardando() ? 'Procesando...' : 'Emitir Comprobante' }}
                     </button>
+                    <button type="button" class="btn-issue-voucher" (click)="imprimir('A4')" *ngIf="isViewMode()" style="background: #10b981; margin-bottom: 0.5rem;">
+                        <i class="pi pi-print"></i>
+                        Imprimir A4
+                    </button>
+                    <button type="button" class="btn-issue-voucher" (click)="imprimir('TICKET_80MM')" *ngIf="isViewMode()" style="background: #334155; margin-bottom: 0.5rem;">
+                        <i class="pi pi-ticket"></i>
+                        Imprimir Ticket
+                    </button>
                     <button type="button" class="btn-issue-voucher" (click)="volver()" *ngIf="isViewMode()" style="background: #64748b;">
                         <i class="pi pi-arrow-left"></i>
                         Volver a la Lista

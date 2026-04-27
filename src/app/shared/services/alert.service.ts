@@ -42,4 +42,21 @@ export class AlertService {
       life: 4000
     });
   }
+
+  // Muestra una notificación de carga persistente
+  loading(detail: string = 'Procesando...', summary: string = 'Cargando'): void {
+    this.messageService.add({
+      key: 'loading-toast',
+      severity: 'info',
+      summary,
+      detail,
+      sticky: true,
+      icon: 'pi pi-spin pi-spinner'
+    });
+  }
+
+  // Quita la notificación de carga
+  clearLoading(): void {
+    this.messageService.clear('loading-toast');
+  }
 }
