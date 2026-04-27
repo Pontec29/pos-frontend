@@ -22,10 +22,12 @@ export interface ProductoPresentacion {
  */
 export interface ProductoBusqueda {
     id: number;
+    codigo: string;
     codigoInterno: string;
     nombre: string;
     tipoControlStock: 'NORMAL' | 'LOTE' | 'SERIE';
     precioCompra: number;
+    stockActual: number;
     presentaciones: ProductoPresentacion[];
 }
 

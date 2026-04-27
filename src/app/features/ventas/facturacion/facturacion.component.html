@@ -37,11 +37,6 @@
                 </div>
 
                 <div class="erp-card">
-                    <div class="section-header">
-                        <i class="pi pi-user"></i>
-                        <h2 class="section-title">Datos del Cliente</h2>
-                    </div>
-
                     <div class="row items-end">
                         <div class="col-12 col-md-2 form-field">
                             <label>Fecha de Emisión</label>
@@ -50,54 +45,49 @@
 
                         <div class="col-12 col-md-6 form-field">
                             <label>Nombre o Razón Social</label>
-                            <!-- <p-select formControlName="cliente" [options]="clientesSugeridos" optionLabel="razonSocial" optionValue="id" placeholder="Buscar cliente..." fluid>
-                            </p-select> -->
                             <p-autoComplete formControlName="cliente" [suggestions]="clientesSugeridos" (completeMethod)="buscarClientes($event)" optionLabel="razonSocial" (onSelect)="onClienteSeleccionado($event)" [forceSelection]="true" placeholder="Buscar cliente..." fluid>
                             </p-autoComplete>
                         </div>
 
-                        <div class="col-6 col-md-2 form-field" *ngIf="!isViewMode()">
+                        <div class="col-2 col-md-2 form-field" *ngIf="!isViewMode()">
                             <p-button label="Nuevo Cliente" icon="pi pi-plus" (click)="abrirModalCliente()" fluid styleClass="btn-new-client w-full"></p-button>
                         </div>
 
 
-                        <div class="col-6 col-md-2 form-field">
+                        <div class="col-2 col-md-1 form-field">
                             <label>Moneda</label>
                             <p-select formControlName="moneda" [options]="[{label: 'PEN', value: 1}, {label: 'USD', value: 2}]" [disabled]="true" fluid></p-select>
                         </div>
-                    </div>
-                </div>
 
-                <div class="erp-card erp-search-section" *ngIf="!isViewMode()">
-                    <div class="row items-end">
-                        <div class="col-12 col-md-4 form-field">
+                        <div class="col-2 col-md-1 form-field">
+                            <label>T. Cambio</label>
+                            <p-inputnumber formControlName="tipoCambio" [minFractionDigits]="3" [maxFractionDigits]="3" placeholder="0.000" fluid></p-inputnumber>
+                        </div>
+
+                        <div class="col-12 col-md-8 form-field">
                             <label>Buscar Producto</label>
                             <p-inputgroup>
-                                <p-autoComplete [formControl]="buscadorControl" [suggestions]="productosSugeridos" (completeMethod)="buscarProductos($event)" optionLabel="nombre" (onSelect)="onProductoSeleccionado($event)" (onClear)="onBuscadorClear()" placeholder="Escanea o busca..." fluid>
+                                <p-autoComplete [formControl]="buscadorControl" 
+                                                [suggestions]="productosSugeridos" 
+                                                (completeMethod)="buscarProductos($event)" 
+                                                optionLabel="nombre" 
+                                                (onSelect)="onProductoSeleccionado($event)" 
+                                                (onClear)="onBuscadorClear()" 
+                                                placeholder="Escanea o busca por nombre o código..." 
+                                                fluid>
+                                    <ng-template let-product pTemplate="item">
+                                        <div class="flex flex-column gap-1">
+                                            <div class="font-bold">{{ product.nombre }}</div>
+                                            <div class="flex justify-between text-sm text-muted">
+                                                <span>{{ product.codigo }}</span>
+                                                <span class="text-primary font-bold">S/ {{ product.precio | number:'1.2-2' }}</span>
+                                                <span [class]="product.stockActual > 0 ? 'text-success' : 'text-danger'">Stock: {{ product.stockActual }}</span>
+                                            </div>
+                                        </div>
+                                    </ng-template>
                                 </p-autoComplete>
                                 <p-inputgroup-addon><i class="pi pi-search"></i></p-inputgroup-addon>
                             </p-inputgroup>
-                        </div>
-
-                        <div class="col-12 col-md-2 form-field">
-                            <label>Unidad</label>
-                            <p-select [options]="itemUnidadOptions" [formControl]="itemUnidad" placeholder="Seleccione" fluid optionLabel="label" optionValue="value">
-                            </p-select>
-                        </div>
-
-                        <div class="col-12 col-md-2 form-field">
-                            <label>Cantidad</label>
-                            <p-inputnumber [formControl]="itemCantidad" mode="decimal" [minFractionDigits]="2" [min]="0.0001" fluid></p-inputnumber>
-                        </div>
-
-                        <div class="col-12 col-md-2 form-field">
-                            <label>Afectación IGV</label>
-                            <p-select [options]="tiposAfectacion" [formControl]="itemAfectacion" fluid></p-select>
-                        </div>
-
-                        <div class="col-12 col-md-2 form-field">
-                            <p-button (click)="agregarDetalle()" label="Agregar" icon="pi pi-plus" [disabled]="!selectedProducto" fluid styleClass="btn-add-item w-full">
-                            </p-button>
                         </div>
                     </div>
                 </div>
@@ -109,11 +99,13 @@
                                 <th class="text-center" style="width: 50px;">#</th>
                                 <th>Descripción</th>
                                 <th style="width: 120px;">Unidad</th>
-                                <th style="width: 180px;">Afectación</th>
-                                <th class="text-center" style="width: 100px;">Cant.</th>
-                                <th class="text-right" style="width: 120px;">Unitario</th>
-                                <th class="text-right" style="width: 120px;">Total</th>
-                                <th class="action-col" style="width: 60px;" *ngIf="!isViewMode()"></th>
+                                <th style="width: 150px;">Afectación</th>
+                                <th class="text-center" style="width: 80px;">Stock</th>
+                                <th class="text-center" style="width: 90px;">Cant.</th>
+                                <th class="text-right" style="width: 100px;">Unitario</th>
+                                <th class="text-right" style="width: 100px;">IGV</th>
+                                <th class="text-right" style="width: 110px;">Total</th>
+                                <th class="action-col" style="width: 50px;" *ngIf="!isViewMode()"></th>
                             </tr>
                         </thead>
                         <tbody formArrayName="detalles">
@@ -126,12 +118,22 @@
                                         }}</small>
                                 </td>
                                 <td>
-                                    <span class="text-sm">{{ item.get('unidadSeleccionada')?.value?.unidadNombre }}</span>
+                                    <p-select [options]="item.get('unidadesList')?.value" 
+                                              formControlName="unidadSeleccionada" 
+                                              optionLabel="unidadNombre"
+                                              (onChange)="onUnidadChange(i)"
+                                              fluid appendTo="body"></p-select>
                                 </td>
-                                <td><p-select [options]="tiposAfectacion" formControlName="afectacion" fluid appendTo="body"></p-select>
+                                <td><p-select [options]="tiposAfectacion" formControlName="afectacion" (onChange)="recalcularFila(i)" fluid appendTo="body"></p-select>
                                 </td>
-                                <td><p-inputnumber formControlName="cantidad" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
-                                <td><p-inputnumber formControlName="precioUnitario" (input)="recalcularFila(i)" fluid></p-inputnumber></td>
+                                <td class="text-center">
+                                    <span [class]="item.get('stockActual')?.value > 0 ? 'text-success font-bold' : 'text-danger font-bold'">
+                                        {{ item.get('stockActual')?.value }}
+                                    </span>
+                                </td>
+                                <td><p-inputnumber formControlName="cantidad" (input)="recalcularFila(i)" fluid [minFractionDigits]="2"></p-inputnumber></td>
+                                <td><p-inputnumber formControlName="precioUnitario" (input)="recalcularFila(i)" fluid [minFractionDigits]="2"></p-inputnumber></td>
+                                <td class="text-right text-muted">{{ item.get('igv')?.value | number:'1.2-2' }}</td>
                                 <td class="text-right font-bold">{{ item.get('subtotal')?.value | number:'1.2-2' }}</td>
                                 <td class="text-center" *ngIf="!isViewMode()">
                                     <button class="btn-delete" type="button" (click)="eliminarFila(i)">
@@ -140,7 +142,7 @@
                                 </td>
                             </tr>
                             <tr *ngIf="detallesFormArray.length === 0">
-                                <td colspan="8" class="text-center py-4 text-muted">
+                                <td colspan="10" class="text-center py-4 text-muted">
                                     No hay productos agregados a la venta
                                 </td>
                             </tr>
@@ -195,9 +197,4 @@
 </div>
 
 <!-- ! SIDEBAR DE PAGOS (COBRO LATERAL) -->
-<app-sidebar-cobro
-    *ngIf="showPaymentModal()"
-    [total]="totalGeneral()"
-    (closed)="showPaymentModal.set(false)"
-    (confirmed)="onVentaConfirmada($event)"
-/>
+<app-sidebar-cobro *ngIf="showPaymentModal()" [total]="totalGeneral()" (closed)="showPaymentModal.set(false)" (confirmed)="onVentaConfirmada($event)" />

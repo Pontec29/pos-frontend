@@ -22,7 +22,7 @@ import { GeneralService } from '@shared/services/general.service';
 import { PRIMENG_FORM_MODULES, PRIMENG_TABLE_MODULES } from '@shared/ui/prime-imports';
 import { VentaRequest } from '@ventas/models/venta.models';
 import { VentasService } from '@ventas/services/ventas.service';
-import { MessageService } from 'primeng/api';
+import { AlertService } from '@shared/services/alert.service';
 import { AutoCompleteModule } from 'primeng/autocomplete';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider';
@@ -62,7 +62,7 @@ export default class FacturacionComponent {
   private readonly contexto = inject(ContextoOperativoService);
   private readonly productoService = inject(ProductoService);
   private readonly authService = inject(AuthService);
-  private readonly messageService = inject(MessageService);
+  private readonly alertService = inject(AlertService);
   private readonly router = inject(Router);
   private readonly ventasService = inject(VentasService);
   private readonly correlativoService = inject(CorrelativoService);
@@ -117,6 +117,7 @@ export default class FacturacionComponent {
     fechaEmision: [new Date(), Validators.required],
     cliente: ['', Validators.required],
     moneda: [{ value: 1, disabled: true }, Validators.required], // 1 = PEN
+    tipoCambio: [null],
     condicionPago: this.fb.group({
       condicion: ['CONTADO', Validators.required],
       formaPago: [null], // Se vuelve opcional ya que se manejará en el modal para contado
@@ -449,12 +450,11 @@ export default class FacturacionComponent {
 
   buscarProductos(event: { query: string }) {
     this.productoService.buscarProductos(event.query).subscribe((res) => {
-      // Adaptamos la respuesta del servicio de productos
       this.productosSugeridos = (res.data ?? []).map((p) => {
-        const unidadPrincipal = p.presentaciones.find((u) => u.esPrincipal) || p.presentaciones[0];
+        const unidadPrincipal = p.presentaciones.find((u: any) => u.esPrincipal) || p.presentaciones[0];
         return {
           ...p,
-          stock: 10, // Mock stock if not present
+          stockActual: p.stockActual ?? 0,
           precio: unidadPrincipal?.precioVenta ?? 0,
         };
       });
@@ -463,17 +463,41 @@ export default class FacturacionComponent {
 
   onProductoSeleccionado(event: { value: any }) {
     if (!event.value) return;
-    // no agregamos de inmediato; guardamos la selección para que el usuario indique cantidad/afectacion
-    this.selectedProducto = event.value;
-    // inicializamos controles con valores por defecto
-    this.itemCantidad.setValue(1);
-    this.itemAfectacion.setValue(this.tiposAfectacion[0]?.value ?? '10');
-    // set default unidad if presentaciones available
-    const unidades: ProductoPresentacion[] = this.selectedProducto.presentaciones ?? [];
-    // preparar opciones para el select de unidad
-    this.itemUnidadOptions = unidades.map((u) => ({ label: u.unidadNombre, value: u.id }));
+    const p = event.value;
+    const unidades: ProductoPresentacion[] = p.presentaciones ?? [];
     const unidadDefault = unidades.find((u) => u.esPrincipal) ?? unidades[0];
-    this.itemUnidad.setValue(unidadDefault ? unidadDefault.id : null);
+    const precioDefault = unidadDefault?.precioVenta ?? 0;
+    const cantidad = 1;
+
+    const filaGroup = this.fb.group({
+      productoId: [p.id, Validators.required],
+      productoNombre: [p.nombre],
+      productoCodigo: [p.codigo ?? ''],
+      unidadesList: [unidades],
+      unidadSeleccionada: [unidadDefault],
+      stockActual: [p.stockActual ?? 0],
+      cantidad: [cantidad, [Validators.required, Validators.min(0.0001)]],
+      precioUnitario: [precioDefault, [Validators.required, Validators.min(0)]],
+      igv: [0], // se calcula de inmediato
+      subtotal: [cantidad * precioDefault],
+      afectacion: [this.tiposAfectacion[0]?.value ?? '10', Validators.required],
+    });
+
+    this.detallesFormArray.push(filaGroup);
+    this.recalcularFila(this.detallesFormArray.length - 1);
+    this.buscadorControl.setValue(null);
+    this.selectedProducto = null;
+  }
+
+  onUnidadChange(index: number) {
+    const row = this.detallesFormArray.at(index);
+    const unidad = row.get('unidadSeleccionada')?.value;
+    if (unidad) {
+      row.patchValue({
+        precioUnitario: unidad.precioVenta ?? 0
+      });
+      this.recalcularFila(index);
+    }
   }
 
   onBuscadorClear() {
@@ -523,10 +547,20 @@ export default class FacturacionComponent {
     const row = this.detallesFormArray.at(index);
     const cantidad = row.get('cantidad')?.value || 0;
     const precioUnitario = row.get('precioUnitario')?.value || 0;
+    const afectacion = row.get('afectacion')?.value || '10';
+
+    const subtotal = cantidad * precioUnitario;
+    let igv = 0;
+
+    if (afectacion === '10') { // Gravado
+      const baseImp = subtotal / 1.18;
+      igv = subtotal - baseImp;
+    }
 
     row.patchValue(
       {
-        subtotal: cantidad * precioUnitario,
+        subtotal: subtotal,
+        igv: igv
       },
       { emitEvent: true },
     );
@@ -534,11 +568,7 @@ export default class FacturacionComponent {
 
   guardar() {
     if (this.ventaForm.invalid || this.detallesFormArray.length === 0) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Atención',
-        detail: 'Por favor complete todos los campos y agregue productos.',
-      });
+      this.alertService.warn('Por favor complete todos los campos y agregue productos.', 'Atención');
       this.ventaForm.markAllAsTouched();
       return;
     }
@@ -619,27 +649,15 @@ export default class FacturacionComponent {
       next: (response) => {
         this.guardando.set(false);
         if (response.success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Venta Guardada',
-            detail: 'La venta se ha registrado exitosamente.',
-          });
+          this.alertService.success('La venta se ha registrado exitosamente.', 'Venta Guardada');
           this.router.navigate(['/ventas/listar-ventas']);
         } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: response.message || 'Error al guardar la venta',
-          });
+          this.alertService.error(response.message || 'Error al guardar la venta');
         }
       },
       error: (error) => {
         this.guardando.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Error al comunicarse con el servidor',
-        });
+        this.alertService.error('Error al comunicarse con el servidor');
         console.error('Error al guardar venta:', error);
       },
     });
@@ -678,11 +696,7 @@ export default class FacturacionComponent {
   // Método para emitir comprobante
   emitirComprobante() {
     // TODO: Implementar lógica de emisión
-    this.messageService.add({
-      severity: 'info',
-      summary: 'Funcionalidad en desarrollo',
-      detail: 'La emisión de comprobantes estará disponible próximamente.',
-    });
+    this.alertService.info('La emisión de comprobantes estará disponible próximamente.', 'Funcionalidad en desarrollo');
   }
 
   // Validadores personalizados
@@ -725,11 +739,7 @@ export default class FacturacionComponent {
         this.guardando.set(false);
         if (res.success && res.data) {
           const newCliente = res.data;
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Éxito',
-            detail: 'Cliente creado correctamente',
-          });
+          this.alertService.success('Cliente creado correctamente', 'Éxito');
 
           // Seleccionar el nuevo cliente en el formulario
           this.ventaForm.get('cliente')?.setValue(newCliente);
@@ -740,11 +750,7 @@ export default class FacturacionComponent {
       },
       error: (err) => {
         this.guardando.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'No se pudo crear el cliente',
-        });
+        this.alertService.error('No se pudo crear el cliente', 'Error');
         console.error(err);
       },
     });
